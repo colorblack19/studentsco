@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School System</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-3">
+    <a class="navbar-brand fw-bold" href="{% url 'student_list' %}">SCHOOL SYSTEM</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+            </li>
+            {% if user.is_staff %}
+               <li class="nav-item">
+                    <a class="nav-link" href="{% url 'student_add' %}">Add Student</a>
+               </li>
+          
+             <li class="nav-item">
+             <a class="nav-link" href="{% url 'feestructure_list' %}">UpdateFees</a>
+             </li>
+
+             {% endif %}
+
+
+
+
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'student_list' %}">Students</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'payments_list' %}">Payments</a>
+            </li>
+
+
+
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+
+
+<!-- SHOW DJANGO MESSAGES HERE -->
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- MAIN CONTENT -->
+{% block content %}
+{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+<script>
+function showAddPopup(triggeringLink) {
+    var name = triggeringLink.id.replace(/^add_/, '');
+    var href = triggeringLink.href;
+    var win = window.open(href, name, 'height=500,width=600,resizable=yes,scrollbars=yes');
+    win.focus();
+    return false;
+}
+
+function dismissAddRelatedObjectPopup(win, newId, newRepr) {
+    var elem = document.getElementById("id_feestructure");
+    var option = new Option(newRepr, newId, true, true);
+    elem.options[elem.options.length] = option;
+    win.close();
+}
+</script>
+
+
+
+</html>

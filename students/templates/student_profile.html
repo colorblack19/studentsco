@@ -1,0 +1,575 @@
+
+     {% extends "base.html" %}
+     {% load static %}
+
+      {% block content %}   
+
+      
+    <style>
+             /* ======= GLOBAL BACKGROUND (PRO GRADIENT + GLASS LOOK) ======= */
+         body {
+        background: linear-gradient(to bottom right, #eef2f7, #f8f9fb);
+        font-family: "Segoe UI", sans-serif;
+           }
+
+            /* ======= PROFILE CARD ======= */
+      .profile-card {
+        background: #ffffffcc;
+        backdrop-filter: blur(8px);
+        padding: 35px;
+        border-radius: 18px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        transition: 0.3s ease-in-out;
+    }
+
+    .profile-card:hover {
+          box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    }
+
+    /* ======= STUDENT PHOTO ======= */
+    .student-photo {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        object-fit: cover;
+    }
+    
+
+    /* ======= TITLES ======= */
+    .section-title {
+        font-weight: 800;
+        margin-bottom: 10px;
+        padding-left: 12px;
+        border-left: 4px solid #0d6efd;
+        font-size: 18px;
+        color: #333;
+    }
+
+    /* ======= INFO BOX ======= */
+    .info-box {
+        background: #f7f9fc;
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 10px;
+        font-size: 15px;
+        font-weight: 500;          /* ← added */
+    }
+
+    .info-box:hover {
+        background: #eef3ff;
+        border-color: #d5def0;
+    }
+
+    /* ======= FEES BOX ======= */
+    .fees-box {
+        background: #fff;
+        padding: 25px;
+        border-radius: 18px;
+        border: 1px solid #e7ecef;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.07)
+    }
+
+    .fees-value {
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: -1px;
+    }
+
+    /* ======= TABLE ======= */
+    .history-table {
+        background: #fff;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        margin-top: 30px;;
+    }
+
+    .table thead {
+        background: #0d6efd !important;
+        color: white !important;
+        letter-spacing: 0.5px;
+    }
+
+    /* ======= POPUP OVERLAYS ======= */
+    .popup-overlay,
+    .right-popup-overlay {
+        background: rgba(0,0,0,0.55);
+        backdrop-filter: blur(4px);
+    }
+
+    /* ======= LEFT  RIGHT SLIDE PANEL ======= */
+    .popup-panel,
+    .right-popup-panel {
+        background: #ffffffdd;
+        backdrop-filter: blur(10px);
+        border-radius: 0;
+    }
+
+    /* ======= INPUT FIELDS ======= */
+    .input-field,
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #cdd6e1;
+        padding: 10px 14px;
+        transition: 0.2s;
+    }
+
+    .input-field:focus,
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 6px rgba(13,110,253,0.35);
+    }
+
+    /* ======= BUTTONS ======= */
+    .save-btn, .close-btn, .btn {
+        border-radius: 8px !important;
+        font-weight: 600;
+    }
+
+    .save-btn {
+        background: #198754;
+        color: #fff;
+    }
+
+    .close-btn {
+        background: #dc3545;
+        color: #fff;
+    }
+
+</style>
+
+<div class="container mt-5 col-md-9">
+        <form method="POST" enctype="multipart/form-data">
+             {% csrf_token %}
+
+
+            <div class="text-center mb-3">
+              {% if student.photo %}
+                <img src="{{ student.photo.url }}" class="student-photo">
+               {% else %}
+             <img src="/static/images/images.png" class="student-photo">
+            {% endif %}
+            </div>
+            
+        </form>
+            <h2 class="fw-bold mb-4 text-center" style="color:#084cb3;">
+                <i class="bi bi-person-circle me-2"></i> {{ student.full_name }}
+            </h2>
+    
+            <!-- Profile Info -->
+       <div class="profile-card mb-4">
+            <div class="row">
+                 <div class="col-md-6">
+                    <p class="section-title">Student Information</p>
+
+                <div class="info-box"><strong>Name:</strong> {{ student.full_name }}</div>
+                <div class="info-box"><strong>Class:</strong> {{ student.class_name }}</div>
+                <div class="info-box"><strong>Admission_Number:</strong> {{ student.admission_number }}</div>
+            </div>
+
+            <div class="col-md-6">
+                <p class="section-title">Parent / Guardian</p>
+
+                <div class="info-box"><strong>Name:</strong> {{ student.parent_name }}</div>
+                <div class="info-box"><strong>Phone:</strong> {{ student.parent_phone }}</div>
+                <div class="info-box"><strong>Parent ID:</strong> {{ student.parent_id_number }}</div>
+            </div>
+        </div>
+    </div>
+
+   <!-- Fees Summary -->
+    <div class="fees-box mb-4 text-center">
+        <div class="row">
+            <div class="col-md-4">
+                <p class="text-muted">Total Fee</p>
+                <p class="fees-value text-primary">Ksh {{ student.total_fee }}</p>
+            </div>
+
+            <div class="col-md-4">
+                <p class="text-muted">Total Paid</p>
+                <p class="fees-value text-success">Ksh {{ total_paid }}</p>
+            </div>
+
+            <div class="col-md-4">
+                <p class="text-muted">Balance</p>
+                <p class="fees-value text-danger">Ksh {{ balance }}</p>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            {% if request.user.is_staff %}
+
+            <button onclick="openPaymentPopup()" class="btn btn-primary btn-lg">
+                Add Payment
+            </button>
+
+            <button onclick="openMpesaPopup()" class="btn btn-success btn-lg ms-2">
+                  <i class="bi bi-phone"></i> Pay via M-PESA
+            </button>
+
+
+            <button class="btn btn-outline-primary btn-lg ms-2" id="openEditModal">
+                <i class="bi bi-pencil-square me-2"></i> Edit Profile
+            </button>
+
+            <a href="{% url 'student_statement_pdf' student.id %}" class="btn btn-dark btn-lg ms-2">
+                <i class="bi bi-file-earmark-pdf"></i> Download Statement
+            </a>
+
+            {% endif %}
+        </div>
+    </div>
+
+    
+    <!-- Payment History -->
+    <div class="history-table">
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-receipt-cutoff me-2"></i>Payment History
+        </h4>
+
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th>Actions</th>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Notes</th>
+                    <th>Status</th>
+
+                </tr>
+            </thead>
+
+<tbody>
+{% for p in payments %}
+<tr>
+
+    <td>
+{% if p.status == "PAID" %}
+    <a href="{% url 'download_receipt' p.id %}"
+       class="btn btn-primary btn-sm ms-2">
+       Download
+    </a>
+{% else %}
+    <button class="btn btn-secondary btn-sm ms-2" disabled
+            title="Receipt available only for PAID payments">
+        Download
+    </button>
+{% endif %}
+
+    </td>    
+    <!-- 1.  Replace p.id with loop counter-->
+    <td>{{ forloop.counter }}</td>
+
+    <!-- 2. Tarehe -->
+    <td>{{ p.date_paid|date:"M d, Y, g:i a" }}</td>
+
+    <!-- 3. Amount -->
+    <td>Ksh {{ p.amount_paid }}</td>
+
+    <!-- 4. Method -->
+    <td>{{ p.method }}</td>
+
+    <!-- 5. Notes + Download -->
+    <td>
+        {{ p.notes }}
+    </td>
+
+    <td>
+    {% if p.status == "PAID" %}
+     🟢 Paid
+    {% elif p.status == "PENDING" %}
+     🟡 Pending
+     {% else %}
+     🔴 Failed
+     {% endif %}
+   </td>
+
+</tr>
+{% empty %}
+<tr>
+    <td colspan="5" class="text-center text-danger">
+        No payments found for this student.
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+
+        </table>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-4">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<!-- ADD PAYMENT POPUP MODAL -->
+
+<div id="paymentPopup" class="popup-overlay">
+    <div class="popup-panel">
+        <h3>Add Payment</h3>
+
+        <form method="POST" id="paymentForm" action="{% url 'add_payment' student.id %}">
+
+            {% csrf_token %}
+
+            <label>Amount Paid</label>
+            <input type="number" name="amount_paid" class="input-field" required>
+
+            
+            <label class="mt-3">Method</label>
+            <select name="method" id="edit_method" class="form-control">
+                <option value="Cash">Cash</option>
+                <option value="Mpesa">Mpesa</option>
+                <option value="Bank">Bank</option>
+            </select>
+
+            <label>Notes (optional)</label>
+            <textarea name="notes" class="input-field"></textarea>
+
+            <div class="buttons">
+                <button type="submit" class="save-btn">Save</button>
+                <button type="button" class="close-btn" onclick="closePaymentPopup()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- M_PESA POPUP MODAL -->
+
+
+<div id="mpesaPopup" class="popup-overlay">
+    <div class="popup-panel">
+        <h3>M-PESA Payment</h3>
+
+        <form method="POST" action="{% url 'mpesa_payment' student.id %}">
+            {% csrf_token %}
+
+            <label>Phone Number</label>
+            <input type="text" name="phone" class="input-field"
+                   placeholder="2547XXXXXXXX" required>
+
+            <label>ID Number</label>
+            <input type="text" name="id_number" class="input-field">
+
+
+            <label>Amount</label>
+            <input type="number" name="amount" class="input-field" required>
+
+            <input type="hidden" name="method" value="Mpesa">
+
+            <div class="buttons">
+                <button type="submit" class="save-btn">Send STK Push</button>
+                <button type="button" class="close-btn" onclick="closeMpesaPopup()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+function openMpesaPopup() {
+    document.getElementById("mpesaPopup").style.display = "flex";
+}
+
+function closeMpesaPopup() {
+    document.getElementById("mpesaPopup").style.display = "none";
+}
+</script>
+
+
+
+<style>
+/* =========== OVERLAY =========== */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* =========== SLIDING PANEL LEFT =========== */
+.popup-panel {
+    width: 350px;
+    background: white;
+    padding: 25px;
+    height: 100%;
+    box-shadow: 3px 0px 10px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(0); }
+}
+
+/* =========== INPUT DESIGN =========== */
+.input-field {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 15px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* =========== BUTTONS =========== */
+.buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.save-btn {
+    background: #198754;
+    color: white;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.close-btn {
+    background: #dc3545;
+    color: white;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+
+}
+</style>
+
+<script>
+function openPaymentPopup() {
+    document.getElementById("paymentPopup").style.display = "flex";
+}
+
+function closePaymentPopup() {
+    document.getElementById("paymentPopup").style.display = "none";
+}
+</script>
+
+
+<!-- EDIT STUDENT RIGHT-SIDE SLIDE PANEL -->
+<div id="editModal" class="right-popup-overlay">
+    <div class="right-popup-panel">
+
+        <h3>Edit Student Details</h3>
+        <hr>
+
+        <form id="editForm" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <label>First Name</label>
+            <input class="form-control mb-2" type="text" name="first_name" value="{{ student.first_name }}">
+
+            <label>Last Name</label>
+            <input class="form-control mb-2" type="text" name="last_name" value="{{ student.last_name }}">
+
+            <label>Admission Number</label>
+            <input class="form-control mb-2" type="text" value="{{ student.admission_number }}" disabled>
+
+            <label>Class</label>
+           <select class="form-control mb-2" name="class_level">
+           <option value="Grade1" {% if student.class_level == "Grade1" %}selected{% endif %}>Grade1</option>
+           <option value="Grade2" {% if student.class_level == "Grade2" %}selected{% endif %}>Grade2</option>
+           <option value="Grade3" {% if student.class_level == "Grade3" %}selected{% endif %}>Grade3</option>
+           <option value="Grade4" {% if student.class_level == "Grade4" %}selected{% endif %}>Grade4</option>
+           <option value="Grade5" {% if student.class_level == "Grade5" %}selected{% endif %}>Grade5</option>
+           <option value="Grade6" {% if student.class_level == "Grade6" %}selected{% endif %}>Grade6</option>
+           <option value="Grade7" {% if student.class_level == "Grade7" %}selected{% endif %}>Grade7</option>
+           <option value="Grade8" {% if student.class_level == "Grade8" %}selected{% endif %}>Grade8</option>
+           <option value="Form1" {% if student.class_level == "Form1" %}selected{% endif %}>Form1</option>
+           <option value="Form2" {% if student.class_level == "Form2" %}selected{% endif %}>Form2</option>
+           <option value="Form3" {% if student.class_level == "Form3" %}selected{% endif %}>Form3</option>
+           <option value="Form4" {% if student.class_level == "Form4" %}selected{% endif %}>Form4</option>
+            </select>
+
+            <label>Phone</label>
+            <input class="form-control mb-2" type="text" name="phone_number" value="{{ student.phone_number }}">
+
+            <label>Parent ID</label>
+            <input class="form-control mb-2" type="text" name="parent_id_number" value="{{ student.parent_id_number }}">
+
+            <label>Photo</label>
+            <input class="form-control mb-3" type="file" name="photo">
+
+            <button  type="submit" class="btn btn-success w-100">Save Changes</button>
+        </form>
+
+    </div>
+</div>
+
+<style>
+.right-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: flex-end;
+    z-index: 9999;
+}
+
+/* RIGHT SLIDING BOX */
+.right-popup-panel {
+    width: 350px;
+    height: 100%;
+    background: white;
+    padding: 25px;
+    box-shadow: -3px 0px 10px rgba(0,0,0,0.3);
+    animation: slideRight 0.3s ease-out;
+    overflow-y: auto;
+}
+
+@keyframes slideRight {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+}
+</style>
+
+<script>
+// OPEN EDIT PANEL
+document.getElementById("openEditModal").onclick = function () {
+    document.getElementById("editModal").style.display = "flex";
+};
+
+// CLOSE WHEN CLICK OUTSIDE
+document.getElementById("editModal").onclick = function(e){
+    if(e.target.id === "editModal"){
+        document.getElementById("editModal").style.display = "none";
+    }
+};
+
+// SUBMIT VIA AJAX
+document.getElementById("editForm").onsubmit = async function(e){
+    e.preventDefault();
+
+    let formData = new FormData(this);
+
+    let response = await fetch("{% url 'edit_student' student.pk %}", {
+        method: "POST",
+        body: formData
+    });
+
+    if(response.ok){
+        document.getElementById("editModal").style.display = "none";
+        location.reload();
+    }
+};
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,159 @@
+
+
+     {% extends "base.html" %}
+     {% load static %}
+     {% block content %}
+    <style>
+        body {
+            background-image: url("{% static 'images/dashimage.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .card { border-radius: 15px; }
+        .stat-icon { font-size: 40px; opacity: 0.4; }
+        .chart-card {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+        }
+
+      .chart-card canvas {
+        height: 320px !important;   
+       }
+
+       .btn-danger {
+                 margin-top: -15px; 
+        }
+</style>
+
+<div class="container py-4">
+  <!-- TOP STATS -->
+    <div class="row g-4 mb-3">
+
+        <div class="col-md-3">
+            <div class="card shadow p-3">
+                <h6 class="text-muted">Total Students</h6>
+                <h3>{{ total_students }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow p-3">
+                <h6 class="text-muted">Total Payments</h6>
+                <h3>{{ total_payments }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow p-3">
+                <h6 class="text-muted">Amount Paid</h6>
+                <h3>KES {{ total_amount_paid }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow p-3">
+                <h6 class="text-muted">Expected Fees</h6>
+                <h3>KES {{ total_fee_expected }}</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CHARTS -->
+    <div class="row g-4">
+
+        <div class="col-md-6">
+            <div class="card p-3 chart-card shadow">
+                <h5 class="fw-bold">Payments Per Class</h5>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-3 chart-card shadow">
+                <h5 class="fw-bold">Paid vs Balance</h5>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BALANCES -->
+    <div class="card shadow mt-4 p-3">
+        <h5 class="fw-bold">⚠️ Students With Balance</h5>
+
+        {% if students_with_balance %}
+            <ul class="list-group">
+                {% for s in students_with_balance %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ s.name }}
+                        <span class="badge bg-danger">KES {{ s.balance }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-success">All students have cleared fees 🎉</p>
+        {% endif %}
+    </div>
+
+    <!-- RECENT PAYMENTS -->
+    <div class="card shadow mt-4 p-3">
+        <h5 class="fw-bold">Recent Payments</h5>
+        <table class="table table-striped">
+            <thead class="table-dark">
+            <tr>
+                <th>Student</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for p in recent_payments %}
+                <tr>
+                    <td>{{ p.student.full_name }}</td>
+                    <td>KES {{ p.amount_paid }}</td>
+                    <td>{{ p.method }}</td>
+                    <td>{{ p.date_paid }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4" class="text-center text-muted">No payments yet</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ classes|safe }},
+        datasets: [{
+            label: 'Payments',
+            data: {{ amount_per_class|safe }},
+            backgroundColor: 'rgba(54,162,235,0.8)'
+        }]
+    }
+});
+
+new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+        labels: ["Paid", "Remaining"],
+        datasets: [{
+            data: [{{ total_amount_paid }}, {{ remaining_balance }}],
+            backgroundColor: ['#28a745','#dc3545']
+        }]
+    }
+});
+
+</script>
+{% endblock %}

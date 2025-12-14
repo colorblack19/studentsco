@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3 class="mb-3">Fee Structure List</h3>
+
+    <a href="{% url 'add_feestructure_popup' %}"
+       class="btn btn-success mb-3"
+       onclick="return showAddPopup(this);">
+        + Add Fee Structure
+    </a>
+
+    <div class="card shadow-sm">
+        <table class="table table-bordered mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Class</th>
+                    <th>Amount</th>
+                    <th style="width: 180px;">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for fee in items %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ fee.class_name }}</td>
+                    <td>KES {{ fee.amount }}</td>
+                    <td>
+
+                     <a href="{% url 'feestructure_edit' fee.id %}" class="btn btn-sm btn-primary">
+                         Change
+                     </a>
+
+                      <a href="{% url 'feestructure_delete' fee.id %}" class="btn btn-sm btn-danger">
+                         Delete
+                        </a>
+
+
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No Fee Structures Added</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

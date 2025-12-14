@@ -1,0 +1,146 @@
+    {% extends "base.html" %}
+    {% load static %}
+
+    {% block content %}
+<body class="bg-light">
+<div class="container mt-5">
+    <h2 class="mb-4">ALL PAYMENTS</h2>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Actions</th>
+                <th>#</th>
+                <th>Student</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Date Paid</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>
+                    <a href="{% url 'download_receipt' payment.id %}" class="btn btn-sm btn-primary">
+                        Download
+                     </a>
+
+                    <!-- FIXED BUTTON -->
+
+                {% if request.user.is_staff %}
+
+                    <button class="btn btn-warning btn-sm"
+                        onclick="openEditPayment({{ payment.id }})">
+
+                        Edit
+                    </button>
+                {% endif %}
+
+                    <a href="{% url 'delete_payment' payment.id %}"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('Delete this payment?')">
+                       Delete
+                    </a>
+
+
+                </td>
+
+                <td>{{ forloop.counter }}</td>
+                <td>{{ payment.student.first_name }} {{ payment.student.last_name }}</td>
+                <td>Ksh {{ payment.amount_paid }}</td>
+                <td>{{ payment.method }}</td>
+                <td>{{ payment.date_paid|date:"M d, Y - h:i A" }}</td>
+      
+            </tr>
+        
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+
+<!-- ================= POPUP LEFT SIDE =============== -->
+<div id="editPaymentModal"
+     style="display:none; position:fixed; left:0; top:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.4); z-index:9999;">
+
+    <div style="width:350px; height:100%; background:white; padding:20px;
+                overflow-y:auto; box-shadow:2px 0 10px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;">
+
+        <h3>EDIT PAYMENT 💰</h3>
+        <hr>
+
+        <form id="editPaymentForm" method="POST">
+            {% csrf_token %}
+
+            <!-- Hidden Payment ID -->
+            <input type="hidden" id="payment_id">
+
+
+            <label>Amount</label>
+            <input type="number" name="amount_paid" id="edit_amount" class="form-control" required>
+
+            <label class="mt-3">Method</label>
+            <select name="method" id="edit_method" class="form-control">
+                <option value="Cash">Cash</option>
+                <option value="Mpesa">Mpesa</option>
+                <option value="Bank">Bank</option>
+            </select>
+
+
+            <button type="submit" class="btn btn-primary mt-3 w-100">Save</button>
+            <button type="button" class="btn btn-outline-secondary mt-2 w-100"
+                    onclick="closeEditPopup()">Cancel</button>
+        </form>
+
+    </div>
+</div>
+  
+<script>
+function openEditPayment(paymentId) {
+
+    document.getElementById("editPaymentModal").style.display = "block";
+
+    // Set hidden ID
+    document.getElementById("payment_id").value = paymentId;
+
+    // Fetch data
+    fetch(`/api/payment/${paymentId}/`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("edit_amount").value = data.amount;
+            document.getElementById("edit_method").value = data.method;
+        });
+}
+
+function closeEditPopup() {
+    document.getElementById("editPaymentModal").style.display = "none";
+}
+
+document.getElementById("editPaymentForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const paymentId = document.getElementById("payment_id").value;
+    const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    const amount   = document.getElementById("edit_amount").value;
+    const method   = document.getElementById("edit_method").value;
+
+    fetch(`/edit_payment/${paymentId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": csrf,
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `amount_paid=${amount}&method=${method}`
+    })
+    .then(res => {
+        closeEditPopup();
+        location.reload();
+    });
+});
+</script>
+{% endblock %}

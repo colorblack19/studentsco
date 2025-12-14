@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | COLOR BLACK 19</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* LEFT SIDE - PINK PANEL */
+        .left-side {
+            width: 45%;
+            background: #ff0066;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .left-side h1 {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .left-side img {
+            width: 70%;
+            max-width: 350px;
+            margin-top: 20px;
+        }
+
+        /* RIGHT SIDE - DARK LOGIN */
+        .right-side {
+            width: 55%;
+            background: #1b1b1f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .login-box {
+            width: 75%;
+            max-width: 380px;
+            color: white;
+        }
+
+        .login-box h2 {
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .login-box p {
+            margin-bottom: 25px;
+            opacity: 0.6;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border-radius: 30px;
+            margin-bottom: 18px;
+            border: 1px solid #444;
+            background: transparent;
+            color: white;
+            outline: none;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #ff0066;
+            border: none;
+            color: white;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .options a {
+            color: #ff0066;
+            text-decoration: none;
+        }
+
+        .signup {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .signup a {
+            color: #ff0066;
+            text-decoration: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <!-- LEFT SIDE -->
+    <div class="left-side">
+        <h1>Welcome to<br>Student Portal</h1>
+
+        <!-- Change this illustration -->
+        <img src="{% static 'imagesb/happy.jpg' %}">
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right-side">
+        <div class="login-box">
+
+            <h2>Login your Account</h2>
+            <p>Please enter your login details</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <input type="text" name="username" class="input-field" placeholder="Username" required>
+
+                <input type="password" name="password" class="input-field" placeholder="Password" required>
+               {% if messages %}
+                   {% for message in messages %}
+                     <p style="color:red;">{{ message }}</p>
+                   {% endfor %}
+               {% endif %}
+
+                <div class="options">
+                    <label><input type="checkbox"> Remember</label>
+                    <a href="{% url 'password_reset' %}">Forgot password?</a>
+                </div>
+
+                <button class="btn-login">Log In</button>
+
+                <div class="signup">
+                    Don’t have an account?
+                    <a href="{% url 'register' %}">Sign Up</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

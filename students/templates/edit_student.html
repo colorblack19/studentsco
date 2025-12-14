@@ -1,0 +1,65 @@
+     {% csrf_token %}
+     {% extends "base.html" %}
+     {% load static %}
+     {% block content %}
+
+    <title>Edit Student</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6fa;
+        }
+        .container {
+            width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px #ccc;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056c7;
+        }
+    </style>
+<div class="container">
+    <h2>Edit Student Profile</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label>First Name</label>
+        <input type="text" name="first_name" value="{{ student.first_name }}">
+
+        <label>Last Name</label>
+        <input type="text" name="last_name" value="{{ student.last_name }}">
+
+        <label>Admission Number</label>
+        <input type="text" name="admission_number" value="{{ student.admission_number }}">
+
+        <label>Class</label>
+        <input type="text" name="class_level" value="{{ student.class_level }}">
+
+        <input type="text" name="phone_number" value="{{ student.phone_number }}">
+
+
+        <label>Profile Photo</label>
+        <input type="file" name="photo">
+
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+{% endblock %}
+

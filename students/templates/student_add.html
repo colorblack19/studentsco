@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="mb-3">Add Student</h3>
+
+    <div class="card shadow-sm p-4">
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label>First Name</label>
+                    {{ form.first_name }}
+                </div>
+
+                <div class="col-md-6">
+                    <label>Last Name</label>
+                    {{ form.last_name }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label>Gender</label>
+                    {{ form.gender }}
+                </div>
+
+                <div class="col-md-4">
+                    <label>Age</label>
+                    {{ form.age }}
+                </div>
+
+                <div class="col-md-4">
+                    <label>Class Level</label>
+                    {{ form.class_level }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label>Parent Name</label>
+                    {{ form.parent_name }}
+                </div>
+
+                <div class="col-md-6">
+                    <label>Phone Number</label>
+                    {{ form.phone_number }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label>Parent ID Number</label>
+                    {{ form.parent_id_number }}
+                </div>
+
+                <div class="col-md-6">
+                    <label>Status</label><br>
+                    {{ form.status }}
+                </div>
+            </div>
+
+            <!-- FIXED FEESTRUCTURE SECTION -->
+            <div class="row mb-3">
+                <label>Fee Structure</label>
+                <div class="d-flex align-items-center">
+                    {{ form.feestructure }}
+
+                    <a href="{% url 'add_feestructure_popup' %}"
+                       class="btn btn-sm btn-outline-primary ms-2"
+                       onclick="return showAddPopup(this);">
+                        +
+                    </a>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label>Photo</label>
+                    {{ form.photo }}
+                </div>
+
+                <div class="col-md-6">
+                    <label>Balance</label>
+                    {{ form.balance }}
+                </div>
+            </div>
+
+            <button class="btn btn-primary">Save</button>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

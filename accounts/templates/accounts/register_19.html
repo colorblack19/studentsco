@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | COLOR BLACK 19</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* LEFT SIDE (PINK) */
+        .left-side {
+            width: 45%;
+            background: #ff0066;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .left-side h1 {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .left-side img {
+            width: 70%;
+            max-width: 350px;
+            margin-top: 20px;
+        }
+
+        /* RIGHT SIDE (DARK) */
+        .right-side {
+            width: 55%;
+            background: #1b1b1f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .form-box {
+            width: 75%;
+            max-width: 380px;
+            color: white;
+        }
+
+        .form-box h2 {
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .form-box p {
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border-radius: 30px;
+            margin-bottom: 18px;
+            border: 1px solid #444;
+            background: transparent;
+            color: white;
+            outline: none;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 12px;
+            background: #ff0066;
+            border: none;
+            color: white;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #ff0066;
+            text-decoration: none;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <!-- LEFT SIDE -->
+    <div class="left-side">
+        <h1>Create Your<br>Account</h1>
+        <img src="{% static 'imagesb/imagesa.jpg' %}">
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right-side">
+        <div class="form-box">
+
+            <h2>Register</h2>
+            <p>Fill in the details to create an account</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <input type="text" name="username" class="input-field" placeholder="Username" required>
+
+                <input type="email" name="email" class="input-field" placeholder="Email Address" required>
+
+                <input type="password" name="password1" class="input-field" placeholder="Create Password" required>
+
+                <input type="password" name="password2" class="input-field" placeholder="Confirm Password" required>
+
+                <button class="btn-register">Register</button>
+
+                <div class="login-link">
+                    Already have an account?
+                    <a href="{% url 'login' %}">Log In</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
