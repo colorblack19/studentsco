@@ -26,3 +26,6 @@ def get_access_token():
 
     data = response.json()
     return data.get("access_token")
+
+
+

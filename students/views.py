@@ -32,9 +32,9 @@ from .mpesa import get_access_token
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseForbidden, FileResponse
-
-
-
+from django.utils import timezone
+from datetime import timedelta
+from .models import Payment
 
 
 
@@ -44,6 +44,11 @@ from django.http import HttpResponseForbidden, FileResponse
 
 def dashboard(request):
     cleanup_pending_payments()
+
+    recent_payments = Payment.objects.filter(
+        status="PAID"
+    ).order_by('-date_paid')[:5]
+
     total_students = Student.objects.count()
     total_payments = Payment.objects.filter(status="PAID").count()
     amount_paid = Payment.objects.filter(status="PAID").aggregate(Sum("amount_paid"))["amount_paid__sum"] or 0
@@ -83,12 +88,6 @@ def dashboard(request):
 
 
             amount_per_class.append(float(total_in_class))
-
-    # ============================
-    # RECENT PAYMENTS
-    # ============================
-        recent_payments = Payment.objects.filter(status="PAID").order_by('-date_paid')[:5]
-
 
     # ============================
     # STUDENTS WITH BALANCE
@@ -509,77 +508,66 @@ def feestructure_delete(request, pk):
     return render(request, 'feestructure_confirm_delete.html', {'fee': feestructure})
 
 
-
-
-
-
-
 def mpesa_payment(request, student_id):
-    if request.method == "POST":
-        student = get_object_or_404(Student, id=student_id)
 
-        phone = request.POST.get("phone")
-        id_number = request.POST.get("id_number", "")
-        amount = int(request.POST.get("amount"))
+    if request.method != "POST":
+        return redirect("student_profile", pk=student_id)
 
-        # 1. Get access token
-        access_token = get_access_token()
+    student = get_object_or_404(Student, id=student_id)
 
-        # 2. Generate password
-        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        password_str = settings.MPESA_SHORTCODE + settings.MPESA_PASSKEY + timestamp
-        password = base64.b64encode(password_str.encode()).decode("utf-8")
+    phone = request.POST.get("phone", "").replace("+", "").strip()
+    amount = int(request.POST.get("amount", 0))
 
-        # 3. STK Push payload
-        payload = {
-            "BusinessShortCode": settings.MPESA_SHORTCODE,
-            "Password": password,
-            "Timestamp": timestamp,
-            "TransactionType": "CustomerPayBillOnline",
-            "Amount": amount,
-            "PartyA": phone,
-            "PartyB": settings.MPESA_SHORTCODE,
-            "PhoneNumber": phone,
-            "CallBackURL": "http://127.0.0.1:8000/mpesa/callback/",
-            "AccountReference": f"STUDENT-{student.id}",
-            "TransactionDesc": "School Fees Payment"
-        }
+    access_token = get_access_token()
 
-        headers = {
-            "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/json"
-        }
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    password_str = settings.MPESA_SHORTCODE + settings.MPESA_PASSKEY + timestamp
+    password = base64.b64encode(password_str.encode()).decode()
 
-        # 4. Send STK Push
-# CHAGUA STK URL
-    if settings.MPESA_ENV == "live":
-       stk_url = "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
-    else:
-       stk_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+    account_reference = f"STUDENT-{student.id}-{timestamp}"
 
-    response = requests.post(
-    stk_url,
-    json=payload,
-    headers=headers
-)
+    payload = {
+        "BusinessShortCode": settings.MPESA_SHORTCODE,
+        "Password": password,
+        "Timestamp": timestamp,
+        "TransactionType": "CustomerPayBillOnline",
+        "Amount": amount,
+        "PartyA": phone,
+        "PartyB": settings.MPESA_SHORTCODE,
+        "PhoneNumber": phone,
+        "CallBackURL":  "https://colorblack.pythonanywhere.com/mpesa/callback/",
+        "AccountReference": account_reference,
+        "TransactionDesc": "School Fees Payment"
+    }
 
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
 
-        # 5. Save as pending
+    stk_url = (
+        "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+        if settings.MPESA_ENV == "live"
+        else "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+    )
+
+    response = requests.post(stk_url, json=payload, headers=headers)
+    data = response.json()
+
+    if data.get("ResponseCode") != "0":
+        messages.error(request, "STK Push failed")
+        return redirect("student_profile", pk=student.id)
+
     Payment.objects.create(
-    student=student,
-    amount_paid=amount,
-    method="Mpesa",
-    status="PENDING",
-    notes=f"STK SENT | Phone: {phone}"
-)
+        student=student,
+        amount_paid=amount,
+        method="Mpesa",
+        status="PENDING",
+        notes=f"Ref:{account_reference}|Phone:{phone}"
+    )
 
-
-    messages.success(request, "STK Push sent successfully")
+    messages.success(request, "Check your phone and enter M-Pesa PIN")
     return redirect("student_profile", pk=student.id)
-
-
-
-
 
 @csrf_exempt
 def mpesa_callback(request):
@@ -622,18 +610,13 @@ def mpesa_callback(request):
         payment.save()
 
     else:
-        # ❌ FAILED / CANCELED
+       
         payment.status = "FAILED"
         payment.notes = f"FAILED | {result_desc}"
         payment.save()
 
     return JsonResponse({"ResultCode": 0, "ResultDesc": "Accepted"})
 
-
-
-from django.utils import timezone
-from datetime import timedelta
-from .models import Payment
 
 def cleanup_pending_payments():
     expiry = timezone.now() - timedelta(minutes=2)

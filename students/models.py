@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 class Student(models.Model):
     GENDER_CHOICES = (
         ('M', 'Male'),
@@ -34,14 +35,7 @@ class Student(models.Model):
     class_level = models.CharField(max_length=50, choices=CLASS_LEVELS)
     date_registered = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=True)
-
-    feestructure = models.ForeignKey(
-        "FeeStructure", 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        blank=True
-    )
-
+    feestructure = models.ForeignKey("FeeStructure",on_delete=models.SET_NULL,null=True,blank=True)
     photo = models.ImageField(upload_to='student_photos/', blank=True, null=True)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -128,6 +122,3 @@ def save(self, *args, **kwargs):
         self.student.balance = 0
 
     self.student.save()
-
-        
-
