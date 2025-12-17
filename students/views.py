@@ -515,8 +515,13 @@ def mpesa_payment(request, student_id):
 
     student = get_object_or_404(Student, id=student_id)
 
-    phone = request.POST.get("phone", "").replace("+", "").strip()
+    phone = request.POST.get("phone", "").strip()
     amount = int(request.POST.get("amount", 0))
+
+    if phone.startswith("+"):
+        phone = phone[1:]
+    if phone.startswith("0"):
+        phone = "254" + phone[1:]
 
     access_token = get_access_token()
 
@@ -527,15 +532,15 @@ def mpesa_payment(request, student_id):
     account_reference = f"STUDENT-{student.id}-{timestamp}"
 
     payload = {
-        "BusinessShortCode": settings.MPESA_SHORTCODE,
-        "Password": password,
-        "Timestamp": timestamp,
+        "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjUxMjE2MTQ1MDQ4",
+        "BusinessShortCode": "174379",
+        "Timestamp": "20251216145048",
+        "Amount": "1",
+        "PartyA": "254708374149",
+        "PartyB": "174379",
         "TransactionType": "CustomerPayBillOnline",
-        "Amount": amount,
-        "PartyA": phone,
-        "PartyB": settings.MPESA_SHORTCODE,
-        "PhoneNumber": phone,
-        "CallBackURL":  "https://colorblack.pythonanywhere.com/mpesa/callback/",
+        "PhoneNumber": "254708374149",
+        "CallBackURL":  "https://paz-eustatic-stridently.ngrok-free.dev/mpesa/callback/",
         "AccountReference": account_reference,
         "TransactionDesc": "School Fees Payment"
     }
@@ -552,6 +557,10 @@ def mpesa_payment(request, student_id):
     )
 
     response = requests.post(stk_url, json=payload, headers=headers)
+
+    print("STK STATUS:", response.status_code)
+    print("STK RESPONSE:", response.text)
+
     data = response.json()
 
     if data.get("ResponseCode") != "0":
