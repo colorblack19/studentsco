@@ -542,7 +542,7 @@ def mpesa_payment(request, student_id):
         "PhoneNumber": "254708374149",
         "CallBackURL":  "https://paz-eustatic-stridently.ngrok-free.dev/mpesa/callback/",
         "AccountReference": account_reference,
-        "TransactionDesc": "School Fees Payment"
+        "TransactionDesc": "StudentsCo Fees Payment"
     }
 
     headers = {
@@ -563,17 +563,22 @@ def mpesa_payment(request, student_id):
 
     data = response.json()
 
+
     if data.get("ResponseCode") != "0":
-        messages.error(request, "STK Push failed")
-        return redirect("student_profile", pk=student.id)
+         messages.error(request, "STK Push failed")
+         return redirect("student_profile", pk=student.id)
+
+    # ✅ STK SUCCESS → HAPA NDIPO CHECKOUT INACHUKULIWA
+    checkout_request_id = data.get("CheckoutRequestID")
 
     Payment.objects.create(
-        student=student,
-        amount_paid=amount,
-        method="Mpesa",
-        status="PENDING",
-        notes=f"Ref:{account_reference}|Phone:{phone}"
-    )
+    student=student,
+    amount_paid=amount,
+    method="Mpesa",
+    status="PENDING",
+    checkout_request_id=checkout_request_id,
+    notes=f"Ref:{account_reference}|Phone:{phone}"
+)
 
     messages.success(request, "Check your phone and enter M-Pesa PIN")
     return redirect("student_profile", pk=student.id)
@@ -591,12 +596,11 @@ def mpesa_callback(request):
     stk_callback = data.get("Body", {}).get("stkCallback", {})
     result_code = stk_callback.get("ResultCode")
     result_desc = stk_callback.get("ResultDesc")
+    checkout_request_id = stk_callback.get("CheckoutRequestID")
 
-    # 🔎 FIND THE LATEST PENDING MPESA PAYMENT
     payment = Payment.objects.filter(
-        method="Mpesa",
-        status="PENDING"
-    ).last()
+        checkout_request_id=checkout_request_id
+    ).first()
 
     if not payment:
         return JsonResponse({"ResultCode": 0, "ResultDesc": "No pending payment"})

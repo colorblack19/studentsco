@@ -94,7 +94,7 @@ class Payment(models.Model):
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
-        default="PAID"   # cash payments stay PAID
+        default="PAID"   
     )
 
     notes = models.CharField(max_length=255, blank=True)

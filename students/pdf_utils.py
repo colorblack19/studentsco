@@ -14,6 +14,8 @@ from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
 from reportlab.graphics.barcode import qr
 from reportlab.graphics.shapes import Drawing
+from reportlab.platypus import KeepTogether
+
 
 # ============================================================
 # 1. RECEIPT PDF – hii iko sawa, nimeiweka pekee yake
@@ -124,7 +126,14 @@ def pdf_header(story):
 
     # ---------- LOAD LOGO ----------
     try:
-        logo = Image("static/images/logo.jpg", width=70, height=70)
+     logo_path = os.path.join(
+        settings.BASE_DIR,
+        "schoolfees",
+        "static",
+        "images",
+        "pngtree.png"
+    )
+     logo = Image(logo_path, width=50, height=50)
     except:
         logo = Paragraph("<b>[School Logo]</b>", styles["Normal"])
 
@@ -292,7 +301,7 @@ def generate_student_statement_pdf(file_path, student, payments, total_paid, tot
         p.notes or ""
     ])
 
-    pay_table = Table(payment_data, colWidths=[90, 120, 100, 90])
+    pay_table = Table(payment_data, colWidths=[90, 120, 100,100 ])
     pay_table.setStyle(TableStyle([
         ("BACKGROUND", (0,0), (-1,0), colors.lightgrey),
         ("TEXTCOLOR", (0,0), (-1,0), colors.black),
@@ -335,7 +344,7 @@ def generate_student_statement_pdf(file_path, student, payments, total_paid, tot
 
     story.append(sig_qr_table)
 
-    story.append(Spacer(1, 25))
+    story.append(Spacer(1, 10))
 
     # --- SIGNATURE LINES ---
     account_sig = Table(
