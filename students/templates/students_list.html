@@ -124,6 +124,19 @@
 
         </table>
 
+        <!-- ✅ PAGINATION INAKAA HAPA CHINI -->
+<div class="pagination">
+    {% if students.has_previous %}
+        <a href="?page={{ students.previous_page_number }}">Prev</a>
+    {% endif %}
+
+    Page {{ students.number }} of {{ students.paginator.num_pages }}
+
+    {% if students.has_next %}
+        <a href="?page={{ students.next_page_number }}">Next</a>
+    {% endif %}
+</div>
+
         <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">
             Back to Dashboard
         </a>
