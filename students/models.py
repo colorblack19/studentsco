@@ -84,6 +84,8 @@ class Payment(models.Model):
         # when record created
     created_at = models.DateTimeField(auto_now_add=True)
     method = models.CharField(max_length=50, default='Cash')
+    checkout_request_id = models.CharField(max_length=100, blank=True, null=True)
+
 
     STATUS_CHOICES = (
         ("PENDING", "Pending"),
