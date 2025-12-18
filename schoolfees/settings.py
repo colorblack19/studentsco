@@ -31,6 +31,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'colorblack.pythonanywhere.com',
     'www.colorblack.pythonanywhere.com',
+    '127.0.0.1',
+    'localhost',
 ]
 
 
@@ -156,6 +158,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles_new"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_REDIRECT_URL = "/brand/"
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'

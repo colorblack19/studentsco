@@ -33,6 +33,7 @@ urlpatterns = [
     path('student/<int:student_id>/mpesa/',views.mpesa_payment,name='mpesa_payment'),
     path("mpesa/callback/", views.mpesa_callback, name="mpesa_callback"),
 
+    path("brand/", views.brand_intro, name="brand_intro"),
 
 
 ]

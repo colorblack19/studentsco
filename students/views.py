@@ -638,3 +638,7 @@ def cleanup_pending_payments():
         created_at__lt=expiry
     ).delete()   # AU .update(status="FAILED")
 
+
+@login_required
+def brand_intro(request):
+    return render(request, 'brand_intro.html')

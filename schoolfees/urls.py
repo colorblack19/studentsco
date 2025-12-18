@@ -18,13 +18,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from students.views import brand_intro
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('students.urls')),
+
+    # BRAND INTRO (HOME PAGE)
+    path('', brand_intro, name='home'),
+
+    # AUTH (LOGIN / REGISTER / DASHBOARD)
     path('accounts/', include('accounts.urls')),
-    path('', include('accounts.urls')),  
+
+    # STUDENTS / SYSTEM
+    path('students/', include('students.urls')),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

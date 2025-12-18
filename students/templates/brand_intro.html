@@ -1,0 +1,61 @@
+
+{% load static %}
+{% block content %}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f8f8f8, #f1ecec);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        overflow: hidden;
+    }
+
+    .brand-box {
+        text-align: center;
+        animation: fadeIn 1.9s ease-in-out;
+    }
+
+    .brand-name {
+        font-size: 34px;
+        font-weight: 700;
+        letter-spacing: 4px;
+        color: #060606;
+    }
+
+    .brand-tagline {
+        margin-top: 6px;
+        font-size: 13px;
+        letter-spacing: 2px;
+        color: #151515;
+        text-transform: uppercase;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes zoomIn {
+        from { transform: scale(0.85); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+</style>
+
+<div class="brand-box">
+    <div class="brand-name">COLORBLACK 19</div>
+    <div class="brand-tagline">School Management System</div>
+</div>
+
+<script>
+    setTimeout(function () {
+        window.location.href = "{% url 'dashboard' %}";
+    }, 2500);
+</script>
+
+{% endblock %}
+
+
