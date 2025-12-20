@@ -31,8 +31,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'colorblack.pythonanywhere.com',
     'www.colorblack.pythonanywhere.com',
-
 ]
+
 
 
 
@@ -85,6 +85,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
             ],
         },
     },
@@ -174,7 +175,6 @@ MESSAGE_TAGS = {
 }
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 
 
 # M-PESA DARAJA (SANDBOX)

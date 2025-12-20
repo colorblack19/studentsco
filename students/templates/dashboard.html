@@ -1,137 +1,256 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+/* BRAND HERO */
+.cb-hero {
+    height: 70vh;
+    background:
+        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)),
+        url("{% static 'images/dashimage.jpg' %}") center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.cb-hero {
+    box-shadow: inset 0 -40px 60px rgba(0,0,0,0.4);
+}
+
+.cb-hero::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10px;
+
+    background: linear-gradient(
+        to bottom,
+        rgba(142, 189, 247, 0),
+        #eef2f7
+    );
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    pointer-events: none;
+}
 
 
-     {% extends "base.html" %}
-     {% load static %}
-     {% block content %}
-    <style>
-        body {
-            background-image: url("{% static 'images/dashimage.jpg' %}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-        }
-        .card { border-radius: 15px; }
-        .stat-icon { font-size: 40px; opacity: 0.4; }
-        .chart-card {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          width: 100%;
-        }
+/* BRAND TEXT ANIMATION */
+.cb-hero h1 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    animation: floatLR 18s ease-in-out infinite;
+    position: relative;
+}
 
-      .chart-card canvas {
-        height: 320px !important;   
-       }
 
-       .btn-danger {
-                 margin-top: -15px; 
-        }
+.cb-hero p,
+.cb-hero small {
+    animation: fadeUp 1.6s ease forwards;
+    opacity: 0;
+}
+
+.cb-hero small {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    color: #cbd5e1;
+}
+
+/* FADE UP EFFECT */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+@keyframes slideInOnce {
+    from {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+
+/* DASHBOARD AREA */
+.dashboard-bg {
+    background: #eef2f7;
+    
+}
+
+
+
+.card {
+    border-radius: 15px;
+}
+
+.chart-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.chart-card canvas {
+    height: 320px !important;
+}
+.stat-card {
+    background: linear-gradient(135deg, #ffffff, #f1f5fb);
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.stat-card h6 {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.stat-card h3 {
+    font-weight: 700;
+    color: #1f2933;
+}
+
+
 </style>
 
+<!-- 🔥 BRAND FIRST -->
+<section class="cb-hero">
+    <div>
+        <h1>COLOR BLACK 19</h1>
+        <p>Smart School Fees Management System</p>
+        <small>Automated • Secure • M-Pesa Integrated</small>
+    </div>
+</section>
+
+<!-- ⬇️ DASHBOARD -->
+<section class="dashboard-bg">
 <div class="container py-4">
-  <!-- TOP STATS -->
-    <div class="row g-4 mb-3">
 
-        <div class="col-md-3">
-            <div class="card shadow p-3">
-                <h6 class="text-muted">Total Students</h6>
-                <h3>{{ total_students }}</h3>
-            </div>
+<!-- TOP STATS -->
+<div class="row g-4 mb-3">
+    <div class="col-md-3">
+        <div class="card shadow p-3">
+            <h6 class="text-muted">Total Students</h6>
+            <h3>{{ total_students }}</h3>
         </div>
-
-        <div class="col-md-3">
-            <div class="card shadow p-3">
-                <h6 class="text-muted">Total Payments</h6>
-                <h3>{{ total_payments }}</h3>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card shadow p-3">
-                <h6 class="text-muted">Amount Paid</h6>
-                <h3>KES {{ total_amount_paid }}</h3>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card shadow p-3">
-                <h6 class="text-muted">Expected Fees</h6>
-                <h3>KES {{ total_fee_expected }}</h3>
-            </div>
-        </div>
-
     </div>
 
-    <!-- CHARTS -->
-    <div class="row g-4">
-
-        <div class="col-md-6">
-            <div class="card p-3 chart-card shadow">
-                <h5 class="fw-bold">Payments Per Class</h5>
-                <canvas id="barChart"></canvas>
-            </div>
+    <div class="col-md-3">
+        <div class="card shadow p-3">
+            <h6 class="text-muted">Total Payments</h6>
+            <h3>{{ total_payments }}</h3>
         </div>
+    </div>
 
-        <div class="col-md-6">
-            <div class="card p-3 chart-card shadow">
-                <h5 class="fw-bold">Paid vs Balance</h5>
-                <canvas id="pieChart"></canvas>
-            </div>
+    <div class="col-md-3">
+        <div class="card shadow p-3">
+            <h6 class="text-muted">Amount Paid</h6>
+            <h3>KES {{ total_amount_paid }}</h3>
         </div>
-
     </div>
 
-    <!-- BALANCES -->
-    <div class="card shadow mt-4 p-3">
-        <h5 class="fw-bold">⚠️ Students With Balance</h5>
-
-        {% if students_with_balance %}
-            <ul class="list-group">
-                {% for s in students_with_balance %}
-                    <li class="list-group-item d-flex justify-content-between">
-                        {{ s.name }}
-                        <span class="badge bg-danger">KES {{ s.balance }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-success">All students have cleared fees 🎉</p>
-        {% endif %}
+    <div class="col-md-3">
+        <div class="card shadow p-3">
+            <h6 class="text-muted">Expected Fees</h6>
+            <h3>KES {{ total_fee_expected }}</h3>
+        </div>
     </div>
 
-    <!-- RECENT PAYMENTS -->
-    <div class="card shadow mt-4 p-3">
-        <h5 class="fw-bold">Recent Payments</h5>
-        <table class="table table-striped">
-            <thead class="table-dark">
-            <tr>
-                <th>Student</th>
-                <th>Amount</th>
-                <th>Method</th>
-                <th>Date</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for p in recent_payments %}
-                <tr>
-                    <td>{{ p.student.full_name }}</td>
-                    <td>KES {{ p.amount_paid }}</td>
-                    <td>{{ p.method }}</td>
-                    <td>{{ p.date_paid }}</td>
-                </tr>
-            {% empty %}
-                <tr><td colspan="4" class="text-center text-muted">No payments yet</td></tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
 </div>
+<!-- CHARTS -->
+<div class="row g-4">
+
+    <div class="col-md-6">
+        <div class="card p-3 chart-card shadow">
+            <h5 class="fw-bold">Payments Per Class</h5>
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-3 chart-card shadow">
+            <h5 class="fw-bold">Paid vs Balance</h5>
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- BALANCES -->
+<div class="card shadow mt-4 p-3">
+    <h5 class="fw-bold">⚠️ Students With Balance</h5>
+
+    {% if students_with_balance %}
+        <ul class="list-group">
+            {% for s in students_with_balance %}
+                <li class="list-group-item d-flex justify-content-between">
+                    {{ s.name }}
+                    <span class="badge bg-danger">KES {{ s.balance }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-success">All students have cleared fees 🎉</p>
+    {% endif %}
+</div>
+
+<!-- RECENT PAYMENTS -->
+<div class="card shadow mt-4 p-3">
+    <h5 class="fw-bold">Recent Payments</h5>
+    <table class="table table-striped">
+        <thead class="table-dark">
+        <tr>
+            <th>Student</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for p in recent_payments %}
+            <tr>
+                <td>{{ p.student.full_name }}</td>
+                <td>KES {{ p.amount_paid }}</td>
+                <td>{{ p.method }}</td>
+                <td>{{ p.date_paid }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">
+                    No payments yet
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</div>
+</section>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-
 new Chart(document.getElementById('barChart'), {
     type: 'bar',
     data: {
@@ -155,5 +274,14 @@ new Chart(document.getElementById('pieChart'), {
     }
 });
 
+
+window.addEventListener("scroll", function () {
+    const hero = document.querySelector(".cb-hero");
+    let scroll = window.scrollY;
+    hero.style.backgroundPositionY = scroll * 0.4 + "px";
+});
+
+
 </script>
+
 {% endblock %}

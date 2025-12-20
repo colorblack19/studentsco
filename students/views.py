@@ -35,6 +35,10 @@ from django.http import HttpResponseForbidden, FileResponse
 from django.utils import timezone
 from datetime import timedelta
 from .models import Payment
+from django.core.paginator import Paginator
+
+
+
 
 
 
@@ -194,6 +198,14 @@ def students_list(request):
         students = students.filter(date_registered__gte=start)
     elif end:
         students = students.filter(date_registered__lte=end)
+
+
+            # ============================
+    # ✅ PAGINATION HAPA 👇
+    # ============================
+    paginator = Paginator(students, 50)   # 50 students per page
+    page_number = request.GET.get("page")
+    students = paginator.get_page(page_number)
 
     # --- COMPUTE BALANCES (keep your original output structure) ---
     student_data = []

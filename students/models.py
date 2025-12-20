@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 
 
+
+
 class Student(models.Model):
     GENDER_CHOICES = (
         ('M', 'Male'),
@@ -101,8 +103,7 @@ class Payment(models.Model):
 
     notes = models.CharField(max_length=255, blank=True)
 
-    def __str__(self):
-        return f"{self.student.first_name} - {self.amount_paid} - {self.status}"
+
 
 
 def save(self, *args, **kwargs):
@@ -124,3 +125,6 @@ def save(self, *args, **kwargs):
         self.student.balance = 0
 
     self.student.save()
+
+def __str__(self):
+        return f"{self.student.first_name} - {self.amount_paid} - {self.status}"
