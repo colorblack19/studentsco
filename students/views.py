@@ -545,11 +545,11 @@ def mpesa_payment(request, student_id):
 
     payload = {
         "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjUxMjE2MTQ1MDQ4",
-        "BusinessShortCode": "174379",
+        "BusinessShortCode": "4189211",
         "Timestamp": "20251216145048",
         "Amount": "1",
         "PartyA": "254708374149",
-        "PartyB": "174379",
+        "PartyB": "4189211",
         "TransactionType": "CustomerPayBillOnline",
         "PhoneNumber": "254708374149",
         "CallBackURL":  "https://paz-eustatic-stridently.ngrok-free.dev/mpesa/callback/",
