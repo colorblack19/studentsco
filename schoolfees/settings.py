@@ -31,8 +31,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'colorblack.pythonanywhere.com',
     'www.colorblack.pythonanywhere.com',
-    "127.0.0.1",
-    "localhost"
+
 ]
 
 
@@ -180,9 +179,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # M-PESA DARAJA (SANDBOX)
-MPESA_CONSUMER_KEY = "E9FjGzaCkwmwipyd5AadKB5zErTS74IpBEmVHxqqHMLwrU48"
-MPESA_CONSUMER_SECRET = "yXYyNO1N9fsAHuxqawuSspfKXqIqkKvzYXnsZhbzvj6KdyAOpp71efhcbZw2NO5Z"
-MPESA_SHORTCODE = "174379"
-MPESA_PASSKEY = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
+MPESA_CONSUMER_KEY = "lM5i0aThOo2SGx2LyF4gBJXijQGidpQW9IxXDvZbFguv2Xhy"
+MPESA_CONSUMER_SECRET = "gfvYCAtflh6Qe5LfeZ0FElC2YyiPF2yt9TnbJuiqvEDZDlX0LzsfP0p1YbR8hUkP"
+MPESA_SHORTCODE = "4189211"
+MPESA_PASSKEY = "d5c8dfb4223f89828a1fe0500340b5456ca20d77c6b963fb6ae874761731afb0"
 MPESA_ENV = "Live"
 MPESA_CALLBACK_URL = "https://paz-eustatic-stridently.ngrok-free.dev/mpesa/callback/"
