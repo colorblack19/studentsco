@@ -31,6 +31,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'colorblack.pythonanywhere.com',
     'www.colorblack.pythonanywhere.com',
+    "127.0.0.1",
+    "localhost"
 ]
 
 
