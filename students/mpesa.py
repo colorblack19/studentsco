@@ -6,7 +6,7 @@ def get_access_token():
     if settings.MPESA_ENV == "live":
         url = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
     else:
-        url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
+        url = "https://live.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
 
     response = requests.get(
         url,
