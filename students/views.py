@@ -565,7 +565,7 @@ def mpesa_payment(request, student_id):
     stk_url = (
         "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
         if settings.MPESA_ENV == "live"
-        else "https://live.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+        else "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
     )
 
     response = requests.post(stk_url, json=payload, headers=headers)
