@@ -22,12 +22,6 @@ urlpatterns = [
     path("teacher/attendance/summary/",views.monthly_attendance_summary,name="monthly_attendance_summary"),
 
 
-
-
-
-
-
-
     path("students/", views.students_list, name="students_list"),
     path("payments/", views.payments_list, name="payments_list"),
     path('add/', views.student_add, name='student_add'),
@@ -53,10 +47,6 @@ urlpatterns = [
     path("mpesa/callback/", views.mpesa_callback, name="mpesa_callback"),
 
     path("alerts/<int:alert_id>/reviewed/",views.mark_alert_reviewed,name="mark_alert_reviewed"),
-
-
-
-
     path("brand/", views.brand_intro, name="brand_intro"),
 
 

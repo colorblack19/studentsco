@@ -48,7 +48,7 @@ from django.db.models import Count, Q
 from django.db.models.functions import TruncMonth
 from .models import AttendanceAlert
 
-
+from django.contrib.auth.decorators import permission_required
 
 
 
@@ -480,6 +480,10 @@ def admin_required(view_func):
 
 
 
+
+
+@login_required
+@permission_required("students.add_student", raise_exception=True)
 def student_add(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)

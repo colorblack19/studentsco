@@ -17,9 +17,9 @@ urlpatterns = [
 
     
 
-    path("admin/add-teacher/", add_teacher, name="add_teacher"),
-
    
+
+    path("admin/add-teacher/", add_teacher, name="add_teacher"),
     # USERS
     path("users/", views.user_list, name="user_list"),
     path("users/add/", views.user_add, name="user_add"),
