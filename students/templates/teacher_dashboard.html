@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<section class="cb-hero">  
+    <!-- ADMIN HERO TOP -->
+    <div class="hero-admin-top">
+        <div class="hero-left">
+            SCHOOL SYSTEM
+        </div>
+
+        <div class="hero-right">
+            <a href="{% url 'logout' %}" class="btn hero-logout-btn">
+                Logout
+            </a>
+        </div>
+
+    </div> 
+
+        <div>
+             <h1>COLOR BLACK 19</h1>
+             <p>Smart School Fees Management System</p>
+             
+             <br>
+             <h3>👋 Welcome, {{ request.user.username }}<h3>
+            
+              
+              
+          
+       </div>
+</section>
+
+
+<section class="dashboard-bg">
+<div class="container py-4">
+
+
+
+    <!-- STATS -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+            <div class="card shadow p-3">
+                <h6 class="text-muted">My Students</h6>
+                <h3>{{ total_students }}</h3>
+
+            </div>
+        </div>
+
+<div class="col-md-4">
+    <div class="card shadow p-3">
+
+        <h6 class="text-muted d-flex justify-content-between align-items-center">
+            Attendance
+
+            {% if attendance_status == "completed" %}
+                <span class="badge bg-success">Completed</span>
+
+            {% elif attendance_status == "incomplete" %}
+                <span class="badge bg-warning text-dark">Incomplete</span>
+
+            {% else %}
+                <span class="badge bg-secondary">Not Started</span>
+            {% endif %}
+        </h6>
+
+        <h3>
+            {{ marked_today }} / {{ total_students }}
+        </h3>
+
+        <small class="text-muted">
+            Students marked today
+        </small>
+
+                <!-- 📊 Progress Bar -->
+        <div class="mt-2">
+            <div class="progress" style="height: 8px;">
+                <div
+                    class="progress-bar
+                    {% if attendance_status == 'completed' %} bg-success
+                    {% elif attendance_status == 'incomplete' %} bg-warning
+                    {% else %} bg-secondary {% endif %}"
+                    role="progressbar"
+                    style="width: {{ attendance_percentage }}%;"
+                    aria-valuenow="{{ attendance_percentage }}"
+                    aria-valuemin="0"
+                    aria-valuemax="100">
+                </div>
+            </div>
+
+            <small class="text-muted">
+                {{ attendance_percentage }}% completed
+            </small>
+        </div>
+
+
+    </div>
+</div>
+
+
+  <!-- PERFORMANCE -->
+<div class="col-md-4">
+    
+      <div class="card shadow p-3 text-decoration-none text-dark">
+
+        <h6 class="text-muted d-flex justify-content-between">
+            ⚠ At-risk students
+
+            {% if new_alerts_count > 0 %}
+                <span class="badge bg-danger">
+                    {{ new_alerts_count }} NEW
+                </span>
+            {% endif %}
+        </h6>
+
+        <h3>{{ new_alerts_count }}</h3>
+
+        <small class="text-muted">
+            Students needing attention
+        </small><br>
+            <a href="{% url 'at_risk_students' %}"
+    class="btn btn-sm btn-outline-primary"> 
+    View At-Risk Students 
+    </a>
+      </div>
+
+   
+
+</div>
+
+
+    <!-- QUICK ACTIONS -->
+<div class="row g-4">
+    <!-- MY STUDENTS -->
+    <div class="col-md-4">
+        <a href="{% url 'teacher_students' %}"
+           class="card pro-card text-decoration-none text-dark">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-1">👨‍🎓 My Students</h6>
+                <p class="text-muted small mb-0">
+                    View students assigned to you
+                </p>
+            </div>
+        </a>
+    </div>
+
+    <!-- ATTENDANCE -->
+    <div class="col-md-4">
+        <a href="{% url 'teacher_attendance' %}"
+           class="card pro-card text-decoration-none text-dark">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-1">📝 Attendance</h6>
+                <p class="text-muted small mb-0">
+                    Mark student attendance
+                </p>
+            </div>
+        </a>
+    </div>
+
+    <!-- 📊 ATTENDANCE HISTORY (KATIKATI – MUHIMU) -->
+    <div class="col-md-4">
+        <a href="{% url 'attendance_history' %}"
+           class="card pro-card text-decoration-none text-dark">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-1">📊 Attendance History</h6>
+                <p class="text-muted small mb-0">
+                    Daily & monthly attendance records
+                </p>
+            </div>
+        </a>
+    </div>
+
+</div>
+
+
+</section>
+<style>
+
+    .cb-hero {
+    height: 70vh; /* ADMIN DEFAULT */
+    background: linear-gradient(
+        rgba(0,0,0,0.75),
+        rgba(0,0,0,0.75)
+    ),
+    url("{% static 'images/dashimage.jpg' %}") center/cover no-repeat;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    box-shadow: inset 0 -40px 60px rgba(0,0,0,0.4);
+}
+
+.hero-admin-top {
+    position: absolute;
+    top: 25px;
+    left: 50px;
+    right: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 5;
+}
+
+/* BRAND TEXT ANIMATION */
+.cb-hero h1 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    animation: floatLR 18s ease-in-out infinite;
+    position: relative;
+}
+
+
+.cb-hero p,
+.cb-hero h3 {
+    animation: fadeUp 1.6s ease forwards;
+    opacity: 0;
+}
+
+.cb-hero h3 {
+    display: block;
+    margin-top: 40px;
+    color: #cbd5e1;
+}
+
+/* FADE UP EFFECT */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+@keyframes slideInOnce {
+    from {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+/* SYSTEM SCHOOL TEXT */
+.hero-left {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-transform: uppercase;
+    opacity: 0.95;
+}
+
+/* LOGOUT BUTTON (LIKE SEARCH STUDENT) */
+.hero-logout-btn {
+    border: 1px solid #fff;
+    color: #fff;
+    background: transparent;
+    padding: 6px 18px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.hero-logout-btn:hover {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}
+
+/* HERO CENTER */
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .hero-admin-top {
+        left: 20px;
+        right: 20px;
+        top: 15px;
+    }
+
+    .hero-left {
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+
+    .hero-logout-btn {
+        padding: 5px 14px;
+        font-size: 0.75rem;
+    }
+}
+
+
+.dashboard-bg {
+  min-height: 50vh;
+  background: url("{% static 'images/abstract.jpg' %}")center/cover no-repeat;
+    
+}
+.pro-card {
+    border: none;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    transition: all 0.25s ease;
+    height: 100%;
+}
+
+/* Hover effect */
+.pro-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* Disabled cards */
+.disabled-card {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.disabled-card:hover {
+    transform: none;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+
+</style>
+
+
+
+{% endblock %}

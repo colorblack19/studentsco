@@ -1,16 +1,17 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-
 <style>
-/* BRAND HERO */
+
+
 .cb-hero {
-    height: 70vh;
+    height: 60vh;
     background: linear-gradient(
         rgba(0,0,0,0.75),
         rgba(0,0,0,0.75)
     ),
     url("{% static 'images/dashimage.jpg' %}") center/cover no-repeat;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -18,6 +19,18 @@
     color: #fff;
     box-shadow: inset 0 -40px 60px rgba(0,0,0,0.4);
 }
+
+/* 👨‍👩‍👦 STUDENTS / PARENTS */
+.cb-hero-full {
+    height: 100vh;
+}
+
+
+.hero-actions {
+    margin-top: 70px;
+}
+
+
 
 /* BRAND TEXT ANIMATION */
 .cb-hero h1 {
@@ -67,6 +80,69 @@
     }
 }
 
+/* ===== HERO ADMIN TOP BAR (INSIDE HERO) ===== */
+.hero-admin-top {
+    position: absolute;
+    top: 25px;
+    left: 50px;
+    right: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 5;
+}
+
+/* SYSTEM SCHOOL TEXT */
+.hero-left {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-transform: uppercase;
+    opacity: 0.95;
+}
+
+/* LOGOUT BUTTON (LIKE SEARCH STUDENT) */
+.hero-logout-btn {
+    border: 1px solid #fff;
+    color: #fff;
+    background: transparent;
+    padding: 6px 18px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.hero-logout-btn:hover {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}
+
+/* HERO CENTER */
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .hero-admin-top {
+        left: 20px;
+        right: 20px;
+        top: 15px;
+    }
+
+    .hero-left {
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+
+    .hero-logout-btn {
+        padding: 5px 14px;
+        font-size: 0.75rem;
+    }
+}
 
 
 /* DASHBOARD AREA */
@@ -90,77 +166,153 @@
     height: 320px !important;
 }
 
-.card h6 {
-    color: #94a3b8;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
+
+.dashboard-card {
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transition: all 0.25s ease;
+    padding: 12px 15px;
 }
 
-.card h3 {
-    font-weight: 700;
-    margin-top: 6px;
-    color: #1e73c8;
+.dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+.dashboard-card h6 {
+    font-size: 0.8rem;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.dashboard-card h3 {
+    font-size: 1.8rem;
+}
+
+.chart-card h5 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: #0f172a;
+}
+
+.table thead th {
+    font-size: 0.85rem;
+    color: #334155;
+    font-weight: 600;
 }
 
 
 </style>
 
-<!-- 🔥 BRAND FIRST -->
-<section class="cb-hero">
-    <div>
+
+<section class="cb-hero {% if not request.user.is_superuser %}cb-hero-full{% endif %}">
+{% if request.user.is_authenticated and not request.user.is_staff %}
+
+    <!-- ADMIN HERO TOP -->
+    <div class="hero-admin-top">
+        <div class="hero-left">
+            SCHOOL SYSTEM
+        </div>
+
+        <div class="hero-right">
+            <a href="{% url 'logout' %}" class="btn hero-logout-btn">
+                Logout
+            </a>
+        </div>
+      </div>
+      
+       {% endif %}
+     <div>
         <h1>COLOR BLACK 19</h1>
         <p>Smart School Fees Management System</p>
         <small>Automated • Secure • M-Pesa Integrated</small>
+
+       <div class="hero-actions">
+
+       {% if request.user.is_superuser %}
+        <!-- ADMIN: no button -->
+
+        {% elif request.user.is_authenticated %}
+        <!-- STUDENT / PARENT -->
+        <a href="{% url 'students_list' %}" 
+           class="btn btn-outline-light btn-lg px-4">
+            🔍 Search Student
+        </a>
+
+       {% else %}
+        <!-- GUEST -->
+        <a href="{% url 'login' %}" 
+           class="btn btn-primary btn-lg px-4 me-2">
+            🔐 Login
+        </a>
+
+        <a href="{% url 'students_list' %}" 
+           class="btn btn-outline-light btn-lg px-4">
+            🔎 Search Student
+        </a>
+        <p class="mt-2 small text-light opacity-75">
+        Search a student by name or class
+          </p>
+          {% endif %}
+  
+       </div>
     </div>
+
+
 </section>
 
-<!-- ⬇️ DASHBOARD -->
-<section class="dashboard-bg">
-<div class="container py-4">
+{% if request.user.is_superuser %}
 
-<!-- TOP STATS -->
-<div class="row g-4 mb-3">
-    <div class="col-md-3">
-        <div class="card shadow p-3">
-            <h6 class="text-muted">Total Students</h6>
+
+
+ <section class="dashboard-bg">
+
+     <div class="container py-4">
+
+     <div class="row g-4 mb-4">
+
+       <div class="col-md-3 col-sm-6">
+          <div class="card dashboard-card">
+            <h6>Total Students</h6>
             <h3>{{ total_students }}</h3>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow p-3">
-            <h6 class="text-muted">Total Payments</h6>
+    <div class="col-md-3 col-sm-6">
+        <div class="card dashboard-card">
+            <h6>Total Payments</h6>
             <h3>{{ total_payments }}</h3>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow p-3">
-            <h6 class="text-muted">Amount Paid</h6>
+    <div class="col-md-3 col-sm-6">
+        <div class="card dashboard-card">
+            <h6>Amount Paid</h6>
             <h3>KES {{ total_amount_paid }}</h3>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow p-3">
-            <h6 class="text-muted">Expected Fees</h6>
+    <div class="col-md-3 col-sm-6">
+        <div class="card dashboard-card">
+            <h6>Expected Fees</h6>
             <h3>KES {{ total_fee_expected }}</h3>
         </div>
     </div>
 
 </div>
-<!-- CHARTS -->
+
+
 <div class="row g-4">
 
     <div class="col-md-6">
-        <div class="card p-3 chart-card shadow">
+        <div class="card dashboard-card p-3 chart-card">
             <h5 class="fw-bold">Payments Per Class</h5>
             <canvas id="barChart"></canvas>
         </div>
     </div>
 
     <div class="col-md-6">
-        <div class="card p-3 chart-card shadow">
+        <div class="card dashboard-card p-3 chart-card">
             <h5 class="fw-bold">Paid vs Balance</h5>
             <canvas id="pieChart"></canvas>
         </div>
@@ -182,15 +334,19 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p class="text-success">All students have cleared fees 🎉</p>
+        <p class="text-success fw-semibold">🎉 All students have cleared fees</p>
+
     {% endif %}
 </div>
 
 <!-- RECENT PAYMENTS -->
 <div class="card shadow mt-4 p-3">
+    
+
     <h5 class="fw-bold">Recent Payments</h5>
     <table class="table table-striped">
-        <thead class="table-dark">
+        <thead class="bg-light">
+
         <tr>
             <th>Student</th>
             <th>Amount</th>
@@ -255,5 +411,5 @@ window.addEventListener("scroll", function () {
 
 
 </script>
-
+{% endif %}
 {% endblock %}

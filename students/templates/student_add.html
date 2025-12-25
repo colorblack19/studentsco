@@ -1,6 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<style>
+.container table {
+    margin-top: 20px;
+}
+
+.container table th {
+    background: #212529;
+    color: #ffffff;
+}
+
+.container table td,
+.container table th {
+    vertical-align: middle;
+}
+
+
+.container form label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.container form input,
+.container form select {
+    border-radius: 10px;
+    padding: 7px;
+}
+
+</style>
+
+
 <div class="container mt-4">
 
     <h3 class="mb-3">Add Student</h3>
@@ -37,6 +68,9 @@
                     <label>Class Level</label>
                     {{ form.class_level }}
                 </div>
+
+
+
             </div>
 
             <div class="row mb-3">
@@ -61,7 +95,13 @@
                     <label>Status</label><br>
                     {{ form.status }}
                 </div>
+
+            <div class="col-md-6">
+                <label>Assign Teacher</label>
+                  {{ form.teacher }}
             </div>
+       
+             </div>
 
             <!-- FIXED FEESTRUCTURE SECTION -->
             <div class="row mb-3">

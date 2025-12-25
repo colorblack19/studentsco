@@ -1,14 +1,33 @@
 from django.urls import path
 from django.shortcuts import redirect
 from . import views
-
+from .views import (
+    teacher_students,
+    teacher_dashboard,
+    mark_attendance,
+)
 
 urlpatterns = [
-    # Redirect homepage → dashboard
-    path('', lambda request: redirect('dashboard')),
+    path("", lambda request: redirect("dashboard")),
 
-    # Dashboard page
+    # MAIN
     path("dashboard/", views.dashboard, name="dashboard"),
+
+    # TEACHER
+    path("teacher/dashboard/", teacher_dashboard, name="teacher_dashboard"),
+    path("teacher/students/", teacher_students, name="teacher_students"),
+    path("teacher/attendance/", mark_attendance, name="teacher_attendance"),
+    path("teacher/attendance/history/", views.attendance_history,name="attendance_history"),
+    path("teacher/performance/at-risk/", views.at_risk_students,name="at_risk_students"),
+    path("teacher/attendance/summary/",views.monthly_attendance_summary,name="monthly_attendance_summary"),
+
+
+
+
+
+
+
+
     path("students/", views.students_list, name="students_list"),
     path("payments/", views.payments_list, name="payments_list"),
     path('add/', views.student_add, name='student_add'),
@@ -32,6 +51,11 @@ urlpatterns = [
     path('feestructure/edit/<int:pk>/', views.feestructure_edit, name='feestructure_edit'),
     path('student/<int:student_id>/mpesa/',views.mpesa_payment,name='mpesa_payment'),
     path("mpesa/callback/", views.mpesa_callback, name="mpesa_callback"),
+
+    path("alerts/<int:alert_id>/reviewed/",views.mark_alert_reviewed,name="mark_alert_reviewed"),
+
+
+
 
     path("brand/", views.brand_intro, name="brand_intro"),
 

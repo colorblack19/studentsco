@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .add-teacher-wrapper {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+    }
+
+    .add-teacher-card {
+        width: 100%;
+        max-width: 420px;
+        background: #ffffff;
+        border-radius: 14px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        padding: 30px;
+    }
+
+    .add-teacher-card h4 {
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 5px;
+    }
+
+    .add-teacher-card p {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 10px 14px;
+        border: 1px solid #cbd5e1;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        border-color: #0f172a;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        font-weight: 600;
+        background: #0f172a;
+        color: #fff;
+        border: none;
+        transition: 0.2s ease;
+    }
+
+    .btn-submit:hover {
+        background: #020617;
+    }
+</style>
+
+<div class="add-teacher-wrapper">
+
+    <div class="add-teacher-card">
+
+        <h4>Add Teacher</h4>
+        <p>Create a new teacher account and assign system access.</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input
+                    type="text"
+                    name="username"
+                    class="form-control"
+                    placeholder="e.g teacher_john"
+                    required
+                >
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input
+                    type="password"
+                    name="password"
+                    class="form-control"
+                    placeholder="Create a strong password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn-submit">
+             Add Teacher
+            </button>
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}

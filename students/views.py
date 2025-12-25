@@ -39,6 +39,18 @@ from django.core.paginator import Paginator
 
 
 
+from .models import Student, Attendance
+from datetime import date
+from django.contrib.auth.models import User, Group
+from django.db.models import Count, Q
+
+
+from django.db.models.functions import TruncMonth
+from .models import AttendanceAlert
+
+
+
+
 
 
 
@@ -178,7 +190,11 @@ def students_list(request):
     class_level = request.GET.get("class", "").strip()   # we will pass this back as "class" in context
     start = request.GET.get("start", "").strip()
     end = request.GET.get("end", "").strip()
-
+    # 🔐 ACCESS CONTROL LOGIC (MUHIMU SANA)
+    # If NOT admin and NO filters → show NOTHING
+    if not request.user.is_superuser:
+        if not search and not class_level and not start and not end:
+            students = Student.objects.none()
     # --- SEARCH (first_name OR last_name OR parent_name) ---
     if search:
         students = students.filter(
@@ -654,3 +670,347 @@ def cleanup_pending_payments():
 @login_required
 def brand_intro(request):
     return render(request, 'brand_intro.html')
+
+
+
+
+@login_required
+def teacher_dashboard(request):
+    user = request.user
+
+    # Teacher only
+    if not hasattr(request.user, "teacherprofile"):
+       return render(request, "403.html")
+
+
+    today = date.today()
+
+    # 👨‍🎓 TOTAL STUDENTS
+    total_students = Student.objects.filter(
+        teacher=user
+    ).count()
+
+    # 📝 MARKED TODAY
+    marked_today = Attendance.objects.filter(
+        teacher=user,
+        date=today
+    ).count()
+
+    # 🔑 Attendance status logic
+    if marked_today == 0:
+        attendance_status = "not_started"
+    elif marked_today < total_students:
+        attendance_status = "incomplete"
+    else:
+        attendance_status = "completed"
+
+    # 📊 Attendance percentage
+    if total_students > 0:
+        attendance_percentage = int((marked_today / total_students) * 100)
+    else:
+        attendance_percentage = 0
+
+    # ==============================
+    # 📊 PERFORMANCE LOGIC (ADD HERE)
+    # ==============================
+
+    attendance_qs = Attendance.objects.filter(teacher=user)
+
+    # ⚠ At-risk students (4+ absents)
+    at_risk_students = (
+        attendance_qs
+        .filter(status="Absent")
+        .values("student")
+        .annotate(absent_count=Count("id"))
+        .filter(absent_count__gte=4)
+    )
+
+    at_risk_count = at_risk_students.count()
+
+    # 🏆 Top performer (least absents)
+    top_performer = (
+        attendance_qs
+        .values(
+            "student__first_name",
+            "student__last_name"
+        )
+        .annotate(
+            absent_count=Count(
+                "id",
+                filter=Q(status="Absent")
+            )
+        )
+        .order_by("absent_count")
+        .first()
+    )
+
+    new_alerts_count = AttendanceAlert.objects.filter(
+    teacher=request.user,
+    status="new").count()
+
+
+
+    # ==============================
+    # CONTEXT
+    # ==============================
+
+    context = {
+        "total_students": total_students,
+        "marked_today": marked_today,
+        "attendance_status": attendance_status,
+        "attendance_percentage": attendance_percentage,
+        "at_risk_count": at_risk_count,
+        "top_performer": top_performer,
+        "new_alerts_count": new_alerts_count,
+    }
+
+    return render(request, "teacher_dashboard.html", context)
+
+
+@login_required
+def at_risk_students(request):
+
+    # 🔐 Teacher only
+    if not hasattr(request.user, "teacherprofile"):
+       return render(request, "403.html")
+
+    teacher = request.user
+
+    # 1️⃣ Get students with 4+ absents
+    risky_students = (
+        Attendance.objects
+        .filter(teacher=teacher, status="Absent")
+        .values("student")
+        .annotate(absent_count=Count("id"))
+        .filter(absent_count__gte=4)
+    )
+
+    # 2️⃣ Ensure alert exists for each at-risk student
+    for s in risky_students:
+        AttendanceAlert.objects.get_or_create(
+            teacher=teacher,
+            student_id=s["student"],
+            defaults={"status": "new"}
+        )
+
+    # 3️⃣ Fetch alerts (THIS replaces your old query)
+    students = (
+        AttendanceAlert.objects
+        .filter(teacher=teacher)
+        .select_related("student")
+        .order_by("-created_at")
+    )
+
+    context = {
+        "students": students
+    }
+
+    return render(request, "at_risk_students.html", context)
+
+
+@login_required
+def mark_alert_reviewed(request, alert_id):
+    alert = AttendanceAlert.objects.get(
+        id=alert_id,
+        teacher=request.user
+    )
+    alert.status = "reviewed"
+    alert.save()
+
+    return redirect("at_risk_students")
+
+
+
+
+@login_required
+def teacher_students(request):
+
+    if not hasattr(request.user, "teacherprofile"):
+       return render(request, "403.html")
+
+
+    students = request.user.students.all()
+
+    context = {
+        "students": students,
+        "total_students": students.count()
+    }
+
+    return render(request, "my_students.html", context)
+
+
+
+
+@login_required
+def mark_attendance(request):
+
+    # 🔐 Teacher only
+    if not hasattr(request.user, "teacherprofile"):
+       return render(request, "403.html")
+
+
+    teacher = request.user
+    students = Student.objects.filter(teacher=teacher)
+    today = timezone.localdate()
+
+    total_students = students.count()
+
+    marked_today = Attendance.objects.filter(
+        teacher=teacher,
+        date=today
+    ).count()
+
+    # 🔒 LOCK LOGIC (HAPA NDIPO PANAWEKWA)
+    attendance_locked = marked_today == total_students and total_students > 0
+
+    # 🚫 BLOCK POST if locked
+    if request.method == "POST" and attendance_locked:
+        messages.warning(
+            request,
+            "Attendance for today is already completed and locked."
+        )
+        return redirect("teacher_attendance")
+
+    # ✅ SAVE ATTENDANCE
+    if request.method == "POST":
+        for student in students:
+            status = request.POST.get(f"status_{student.id}")
+
+            if status:
+                Attendance.objects.update_or_create(
+                    student=student,
+                    date=today,
+                    defaults={
+                        "teacher": teacher,
+                        "status": status,
+                        "is_locked": True
+                    }
+                )
+
+        messages.success(request, "Attendance saved successfully.")
+        return redirect("teacher_attendance")
+
+    # 🧠 Load existing attendance
+    attendance_map = {
+        a.student_id: a.status
+        for a in Attendance.objects.filter(
+            teacher=teacher,
+            date=today
+        )
+    }
+
+    context = {
+        "students": students,
+        "today": today,
+        "attendance_map": attendance_map,
+        "attendance_locked": attendance_locked,
+    }
+
+    return render(request, "attendance.html", context)
+
+
+@login_required
+def attendance_history(request):
+
+    # Teacher only
+    if not hasattr(request.user, "teacherprofile"):
+       return render(request, "403.html")
+
+
+    teacher = request.user
+
+    # Selected date
+    selected_date = request.GET.get("date")
+    if selected_date:
+        selected_date = date.fromisoformat(selected_date)
+    else:
+        selected_date = timezone.localdate()
+
+    # Attendance records for selected date
+    records = (
+        Attendance.objects
+        .filter(teacher=teacher, date=selected_date)
+        .select_related("student")
+    )
+
+    # 🚨 Students with 4+ absents
+    absent_alerts = (
+        Attendance.objects
+        .filter(teacher=teacher, status="Absent")
+        .values(
+            "student_id",
+            "student__first_name",
+            "student__last_name"
+        )
+        .annotate(absent_count=Count("id"))
+        .filter(absent_count__gte=4)
+    )
+
+    context = {
+        "records": records,
+        "selected_date": selected_date,
+        "absent_alerts": absent_alerts,
+    }
+
+    return render(request, "attendance_history.html", context)
+
+
+@login_required
+def monthly_attendance_summary(request):
+
+    # 🔐 Teacher only
+    if not hasattr(request.user, "teacherprofile"):
+       return render(request, "403.html")
+
+
+    teacher = request.user
+
+    # 📅 Selected month
+    selected_month = request.GET.get("month")
+
+    if selected_month:
+        year, month = map(int, selected_month.split("-"))
+        start_date = date(year, month, 1)
+    else:
+        today = timezone.now().date()
+        start_date = date(today.year, today.month, 1)
+
+    # 📊 Attendance summary per student
+    summary = (
+        Attendance.objects
+        .filter(
+            teacher=teacher,
+            date__year=start_date.year,
+            date__month=start_date.month
+        )
+        .values(
+            "student_id",
+            "student__first_name",
+            "student__last_name"
+        )
+        .annotate(
+            total_days=Count("id"),
+            absent_days=Count("id", filter=Q(status="Absent"))
+        )
+        .order_by("student__first_name")
+    )
+
+    # 📈 Add attendance percentage
+    for s in summary:
+        if s["total_days"] > 0:
+            s["attendance_percentage"] = int(
+                ((s["total_days"] - s["absent_days"]) / s["total_days"]) * 100
+            )
+        else:
+            s["attendance_percentage"] = 0
+
+    context = {
+        "summary": summary,
+        "selected_month": start_date.strftime("%Y-%m"),
+    }
+
+    return render(
+        request,
+        "monthly_attendance_summary.html",
+        context
+    )

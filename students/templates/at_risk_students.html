@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-semibold">
+            🚨 At-Risk Students
+        </h4>
+
+
+
+        <a href="{% url 'teacher_dashboard' %}"
+           class="btn btn-sm btn-outline-secondary">
+            ⬅ Back
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <table class="table table-bordered mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    <th>Absents</th>
+                    <th>Status</th>
+                    
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        {{ s.student.first_name }} {{ s.student.last_name }}
+                    </td>
+                    <td>{{ s.absent_count }}</td>
+
+                    <!-- STATUS -->
+                    <td>
+                        {% if s.status == "new" %}
+                            <span class="badge bg-danger">NEW</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Reviewed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">
+                        🎉 No at-risk students
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

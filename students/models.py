@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+from django.conf import settings
 
 
 
@@ -40,10 +41,18 @@ class Student(models.Model):
     feestructure = models.ForeignKey("FeeStructure",on_delete=models.SET_NULL,null=True,blank=True)
     photo = models.ImageField(upload_to='student_photos/', blank=True, null=True)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
 
+    teacher = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="students"
+    )
     # UNIQUE ADMISSION NO FROM DATABASE
     admission_number = models.CharField(max_length=10, unique=True, blank=True, null=True)
-
+    
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
@@ -68,6 +77,70 @@ class Student(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+    
+
+    # ✅ ATTENDANCE MODEL (IKO NJE YA STUDENT)
+class Attendance(models.Model):
+    STATUS_CHOICES = (
+        ("Present", "Present"),
+        ("Absent", "Absent"),
+    )
+
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="attendances"
+    )
+
+    teacher = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    date = models.DateField()
+
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES
+    )
+    is_locked = models.BooleanField(default=False)
+    class Meta:
+        unique_together = ("student", "date")
+
+    def __str__(self):
+        return f"{self.student.full_name} - {self.date} - {self.status}"
+    
+
+
+class AttendanceAlert(models.Model):
+    STATUS_CHOICES = (
+        ("new", "New"),
+        ("reviewed", "Reviewed"),
+    )
+
+    teacher = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    student = models.ForeignKey(
+        "Student",
+        on_delete=models.CASCADE
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="new"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("teacher", "student")
+
+    def __str__(self):
+        return f"{self.student} - {self.status}"
+
 
 
 class FeeStructure(models.Model):
@@ -128,3 +201,5 @@ def save(self, *args, **kwargs):
 
 def __str__(self):
         return f"{self.student.first_name} - {self.amount_paid} - {self.status}"
+
+

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+  <!-- HEADER -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-semibold mb-0">👤 User Management</h4>
+      <small class="text-muted">
+        Manage system users, roles & permissions
+      </small>
+    </div>
+
+    <a href="{% url 'user_add' %}" class="btn btn-success btn-sm px-3">
+      <strong>＋ Add User</strong>
+    </a>
+  </div>
+
+  <!-- CARD -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light text-uppercase small">
+          <tr>
+            <th class="ps-3">Username</th>
+            <th>Role</th>
+            <th>Groups</th>
+            <th class="text-end pe-3">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <!-- USERNAME -->
+            <td class="ps-3 fw-semibold">
+              {{ user.username }}
+            </td>
+
+            <!-- ROLE -->
+            <td>
+              {% if user.is_superuser %}
+                <span class="badge bg-danger">Super Admin</span>
+              {% elif user.is_staff %}
+                <span class="badge bg-primary">Admin</span>
+              {% else %}
+                <span class="badge bg-secondary">User</span>
+              {% endif %}
+            </td>
+
+            <!-- GROUPS -->
+            <td>
+              {% if user.groups.all %}
+                {% for g in user.groups.all %}
+                  <span class="badge bg-light text-dark border">
+                    {{ g.name }}
+                  </span>
+                {% endfor %}
+              {% else %}
+                <small class="text-muted">—</small>
+              {% endif %}
+            </td>
+
+            <!-- ACTIONS -->
+            <td class="text-end pe-3">
+              <a href="{% url 'user_edit' user.id %}"
+                 class="btn btn-sm btn-outline-primary me-1">
+                Edit
+              </a>
+
+              <a href="{% url 'user_delete' user.id %}"
+                 class="btn btn-sm btn-outline-danger">
+                Delete
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center py-4 text-muted">
+              No users found
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

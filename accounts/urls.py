@@ -1,6 +1,11 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from .views import add_teacher 
+from .views import group_list, group_edit
+
+
+
 
 urlpatterns = [
     path('', views.login_user, name='login'),
@@ -9,6 +14,26 @@ urlpatterns = [
     path('register/', views.register_user, name='register'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('logout/', views.logout_user, name='logout'),
+
+    
+
+    path("admin/add-teacher/", add_teacher, name="add_teacher"),
+
+   
+    # USERS
+    path("users/", views.user_list, name="user_list"),
+    path("users/add/", views.user_add, name="user_add"),
+    path("users/<int:id>/edit/", views.user_edit, name="user_edit"),
+    path("users/<int:id>/delete/", views.user_delete, name="user_delete"),
+
+
+    path("groups/", group_list, name="group_list"),
+    path("groups/<int:id>/edit/", group_edit, name="group_edit"),
+
+
+
+
+
 
 
    # --- PASSWORD RESET SYSTEM ---

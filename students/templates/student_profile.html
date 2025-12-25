@@ -6,11 +6,16 @@
 
       
     <style>
-             /* ======= GLOBAL BACKGROUND (PRO GRADIENT + GLASS LOOK) ======= */
-         body {
-        background:url("{% static 'images/backo.jpg' %}");
-        font-family: "Segoe UI", sans-serif;
-           }
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(to right, #f5f7fa, #e4e7eb);
+    color: #222;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+
 
             /* ======= PROFILE CARD ======= */
       .profile-card {
@@ -191,7 +196,7 @@
     </div>
 </div>
 
-            <h2 class="fw-bold mb-4 text-center" style="color:#f0f0f0;">
+            <h2 class="fw-bold mb-4 text-center" style="color:#131365;">
                 <i class="bi bi-person-circle me-2"></i> {{ student.full_name }}
             </h2>
     
@@ -346,8 +351,8 @@
 
         </table>
     </div>
-    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-4">
-        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    <a href="{% url 'students_list' %}" class="btn btn-secondary mt-4">
+        <i class="bi bi-arrow-left"></i> Back to students
     </a>
 </div>
 

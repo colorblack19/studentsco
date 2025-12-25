@@ -1,0 +1,106 @@
+ {% extends "base.html" %}
+{% block content %}
+
+
+{% if absent_alerts %}
+<div class="alert alert-danger shadow-sm mb-4">
+    <h6 class="fw-semibold mb-2">
+        🚨 Students at Risk (4+ Absents)
+    </h6>
+    <ul class="mb-0">
+        {% for s in absent_alerts %}
+            <li>
+                {{ s.student__first_name }} {{ s.student__last_name }}
+                — {{ s.absent_count }} absents
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="fw-semibold mb-0">
+        📊 Attendance History
+         </h4>
+
+       <a href="{% url 'monthly_attendance_summary' %}"
+               class="btn btn-sm btn-outline-primary">
+        📅 Monthly Summary
+       </a>
+
+    
+          <a href="{% url 'teacher_dashboard' %}" class="btn btn-sm btn-outline-secondary">
+            ⬅ Back to Dashboard
+            </a>
+      </div>
+
+
+
+
+    <!-- DATE FILTER -->
+    <form method="get" class="mb-3">
+        <label class="form-label">Select date</label>
+        <input type="date"
+               name="date"
+               value="{{ selected_date }}"
+               class="form-control"
+               onchange="this.form.submit()">
+    </form>
+
+    <div class="card shadow-sm">
+        <table class="table table-bordered mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    <th>class</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+
+
+                    
+                    <td>{{ forloop.counter }}</td>
+                    
+
+                    <td>
+                               {{ record.student.first_name }} {{ record.student.last_name }}
+
+                             {% for alert in absent_alerts %}
+                               {% if alert.student_id == record.student.id %}
+                             <span class="badge bg-danger ms-2">
+                               ⚠ At Risk
+                           </span>
+                            {% endif %}
+                             {% endfor %}
+                    </td>
+
+
+                    <td>{{ student.class_name }}</td>    
+                    <td>
+                        {% if record.status == "Present" %}
+                            <span class="badge bg-success">Present</span>
+                        {% else %}
+                            <span class="badge bg-danger">Absent</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center text-muted">
+                        No attendance records for this date
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+</div>
+{% endblock %}  
