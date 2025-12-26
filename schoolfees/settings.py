@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from django.contrib.messages import constants as messages
+import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,14 +26,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-p+@so^l0+(p&5!01r$dx_45@jdds)+_%cgq-y35l!axq^o9v1x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
 
 
 
 ALLOWED_HOSTS = [
     'colorblack.pythonanywhere.com',
     'www.colorblack.pythonanywhere.com',
-
 ]
 
 
@@ -44,9 +46,15 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',  
+    'django.contrib.staticfiles',
+
     'accounts',
     'students.apps.StudentsConfig',
+
+
+
+
+
 ]
 
 MIDDLEWARE = [
@@ -137,6 +145,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles_new"
 
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
+
 
 
 
@@ -144,7 +156,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles_new"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_REDIRECT_URL = "/brand/"
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
@@ -164,9 +175,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # M-PESA DARAJA (SANDBOX)
-MPESA_CONSUMER_KEY = "lM5i0aThOo2SGx2LyF4gBJXijQGidpQW9IxXDvZbFguv2Xhy"
-MPESA_CONSUMER_SECRET = "gfvYCAtflh6Qe5LfeZ0FElC2YyiPF2yt9TnbJuiqvEDZDlX0LzsfP0p1YbR8hUkP"
-MPESA_SHORTCODE = "4189211"
-MPESA_PASSKEY = "d5c8dfb4223f89828a1fe0500340b5456ca20d77c6b963fb6ae874761731afb0"
-MPESA_ENV = "Live"
-MPESA_CALLBACK_URL = "https://paz-eustatic-stridently.ngrok-free.dev/mpesa/callback/"
+MPESA_CONSUMER_KEY = os.environ.get("MPESA_CONSUMER_KEY")
+MPESA_CONSUMER_SECRET = os.environ.get("MPESA_CONSUMER_SECRET")
+MPESA_SHORTCODE = os.environ.get("MPESA_SHORTCODE")
+MPESA_PASSKEY = os.environ.get("MPESA_PASSKEY")
+MPESA_ENV = os.environ.get("MPESA_ENV", "Sandbox")
+MPESA_CALLBACK_URL = os.environ.get("MPESA_CALLBACK_URL")
+
