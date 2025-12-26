@@ -677,13 +677,16 @@ def brand_intro(request):
 
 
 
-
 @login_required
 def teacher_dashboard(request):
-    user = request.user
-    if not request.user.groups.filter(name="Teacher - Basic").exists():
-      return render(request, "403.html")
 
+    # 🔐 Teacher only
+    if not hasattr(request.user, "teacherprofile"):
+        return render(request, "403.html")
+
+    user = request.user
+
+    # 🔽 endelea na logic yako yote hapa chini
 
     today = date.today()
 
