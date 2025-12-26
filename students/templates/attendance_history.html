@@ -54,7 +54,6 @@
                 <tr>
                     <th>#</th>
                     <th>Student</th>
-                    <th>class</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -78,9 +77,7 @@
                             {% endif %}
                              {% endfor %}
                     </td>
-
-
-                    <td>{{ student.class_name }}</td>    
+  
                     <td>
                         {% if record.status == "Present" %}
                             <span class="badge bg-success">Present</span>

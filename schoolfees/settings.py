@@ -16,6 +16,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'colorblack.pythonanywhere.com',
     'www.colorblack.pythonanywhere.com',
+    '127.0.0.1','localhost'
 ]
 
 INSTALLED_APPS = [
@@ -48,16 +49,22 @@ ROOT_URLCONF = 'schoolfees.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+
+        # Global templates folder
         'DIRS': [BASE_DIR / 'templates'],
 
         'APP_DIRS': True,
+
         'OPTIONS': {
             'context_processors': [
+                # Django defaults (USIONDOE)
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'accounts.context_processors.user_role',
 
+                # 👇 CUSTOM ROLE CONTEXT (MUHIMU)
+                'accounts.context_processors.user_role',
             ],
         },
     },
