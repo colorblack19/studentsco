@@ -50,7 +50,7 @@ from .models import AttendanceAlert
 
 from django.contrib.auth.decorators import permission_required
 
-
+from accounts.models import TeacherProfile
 
 
 
@@ -677,14 +677,14 @@ def brand_intro(request):
 
 
 
-
 @login_required
 def teacher_dashboard(request):
-    user = request.user
 
-    # Teacher only
+    # 🔐 Teacher only
     if not hasattr(request.user, "teacherprofile"):
-       return render(request, "403.html")
+        return render(request, "403.html")
+
+    user = request.user
 
 
     today = date.today()
