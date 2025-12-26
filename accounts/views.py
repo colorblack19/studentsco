@@ -22,19 +22,22 @@ def login_user(request):
 
         if user is not None:
             login(request, user)
-            
-            if user.groups.filter(name__icontains="Teacher").exists():
-                return redirect('teacher_dashboard')
-            elif user.is_staff:
-                return redirect('dashboard')
-            else:
-                return redirect('dashboard')
 
+            # 🔐 ROLE BASED REDIRECT (FINAL & CLEAN)
+            if hasattr(user, "teacherprofile"):
+                return redirect("teacher_dashboard")
+
+            elif user.is_staff:
+                return redirect("dashboard")
+
+            else:
+                return redirect("dashboard")
 
         else:
             messages.error(request, "Invalid username or password")
 
     return render(request, 'accounts/login_19.html')
+
 
 
 def logout_user(request):
@@ -89,7 +92,6 @@ def add_teacher(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
-        email = request.POST.get("email")
 
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists")
@@ -97,20 +99,17 @@ def add_teacher(request):
 
         user = User.objects.create_user(
             username=username,
-            email=email,
             password=password
         )
 
-        # 🔐 CREATE ROLE (STABLE)
-        TeacherProfile.objects.create(user=user)
+        # GROUP = ROLE
+        group, _ = Group.objects.get_or_create(name="Teacher - Basic")
+        user.groups.add(group)
 
-        # 🎯 OPTIONAL: DEFAULT GROUP
-        default_group, _ = Group.objects.get_or_create(
-            name="Teacher - Basic"
-        )
-        user.groups.add(default_group)
+        # (OPTIONAL) create profile if you still want it
+        TeacherProfile.objects.get_or_create(user=user)
 
-        messages.success(request, "Teacher added successfully")
+        messages.success(request, f"Teacher {username} created successfully")
         return redirect("dashboard")
 
     return render(request, "accounts/add_teacher.html")

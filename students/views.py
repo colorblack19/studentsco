@@ -50,7 +50,7 @@ from .models import AttendanceAlert
 
 from django.contrib.auth.decorators import permission_required
 
-
+from accounts.models import TeacherProfile
 
 
 
@@ -686,7 +686,6 @@ def teacher_dashboard(request):
 
     user = request.user
 
-    # 🔽 endelea na logic yako yote hapa chini
 
     today = date.today()
 
