@@ -681,9 +681,8 @@ def brand_intro(request):
 @login_required
 def teacher_dashboard(request):
     user = request.user
-    if not request.user.groups.filter(name__icontains="Teacher").exists():
-        return render(request, "403.html")
-
+    if not request.user.groups.filter(name="Teacher - Basic").exists():
+      return render(request, "403.html")
 
 
     today = date.today()
