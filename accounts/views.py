@@ -22,16 +22,14 @@ def login_user(request):
 
         if user is not None:
             login(request, user)
-
-            # ✅ FINAL ROLE CHECK
-            if hasattr(user, 'teacherprofile'):
+            
+            if user.groups.filter(name__icontains="Teacher").exists():
                 return redirect('teacher_dashboard')
-
             elif user.is_staff:
                 return redirect('dashboard')
-
             else:
                 return redirect('dashboard')
+
 
         else:
             messages.error(request, "Invalid username or password")
