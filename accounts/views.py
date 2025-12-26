@@ -23,8 +23,8 @@ def login_user(request):
         if user is not None:
             login(request, user)
 
-            # 🔀 ROLE BASED REDIRECT (PRO)
-            if user.groups.filter(name="Teacher").exists():
+            # ✅ FINAL ROLE CHECK
+            if hasattr(user, 'teacherprofile'):
                 return redirect('teacher_dashboard')
 
             elif user.is_staff:
@@ -37,7 +37,6 @@ def login_user(request):
             messages.error(request, "Invalid username or password")
 
     return render(request, 'accounts/login_19.html')
-
 
 
 def logout_user(request):
