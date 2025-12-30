@@ -1,6 +1,8 @@
-accounts.zip# Virtual environment
-venv/
-env/
+# Django static collected files
+staticfiles/
+
+# Media uploads
+media/
 
 # Python
 __pycache__/
@@ -9,8 +11,9 @@ __pycache__/
 # Database
 db.sqlite3
 
-# Media uploads
-media/
+# Virtual environment
+venv/
+env/
 
 # VS Code
 .vscode/
@@ -18,9 +21,6 @@ media/
 # Zip files
 accounts.zip
 
-# Virtual environment
-venv/
-env/
 
 # Python
 __pycache__/
