@@ -118,8 +118,9 @@ def add_teacher(request):
         )
 
         # GROUP = ROLE
-        group, _ = Group.objects.get_or_create(name="Teacher - Basic")
+        group, _ = Group.objects.get_or_create(name="Teacher")
         user.groups.add(group)
+
 
         # (OPTIONAL) create profile if you still want it
         TeacherProfile.objects.get_or_create(user=user)
@@ -175,7 +176,7 @@ def user_list(request):
     users = (
         User.objects
         .filter(
-            Q(groups__name="Teacher") | Q(is_staff=True)
+            Q(groups__name__icontains="Teacher") | Q(is_staff=True)
         )                       # ✅ Teacher AU Staff
         .exclude(is_superuser=True)  # ❌ Ondoa SYSTEM@SCHOOL
         .exclude(id=request.user.id) # ❌ Ondoa wewe admin ulielogin
