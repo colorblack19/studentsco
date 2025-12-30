@@ -1102,7 +1102,17 @@ def admin_attendance_overview(request):
 
     records = (
         Attendance.objects
-        .select_related("student", "teacher")
+
+
+
+        .select_related(
+    "student",
+    "student__feestructure",
+    "student__teacher",
+    "teacher"
+)
+
+
         .order_by("-date")
     )
 
