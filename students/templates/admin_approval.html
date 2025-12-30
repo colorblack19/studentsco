@@ -1,0 +1,307 @@
+
+{% extends "base.html" %}
+{% block content %}
+
+
+<style>
+
+/* ================================
+   ADMIN APPROVAL – CLEAN PRO UI
+================================ */
+
+/* Page background */
+.admin-approval-page {
+    background: #f3f4f6;
+}
+
+/* Main wrapper */
+.approval-wrapper {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 12px 30px rgba(0,0,0,.08);
+    overflow: hidden;
+}
+
+/* LEFT PANEL */
+.approval-wrapper .col-md-5 {
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+}
+
+.approval-wrapper h4 {
+    font-weight: 600;
+    color: #d9dee7;
+}
+
+.approval-wrapper p {
+    color: #cbced2;
+    font-size: 14px;
+}
+
+/* Inputs */
+.approval-wrapper input.form-control {
+    border-radius: 10px;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+.approval-wrapper input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+}
+
+/* Button */
+.approval-wrapper .btn-danger {
+    background: #2563eb;
+    border: none;
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 12px;
+    transition: background .2s ease;
+}
+
+.approval-wrapper .btn-danger:hover {
+    background: #1d4ed8;
+}
+
+/* Alerts */
+.approval-wrapper .alert {
+    font-size: 13px;
+    border-radius: 8px;
+}
+
+/* RIGHT PANEL */
+.approval-wrapper .col-md-7 {
+    background: #f9fafb;
+}
+
+/* Section title */
+.approval-wrapper .col-md-7 h5 {
+    font-weight: 600;
+    color: #111827;
+}
+
+/* TABLE */
+.approval-wrapper table {
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 13px;
+}
+
+.approval-wrapper thead th {
+    background: #f3f4f6;
+    color: #374151;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: .05em;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.approval-wrapper tbody td {
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.approval-wrapper tbody tr:hover {
+    background: #eff6ff;
+}
+
+/* Empty state */
+.approval-wrapper tbody td.text-muted {
+    font-style: italic;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .approval-wrapper {
+        width: 95% !important;
+    }
+
+    .approval-wrapper .col-md-5 {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+    }
+}
+/* ================================
+   ADMIN ACTIONS – LARGE TABLE
+================================ */
+
+.approval-wrapper table {
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 13px;
+    width: 100%;
+    table-layout: fixed; /* ⭐ HII NDIO KEY */
+}
+
+
+/* Fix text breaking inside table */
+.approval-wrapper td {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.approval-wrapper thead th {
+    padding: 14px 16px;
+    font-size: 12px;
+}
+
+.approval-wrapper tbody td {
+    padding: 14px 16px;
+    vertical-align: middle;
+}
+
+/* Make rows feel solid */
+.approval-wrapper tbody tr {
+    transition: background 0.15s ease;
+}
+
+/* Hover effect (admin feel) */
+.approval-wrapper tbody tr:hover {
+    background: #e0ecff;
+}
+
+/* Username bold */
+.approval-wrapper tbody td:first-child {
+    
+    color: #1f2937;
+    
+}
+
+/* Action column stand out */
+.approval-wrapper tbody td:nth-child(2) {
+    color: #111827;
+}
+
+/* Date column subtle */
+.approval-wrapper tbody td:last-child {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* Empty state bigger */
+.approval-wrapper tbody td.text-muted {
+    padding: 25px;
+    font-size: 14px;
+}
+
+/* On wide screens – let table breathe */
+@media (min-width: 1200px) {
+    .approval-wrapper .col-md-7 {
+        padding: 2rem 2.5rem;
+    }
+}
+
+.page-wrapper {
+    padding-top: 0;
+}
+
+/* ADMIN ONLY */
+.page-wrapper.admin-layout {
+    padding-top: 50px;   /* height ya fixed navbar */
+}
+</style>
+
+<div class="page-wrapper {% if request.user.is_staff %}admin-layout{% endif %}">
+
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-dark admin-approval-page">
+
+    <div class="row w-75 shadow-lg rounded-4 overflow-hidden approval-wrapper">
+
+
+        <!-- LEFT: APPROVAL FORM -->
+        <div class="col-md-5 bg-black text-white p-4">
+            <h4 class="mb-2">🔐 Admin Approval</h4>
+           <p class="approval-desc">
+           This action requires administrator permission.
+           </p>
+
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger py-1">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <input type="text"
+                       name="username"
+                       class="form-control mb-3"
+                       placeholder="Admin Username"
+                       required>
+
+                <input type="password"
+                       name="password"
+                       class="form-control mb-3"
+                       placeholder="Admin Password"
+                       required>
+
+                <button class="btn btn-danger w-100">
+                    ✅ Approve Action
+                </button>
+            </form>
+
+          <small class="approval-note">
+             Approval is valid for one action only.
+           </small>
+        
+        </div>
+
+        <!-- RIGHT: ACTION REPORT -->
+        <div class="col-md-7 bg-light p-4">
+            <h5 class="mb-3">📊 Recent Admin Actions</h5>
+
+            <table class="table table-sm table-bordered align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Date</th>
+                        <th class="text-end">ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ log.user.username }}</td>
+                        <td>{{ log.action }}</td>
+                        <td>{{ log.timestamp|date:"d M Y, H:i" }}</td>
+
+                            <td class="text-end">
+                             {% if request.user.is_superuser %}
+                              <a href="{% url 'delete_admin_log' log.id %}"
+                            class="btn btn-sm btn-danger"
+                             onclick="return confirm('Delete this record?')">
+                              🗑
+                               </a>
+                          {% else %}
+                              <span class="text-muted">—</span>
+                                 {% endif %}
+                         </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">
+                            No actions recorded.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+</div>
+{% endblock %}

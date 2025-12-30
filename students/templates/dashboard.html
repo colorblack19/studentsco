@@ -5,7 +5,7 @@
 
 
 .cb-hero {
-    height: 60vh;
+    height: 80vh;
     background: linear-gradient(
         rgba(0,0,0,0.75),
         rgba(0,0,0,0.75)
@@ -19,12 +19,6 @@
     color: #fff;
     box-shadow: inset 0 -40px 60px rgba(0,0,0,0.4);
 }
-
-/* 👨‍👩‍👦 STUDENTS / PARENTS */
-.cb-hero-full {
-    height: 100vh;
-}
-
 
 .hero-actions {
     margin-top: 70px;
@@ -80,70 +74,11 @@
     }
 }
 
-/* ===== HERO ADMIN TOP BAR (INSIDE HERO) ===== */
-.hero-admin-top {
-    position: absolute;
-    top: 25px;
-    left: 50px;
-    right: 50px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 5;
-}
-
-/* SYSTEM SCHOOL TEXT */
-.hero-left {
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: #ffffff;
-    text-transform: uppercase;
-    opacity: 0.95;
-}
-
-/* LOGOUT BUTTON (LIKE SEARCH STUDENT) */
-.hero-logout-btn {
-    border: 1px solid #fff;
-    color: #fff;
-    background: transparent;
-    padding: 6px 18px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    transition: all 0.3s ease;
-}
-
-.hero-logout-btn:hover {
-    background: #dc3545;
-    border-color: #dc3545;
-    color: #fff;
-}
-
 /* HERO CENTER */
 .hero-content {
     position: relative;
     z-index: 2;
 }
-
-/* MOBILE */
-@media (max-width: 768px) {
-    .hero-admin-top {
-        left: 20px;
-        right: 20px;
-        top: 15px;
-    }
-
-    .hero-left {
-        font-size: 0.9rem;
-        letter-spacing: 1px;
-    }
-
-    .hero-logout-btn {
-        padding: 5px 14px;
-        font-size: 0.75rem;
-    }
-}
-
 
 /* DASHBOARD AREA */
 .dashboard-bg {
@@ -206,62 +141,17 @@
 
 
 <section class="cb-hero {% if not request.user.is_superuser %}cb-hero-full{% endif %}">
-{% if request.user.is_authenticated and not request.user.is_staff %}
-
-    <!-- ADMIN HERO TOP -->
-    <div class="hero-admin-top">
-        <div class="hero-left">
-            SCHOOL SYSTEM
-        </div>
-
-        <div class="hero-right">
-            <a href="{% url 'logout' %}" class="btn hero-logout-btn">
-                Logout
-            </a>
-        </div>
-      </div>
       
-       {% endif %}
      <div>
         <h1>COLOR BLACK 19</h1>
         <p>Smart School Fees Management System</p>
         <small>Automated • Secure • M-Pesa Integrated</small>
-
-       <div class="hero-actions">
-
-       {% if request.user.is_superuser %}
-        <!-- ADMIN: no button -->
-
-        {% elif request.user.is_authenticated %}
-        <!-- STUDENT / PARENT -->
-        <a href="{% url 'students_list' %}" 
-           class="btn btn-outline-light btn-lg px-4">
-            🔍 Search Student
-        </a>
-
-       {% else %}
-        <!-- GUEST -->
-        <a href="{% url 'login' %}" 
-           class="btn btn-primary btn-lg px-4 me-2">
-            🔐 Login
-        </a>
-
-        <a href="{% url 'students_list' %}" 
-           class="btn btn-outline-light btn-lg px-4">
-            🔎 Search Student
-        </a>
-        <p class="mt-2 small text-light opacity-75">
-        Search a student by name or class
-          </p>
-          {% endif %}
-  
-       </div>
     </div>
 
 
 </section>
 
-{% if request.user.is_superuser %}
+
 
 
 
@@ -411,5 +301,5 @@ window.addEventListener("scroll", function () {
 
 
 </script>
-{% endif %}
+
 {% endblock %}

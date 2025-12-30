@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+
+  .page-wrapper {
+    padding-top: 70px;
+    padding-left: 30px;
+}
+
+</style>
+
+
+
+
+<div class="page-wrapper">
+<h4 class="mb-3">🚨 Attendance Alerts</h4>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Student</th>
+      <th>Teacher</th>
+      <th>Status</th>
+      <th>Created</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for alert in alerts %}
+    <tr>
+      <td>{{ alert.student }}</td>
+      <td>{{ alert.teacher.username }}</td>
+      <td>{{ alert.status }}</td>
+      <td>{{ alert.created_at|date:"Y-m-d" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No alerts</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

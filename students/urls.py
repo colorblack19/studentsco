@@ -4,10 +4,25 @@ from . import views
 from .views import (
     teacher_students,
     teacher_dashboard,
-    mark_attendance,
+    mark_attendance
 )
+from .views import (
+    admin_attendance_overview,
+    admin_locked_attendance,
+    unlock_attendance,attendance_alerts,)
+from .views import delete_admin_log
+
+from accounts.views import home_dashboard
 
 urlpatterns = [
+    
+
+
+
+    path("", home_dashboard, name="home_dashboard"),
+
+
+
     path("", lambda request: redirect("dashboard")),
 
     # MAIN
@@ -20,6 +35,19 @@ urlpatterns = [
     path("teacher/attendance/history/", views.attendance_history,name="attendance_history"),
     path("teacher/performance/at-risk/", views.at_risk_students,name="at_risk_students"),
     path("teacher/attendance/summary/",views.monthly_attendance_summary,name="monthly_attendance_summary"),
+
+    # 🔍 Admin Attendance
+    path("admin/attendance/",admin_attendance_overview,name="attendance_overview"),
+
+    path("admin/attendance/locked/",admin_locked_attendance,name="locked_attendance"),
+
+
+    # 🔓 ACTION (no template)
+    path("admin/attendance/unlock/<int:attendance_id>/",unlock_attendance,name="unlock_attendance"),
+
+
+    path("attendance/alerts/",attendance_alerts,name="attendance_alerts"),
+
 
 
     path("students/", views.students_list, name="students_list"),
@@ -48,6 +76,20 @@ urlpatterns = [
 
     path("alerts/<int:alert_id>/reviewed/",views.mark_alert_reviewed,name="mark_alert_reviewed"),
     path("brand/", views.brand_intro, name="brand_intro"),
+    path('fee-structure/',views.public_feestructure,name='public_feestructure'),
+   
+
+
+    path('search-student/', views.search_student, name='search_student'),
+
+
+    path("verify-admission/<int:pk>/",views.verify_admission,name="verify_admission"),
+
+    path("admin-approval/", views.admin_approval, name="admin_approval"),
+
+    path("admin/log/delete/<int:log_id>/", delete_admin_log, name="delete_admin_log"),
+    
+
 
 
 ]

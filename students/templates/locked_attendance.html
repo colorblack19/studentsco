@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+
+  .page-wrapper {
+    padding-top: 70px;
+    padding-left: 30px;
+}
+
+</style>
+
+<div class="page-wrapper">
+<div class="container py-4">
+    <h4 class="fw-semibold mb-3">🔒 Locked Attendance</h4>
+
+    <div class="card shadow-sm">
+        <div class="card-body table-responsive">
+
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Student</th>
+                        <th>Class</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for record in records %}
+                    <tr>
+                        <td>{{ record.student.full_name }}</td>
+                        <td>{{ record.student.student_class }}</td>
+                        <td>{{ record.date }}</td>
+
+                        <td>
+                            {% if record.is_present %}
+                                <span class="badge bg-success">Present</span>
+                            {% else %}
+                                <span class="badge bg-danger">Absent</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{% url 'unlock_attendance' record.id %}"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('Unlock this attendance?');">
+                                🔓 Unlock
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            No locked attendance records 🎉
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

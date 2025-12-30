@@ -1,0 +1,276 @@
+
+     {% extends "base.html" %}
+     {% load static %}
+
+      {% block content %}   
+
+
+<style>
+
+  .page-wrapper {
+    padding-top: 70px;
+    padding-left: 20px;
+}
+
+</style>
+
+<div class="page-wrapper">
+<div class="container my-5">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <p class="text-muted">
+                Manage school events and schedules
+            </p>
+        </div>
+
+        <a href="{% url 'add_event' %}" class="btn btn-primary">
+            ADD NEW EVENT
+        </a>
+    </div>
+
+    <!-- ALERT MESSAGE -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- TABLE -->
+    <div class="card shadow border-0 rounded-4">
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for e in events %}
+                        <tr>
+
+                            <td class="fw-semibold">{{ forloop.counter }}</td>
+
+                            <!-- EVENT -->
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    {% if e.image %}
+                                        <img src="{{ e.image.url }}" class="event-thumb">
+                                    {% else %}
+                                        <div class="event-placeholder">📅</div>
+                                    {% endif %}
+
+                                    <div>
+                                        <div class="fw-semibold">{{ e.title }}</div>
+                                        <small class="text-muted">
+                                            Event ID: {{ e.id }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- DATE -->
+                            <td>
+                                {{ e.start_date|date:"M d, Y" }} <br>
+                                <small class="text-muted">
+                                    {{ e.start_date|date:"g:i A" }}
+                                </small>
+                            </td>
+
+                            <!-- STATUS -->
+                            <td>
+                                <span class="badge bg-success">
+                                    Active
+                                </span>
+                            </td>
+
+                            <!-- ACTIONS -->
+                            <td class="text-end">
+                                <a href="{% url 'edit_event' e.id %}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    ✏️ Edit
+                                </a>
+
+                                <a href="{% url 'delete_event' e.id %}"
+                                   class="btn btn-sm btn-outline-danger">
+                                    🗑 Delete
+                                </a>
+                            </td>
+
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                No events available
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</div>
+
+
+<style>
+/* ===== CENTER MAIN CONTAINER ===== */
+.container {
+    max-width: 1100px;   /* iwe katikati, isiwe wide sana */
+}
+
+/* ===== HEADER SECTION ===== */
+.container .d-flex {
+    align-items: center;
+}
+
+.container p.text-muted {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* ===== TOP HEADER SECTION ===== */
+.container > .d-flex {
+    flex-direction: column;        /* zishuke chini kwa mstari */
+    align-items: center !important;
+    text-align: center;
+    gap: 0.6rem;
+    margin-bottom: 2.8rem;         /* space kati ya header na table */
+}
+
+/* HEADER TEXT */
+.container p.text-muted {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+}
+
+/* ADD NEW EVENT LINK */
+.container a.btn-primary {
+    margin-top: 0.2rem;
+    padding: 0.45rem 1.2rem;
+    font-weight: 600;
+}
+
+
+/* BUTTON */
+a.btn.btn-primary {
+    border-radius: 10px;
+    padding: 0.55rem 1.3rem;
+    font-weight: 600;
+}
+
+/* ===== CARD / TABLE WRAPPER ===== */
+.card {
+    border-radius: 16px;
+}
+
+.card.shadow {
+    box-shadow: 0 14px 35px rgba(0,0,0,0.08) !important;
+}
+
+/* ===== TABLE ===== */
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* TABLE HEADER */
+.table thead th {
+    font-size: 0.8rem;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #6c757d;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    white-space: nowrap;
+}
+
+/* TABLE BODY */
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+/* ROW HOVER */
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* ===== EVENT IMAGE ===== */
+.event-thumb {
+    width: 46px;
+    height: 46px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.event-placeholder {
+    width: 46px;
+    height: 46px;
+    background: #eef2f7;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+/* ===== STATUS BADGE ===== */
+.badge {
+    border-radius: 20px;
+    font-size: 0.75rem;
+    padding: 0.45em 0.8em;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.btn-sm {
+    border-radius: 8px;
+    padding: 0.35rem 0.7rem;
+    font-weight: 500;
+}
+
+/* ===== EMPTY STATE ===== */
+tbody tr td[colspan] {
+    font-size: 0.95rem;
+    padding: 3rem !important;
+    text-align: center;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .table thead {
+        display: none;
+    }
+}
+.page-wrapper {
+    padding-top: 70px;
+}
+
+
+</style>
+{% endblock %}

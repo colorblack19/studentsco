@@ -19,18 +19,27 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from students.views import brand_intro
+from accounts.views import home_dashboard
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+
+           # 🔥 HOME PAGE (ROOT)
+    path("", home_dashboard, name="home_dashboard"),
 
     # BRAND INTRO (HOME PAGE)
     path('', brand_intro, name='home'),
 
+    
+    path("", include("events.urls")),
     # AUTH (LOGIN / REGISTER / DASHBOARD)
     path('accounts/', include('accounts.urls')),
 
     # STUDENTS / SYSTEM
     path('students/', include('students.urls')),
+
+
+    path('admin/', admin.site.urls),
+    
 
 
 ]

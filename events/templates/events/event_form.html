@@ -1,0 +1,88 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm event-form-card">
+                <div class="card-header text-center">
+                    <h4 class="mb-0">{{ title }}</h4>
+                </div>
+
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="form-fields">
+                            {{ form.as_p }}
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'admin_events' %}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success px-4">
+                                Save Event
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .event-form-card {
+    border: none;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.event-form-card .card-header {
+    background: linear-gradient(135deg, #198754, #157347);
+    color: #fff;
+    padding: 1.2rem;
+}
+
+.event-form-card h4 {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.form-fields p {
+    margin-bottom: 1rem;
+}
+
+.form-fields label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.form-fields input,
+.form-fields select,
+.form-fields textarea {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-fields input:focus,
+.form-fields select:focus,
+.form-fields textarea:focus {
+    outline: none;
+    border-color: #198754;
+    box-shadow: 0 0 0 0.15rem rgba(25, 135, 84, 0.25);
+}
+
+button.btn-success {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+a.btn-outline-secondary {
+    border-radius: 8px;
+}
+
+</style>

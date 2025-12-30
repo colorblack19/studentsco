@@ -1,0 +1,149 @@
+
+<div class="delete-wrapper">
+
+    <div class="delete-card">
+
+        <div class="delete-icon">
+            🗑
+        </div>
+
+        <h4 class="delete-title">
+            Delete Event
+        </h4>
+
+        <p class="delete-text">
+            Are you sure you want to delete
+            <br>
+            <span class="delete-event-name">
+                "{{ event.title }}"
+            </span>?
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="delete-actions">
+                <button type="submit" class="btn-delete">
+                    Yes, Delete
+                </button>
+
+                <a href="{% url 'admin_events' %}"
+                   class="btn-cancel">
+                    Cancel
+                </a>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+<style>
+
+/* ===== DELETE EVENT PAGE ===== */
+
+.delete-wrapper {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-card {
+    width: 100%;
+    max-width: 520px;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+/* ICON */
+.delete-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    font-size: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+}
+
+/* TITLE */
+.delete-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 10px;
+}
+
+/* TEXT */
+.delete-text {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+/* EVENT NAME */
+.delete-event-name {
+    font-weight: 600;
+    color: #dc3545;
+}
+
+/* BUTTONS */
+.delete-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-delete {
+    padding: 10px 26px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 10px;
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+    background: #bb2d3b;
+    transform: translateY(-1px);
+}
+
+.btn-cancel {
+    padding: 10px 26px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 10px;
+    background: #f1f3f5;
+    color: #495057;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+</style>

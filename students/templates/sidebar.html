@@ -1,0 +1,131 @@
+<style>
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    margin-left: 185px;                     
+    transition: margin-left 0.3s ease;
+}
+
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    width:195px;
+    height: calc(100vh - 56px); /* height ya navbar */
+    position: fixed;
+    top: 56px;
+    left: 0;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 1.2rem 0;
+    overflow-y: auto;
+    z-index: 1030;
+}
+
+/* ===== MENU ===== */
+.sidebar-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 1.4rem;
+    color: #111827;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+/* HOVER */
+.sidebar-menu li a:hover {
+    background: #f3f4f6;
+    border-left-color: #0d6efd;
+    color: #0d6efd;
+}
+
+/* ACTIVE (OPTIONAL) */
+.sidebar-menu li a.active {
+    background: #eaf2ff;
+    border-left-color: #0d6efd;
+    color: #0d6efd;
+}
+
+/* TEXT */
+.sidebar-menu li a span {
+    white-space: nowrap;
+}
+
+/* DIVIDER */
+.sidebar-menu .divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 0.7rem 1.2rem;
+}
+
+
+</style>
+
+<aside class="sidebar">
+
+    <ul class="sidebar-menu">
+
+        <li>
+            <a href="{% url 'admin_events' %}">
+                📅 <span>School Events</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'attendance_overview' %}">
+                🗂️<span>All Attendance</span>
+            </a>
+        </li>
+
+        <li>
+    <a href="{% url 'locked_attendance' %}">
+        🔐 <span>Locked Records</span>
+    </a>
+        </li>
+
+        <li>
+            <a href="{% url 'attendance_alerts' %}">
+                🚨 <span>Attendance Alerts</span>
+            </a>
+        </li>
+
+        <li class="divider"></li>
+
+        <li>
+            <a href="{% url 'add_teacher' %}">
+                👨‍🏫 <span>Teachers</span>
+            </a>
+        </li>
+
+        <li class="divider"></li>
+
+        <li>
+            <a href="{% url 'group_list' %}">
+                ⚙ <span>Manage Groups</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'user_list' %}">
+                👥<span>Manage Users</span>
+            </a>
+        </li>
+
+       
+{% if request.user.is_superuser %}
+<li>
+    <a href="{% url 'admin_approval' %}">
+        🛡️ <span>Admin Room</span>
+    </a>
+</li>
+{% endif %}
+    </ul>
+</aside>

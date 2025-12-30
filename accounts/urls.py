@@ -4,21 +4,20 @@ from django.contrib.auth import views as auth_views
 from .views import add_teacher 
 from .views import group_list, group_edit
 
-
-
+from .views import after_login_redirect
 
 urlpatterns = [
+    
+ 
     path('', views.login_user, name='login'),
     path('login/', views.login_user, name='login'),
     path('logout/', views.logout_user, name='logout'),
     path('register/', views.register_user, name='register'),
-    path('dashboard/', views.dashboard, name='dashboard'),
-    path('logout/', views.logout_user, name='logout'),
 
     
 
-   
-
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('logout/', views.logout_user, name='logout'),
     path("admin/add-teacher/", add_teacher, name="add_teacher"),
     # USERS
     path("users/", views.user_list, name="user_list"),
@@ -55,4 +54,9 @@ urlpatterns = [
     path('password-reset-complete/',
          auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'),
          name='password_reset_complete'),
+
+
+    path("redirect/", after_login_redirect, name="after_login_redirect"),
+    path("about/", views.about_us, name="about"),
+    
 ]

@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 
+
+<style>
+.page-wrapper {
+    padding-top: 70px;
+    padding-left: 30px;
+}
+</style>
+
+
+<div class="page-wrapper">
+
+
 <div class="container-fluid mt-4">
 
   <!-- HEADER -->
@@ -8,7 +20,9 @@
     <div>
       <h4 class="fw-semibold mb-0">👤 User Management</h4>
       <small class="text-muted">
-        Manage system users, roles & permissions
+
+    Showing registered teachers only
+
       </small>
     </div>
 
@@ -90,5 +104,5 @@
   </div>
 
 </div>
-
+</div>
 {% endblock %}

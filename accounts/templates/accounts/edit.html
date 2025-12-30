@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
+<style>
 
+  .page-wrapper {
+    padding-top: 70px;
+    padding-left: 20px;
+}
+
+</style>
+
+<div class="page-wrapper">
 <div class="container mt-4">
     <h4 class="mb-3">✏️ Change user: <strong>{{ user_obj.username }}</strong></h4>
 
@@ -62,5 +71,5 @@
 
     </form>
 </div>
-
+</div>
 {% endblock %}

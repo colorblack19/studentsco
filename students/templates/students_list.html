@@ -3,38 +3,133 @@
 
 {% block content %}
 
-
 <style>
     body {
-        background: #d5d6d8;
+        background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+        font-family: "Segoe UI", Tahoma, sans-serif;
     }
+
     .table-container {
-        background: #fff;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(111, 112, 112, 0.891);
+        background: #ffffff;
+        padding: 35px;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
-    .filter-box {
-        background: #f8f9fa;
-        padding: 20px;
+
+    h2 {
+        color: #2c3e50;
+        letter-spacing: 0.5px;
+    }
+
+    /* HEADER SUMMARY */
+    .summary-box {
+        background: #f1f5ff;
         border-radius: 12px;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        padding: 15px 20px;
         margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        color: #2c3e50;
     }
+    .summary-box h3 {
+        font-weight: 600;
+        color: #0d6efd;
+    }
+
+    .summary-box h4 {
+        font-weight: 600;
+        color: #0d6efd;
+    }
+
+    /* FILTER BOX */
+    .filter-box {
+        background: #fdfefe;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+        margin-bottom: 30px;
+        border-left: 5px solid #0d6efd;
+    }
+
     .filter-title {
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 10px;
+        font-weight: 600;
+        color: #0d6efd;
+        margin-bottom: 15px;
         font-size: 18px;
     }
 
+    .form-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #495057;}
+
+         /* TABLE */
+    table {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    thead th {
+        font-size: 14px;
+        letter-spacing: 0.3px;
+    }
+
+    tbody td {
+        font-size: 14px;
+        color: #2c3e50;
+        vertical-align: middle;
+    }
+
+    tbody tr:hover {
+        background-color: #f1f5ff;
+        transition: 0.2s ease-in-out;}
+            /* EMPTY STATE */
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+        font-size: 15px;
+    }
+      /* PAGINATION */
+    .pagination {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #555;
+        text-align: center;
+    }
+
+    .pagination a {
+        text-decoration: none;
+        margin: 0 10px;
+        font-weight: 500;
+        color: #0d6efd;
+    }
+
+    .pagination a:hover {
+        text-decoration: underline;
+    }
 </style>
 
 <div class="container py-5">
     <div class="table-container">
+          <h2 class="fw-bold mb-3">👨‍🎓 ALL STUDENTS</h2>
 
-        <h2 class="fw-bold mb-4">All Students</h2>
+        <!-- SUMMARY -->
+        <div class="summary-box">
+            <div>
+            Total Students:
+            <h3>{{ total_students }}</h3>
 
+            </div>
+            <div>
+                System Status:
+                <h4>
+                    Active
+               </h4>
+            </div>
+        </div>
         <!-- -------------- FILTER BOX ---------------- -->
         <div class="filter-box">
             <div class="filter-title">Search & Filters</div>
@@ -87,7 +182,7 @@
             </form>
         </div>
         <!-- -------------- END FILTER BOX ---------------- -->
-
+       
         <table class="table table-hover align-middle">
             <thead class="table-dark">
                 <tr>
@@ -101,27 +196,48 @@
             </thead>
 
             <tbody>
+                 {% if student_data %}
             {% for item in student_data %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ item.student.full_name }}</td>
                     <td>{{ item.student.parent_name }}</td>
                     <td>{{ item.student.class_level }}</td>
-                    <td>Ksh {{ item.balance }}</td>
+                    <td>
+                  {% if request.user.is_superuser %}
+                  <span class="balance">Ksh {{ item.balance }}</span>
+                  {% else %}
+                  <span class="badge bg-light text-secondary px-3 py-2">
+                     <i class="bi bi-eye"></i> 🔒 View profile
+                     </span>
+
+                   {% endif %}
+                 </td>
+
 
                     <td>
                         <a href="{% url 'student_profile' item.student.id %}" class="btn btn-primary btn-sm">
                             View
                         </a>
-
                         <a href="{% url 'delete_student' item.student.id %}"
                            class="btn btn-danger btn-sm"
                            onclick="return confirm('Are you sure you want to delete this student?')">
                            Delete
                         </a>
+                        
                     </td>
                 </tr>
-            {% endfor %}
+           
+                    {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            😕 No students found with the selected filters.
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
             </tbody>
 
         </table>
@@ -138,11 +254,27 @@
     {% endif %}
 </div>
 
-        <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">
-            Back to Dashboard
-        </a>
+{% if request.user.is_superuser %}
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+{% else %}
+    <a href="{% url 'home' %}" class="btn btn-secondary mt-3">
+        Back to Home
+    </a>
+{% endif %}
 
     </div>
 </div>
 
+<script>
+    if (window.location.search.includes("search=") &&
+        !window.location.search.includes("search=&")) {
+        setTimeout(() => {
+            document.querySelector('input[name="search"]').value = "";
+        }, 2000);
+    }
+
+
+</script>
 {% endblock %}

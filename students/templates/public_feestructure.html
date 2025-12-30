@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+
+    <!-- PAGE TITLE -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">📢 Official School Fee Structure</h2>
+        <p class="text-muted">
+            This fee structure applies to all students as approved by the school administration.
+        </p>
+    </div>
+
+    <!-- NOTICE -->
+    <div class="alert alert-info">
+        <strong>Note:</strong> Fees should be paid according to the structure below.
+        Any updates will be communicated officially through this page.
+    </div>
+
+    <!-- TABLE -->
+    <div class="card shadow-sm">
+        <table class="table table-bordered table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Class</th>
+                    <th>Total Fees (KES)</th>
+                    <th>Opening Amount</th>
+                    <th>Balance Deadline</th>
+                    <th>Additional Notes</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for fee in items %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ fee.class_name }}</td>
+                    <td><strong>{{ fee.amount }}</strong></td>
+                    <td>{{ fee.opening_amount|default:"-" }}</td>
+                    <td>{{ fee.deadline|date:"M d, Y"|default:"-" }}</td>
+                    <td>{{ fee.notes|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">
+                        No fee structure published at the moment.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+    <a href="{% url 'home' %}" class="btn btn-secondary mt-3">
+        Back to Home
+    </a>
+</div>
+
+{% endblock %}

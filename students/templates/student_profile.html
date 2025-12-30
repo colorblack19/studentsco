@@ -10,14 +10,95 @@ body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    background: linear-gradient(to right, #f5f7fa, #e4e7eb);
-    color: #222;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    color: #0f172a;
+}
+
+/* ================= HERO ================= */
+
+.page-hero {
+    position: relative;
+     padding: 30px 10px 30px;
+    background: linear-gradient(
+        rgba(41, 98, 233, 0.85),
+        rgba(15,23,42,0.85)
+    );
+    color: #fff;
+    text-align: center;
+}
+.page-hero h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: .8px;
+    margin-bottom: 12px;
+}
+
+.page-hero p {
+    max-width: 720px;
+    margin: auto;
+    color: #cbd5e1;
+    font-size: 1.05rem;
+}
+
+/* ================= MAIN CONTAINER ================= */
+.page-section {
+    padding: 90px 0;
+    margin-top: -60px;
+}
+
+.main-container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 0 20px;
+}
+
+/* ================= CARD ================= */
+.content-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 45px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.08);
+    margin-bottom: 40px;
+}
+/* ================= TITLES ================= */
+.section-title {
+    font-weight: 800;
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+}
+
+.section-subtitle {
+    color: #64748b;
+    font-size: 1rem;
+    max-width: 700px;
+    margin-bottom: 40px;
+}
+
+/* ================= GRID ================= */
+.content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+}
+
+/* ================= BOX ================= */
+.info-box {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.06);
+    transition: .3s ease;
+    margin-bottom: 15px;
+}
+
+.info-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(0,0,0,.12);
 }
 
 
-
-            /* ======= PROFILE CARD ======= */
+/* ======= PROFILE CARD ======= */
       .profile-card {
         background: #ffffffcc;
         backdrop-filter: blur(8px);
@@ -30,6 +111,16 @@ body {
     .profile-card:hover {
           box-shadow: 0 12px 40px rgba(0,0,0,0.12);
     }
+
+
+    /* ================= CTA ================= */
+.cta-section {
+    background: rgba(15,23,42,0.85);
+    color: #fff;
+    padding: 80px 20px;
+    text-align: center;
+    margin-top: -40px;
+}
 
     /* ======= STUDENT PHOTO ======= */
     .student-photo {
@@ -52,7 +143,6 @@ body {
     /* ======= TITLES ======= */
     .section-title {
         font-weight: 800;
-        margin-bottom: 10px;
         padding-left: 12px;
         border-left: 4px solid #0d6efd;
         font-size: 18px;
@@ -65,7 +155,6 @@ body {
         padding: 14px 16px;
         border-radius: 12px;
         border: 1px solid #e5e7eb;
-        margin-bottom: 10px;
         font-size: 15px;
         font-weight: 500;          /* ← added */
     }
@@ -96,7 +185,6 @@ body {
         border-radius: 16px;
         padding: 25px;
         box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-        margin-top: 30px;;
     }
 
     .table thead {
@@ -151,9 +239,93 @@ body {
         color: #fff;
     }
 
-    
+
+/* 🔒 FULL SCREEN OVERLAY */
+#admissionOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 99999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 🧾 MODAL BOX */
+.admission-modal {
+  background: #fff;
+  padding: 35px 30px;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+/* 🚫 PREVENT SCROLL */
+body.lock-scroll {
+  overflow: hidden;
+}
+
+
+.page-wrapper {
+    padding-top: 0;
+}
+
+/* ADMIN ONLY */
+.page-wrapper.admin-layout {
+    padding-top: 50px;   /* height ya fixed navbar */
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+
+
+
 
 </style>
+
+{% if not verified %}
+<div id="admissionOverlay">
+  <div class="admission-modal">
+    <h4>🔐 Verify Admission Number</h4>
+    <p>Please enter the correct admission number to continue.</p>
+
+    <input type="text"
+           id="admissionInput"
+           placeholder="e.g STU0005"
+           class="form-control mb-3">
+
+    <div id="admissionError" class="text-danger mb-2"></div>
+
+    <button class="btn btn-primary w-100"
+            onclick="verifyAdmission()">
+      Submit
+    </button>
+  </div>
+</div>
+{% endif %}
+
+<div class="page-wrapper {% if request.user.is_staff %}admin-layout{% endif %}">
+
+<section class="page-hero">
+
+<h1>Student Profile Overview</h1>
+<p class="subtitle">
+    View important academic and payment information securely.
+</p>
+ 
 
 <div class="container mt-5 col-md-9">
         <form method="POST" enctype="multipart/form-data">
@@ -195,12 +367,15 @@ body {
         </div>
     </div>
 </div>
-
-            <h2 class="fw-bold mb-4 text-center" style="color:#131365;">
+            <h2 class="fw-bold mb-4 text-center" style="color:#f9f9fa;">
                 <i class="bi bi-person-circle me-2"></i> {{ student.full_name }}
             </h2>
-    
-            <!-- Profile Info -->
+
+</section>  
+
+
+<!-- ================= INFORMATION ================= -->
+<section class="page-section">
        <div class="profile-card mb-4">
             <div class="row">
                  <div class="col-md-6">
@@ -221,28 +396,42 @@ body {
         </div>
     </div>
 
-   <!-- Fees Summary -->
-    <div class="fees-box mb-4 text-center">
-        <div class="row">
-            <div class="col-md-4">
+
+
+
+<!-- ================= CONTENT ================= -->
+
+        <div class="content-card">
+                    <h2 class="section-title">Fees Summary</h2>
+                    <p class="section-subtitle">
+                   A clear overview of total fees, payments made, and remaining balance.</p>
+                    </p>
+    
+
+
+          <div class="content-grid {% if request.user.is_staff %}admin-cards{% endif %}">
+
+            <div class="info-box">
+            
                 <p class="text-muted">TOTAL FEE</p>
                 <p class="fees-value text-primary">Ksh {{ student.total_fee }}</p>
-            </div>
+              </div>
 
-            <div class="col-md-4">
-                <p class="text-muted">TOTAL PAID</p>
-                <p class="fees-value text-success">Ksh {{ total_paid }}</p>
-            </div>
+                <div class="info-box">
+                   <p class="text-muted">TOTAL PAID</p>
+                     <p class="fees-value text-success">Ksh {{ total_paid }}</p>
+               </div>
 
-            <div class="col-md-4">
+             <div class="info-box">
                 <p class="text-muted">BALANCE</p>
                 <p class="fees-value text-danger">Ksh {{ balance }}</p>
             </div>
+            </div>
+
+
         </div>
-
-        <div class="mt-4">
-
-
+      </div>
+<div class="cta-section">
             <button onclick="openMpesaPopup()" class="btn btn-success btn-lg ms-2">
                   <i class="bi bi-phone"></i> via M-PESA
             </button>
@@ -268,17 +457,13 @@ body {
                  Download Statement
             </a>
 
+        <br>
+        <br>
+<div class="section-header">
+    <h4>Payment History</h4>
+    <p>A detailed record of all payments made for this student.</p>
+</div>
 
-        </div>
-    
-    </div>
-
-    
-    <!-- Payment History -->
-    <div class="history-table">
-        <h4 class="fw-bold mb-3">
-            <i class="bi bi-receipt-cutoff me-2"></i>PAYMENT HISTORY
-        </h4>
 
         <table class="table table-bordered table-striped">
             <thead class="table-dark text-center">
@@ -347,16 +532,28 @@ body {
     </td>
 </tr>
 {% endfor %}
+
 </tbody>
 
-        </table>
-    </div>
-    <a href="{% url 'students_list' %}" class="btn btn-secondary mt-4">
-        <i class="bi bi-arrow-left"></i> Back to students
-    </a>
-</div>
 
-<!-- ADD PAYMENT POPUP MODAL -->
+</table>
+    </div>
+    {% if request.user.is_superuser %}
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+{% else %}
+    <a href="{% url 'students_list' %}" class="btn btn-secondary mt-3">
+        Back to students
+    </a>
+{% endif %}
+
+    </div>
+  
+</section>
+
+  
+</div>
 
 <div id="paymentPopup" class="popup-overlay">
     <div class="popup-panel">
@@ -588,6 +785,11 @@ function closePaymentPopup() {
     to   { transform: translateX(0); }
 }
 </style>
+{% if not verified %}
+<script>
+  document.body.classList.add("lock-scroll");
+</script>
+{% endif %}
 
 <script>
 // OPEN EDIT PANEL
@@ -618,6 +820,40 @@ document.getElementById("editForm").onsubmit = async function(e){
         location.reload();
     }
 };
+
+
+
+
+
+
+function verifyAdmission() {
+    const admission = document.getElementById("admissionInput").value;
+    const errorBox = document.getElementById("admissionError");
+
+    fetch("{% url 'verify_admission' student.id %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "admission_number=" + encodeURIComponent(admission)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            document.body.classList.remove("lock-scroll");
+            location.reload();
+        } else {
+            errorBox.innerText = data.message;
+        }
+    });
+}
+
+
+
+  
+
+
 
 </script>
 

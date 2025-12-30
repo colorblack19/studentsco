@@ -1,0 +1,259 @@
+{% extends "base_public.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+/* ================= ABOUT HERO ================= */
+.about-hero {
+    position: relative;
+    padding: 140px 0 100px;
+    background: linear-gradient(
+        rgba(15,23,42,0.85),
+        rgba(15,23,42,0.85)
+    ),
+    url("{% static 'images/about-bg.jpg' %}") center/cover no-repeat;
+    color: #fff;
+    text-align: center;
+}
+
+.about-hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.about-hero p {
+    max-width: 700px;
+    margin: auto;
+    color: #cbd5e1;
+    font-size: 1.1rem;
+}
+
+/* ================= SECTIONS ================= */
+.section {
+    padding: 90px 0;
+}
+
+.section-title {
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.section-subtitle {
+    color: #64748b;
+    max-width: 700px;
+    margin-bottom: 50px;
+}
+
+/* ================= ABOUT GRID ================= */
+.about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 40px;
+}
+
+.about-card {
+    background: #fff;
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 10px 35px rgba(0,0,0,.08);
+}
+
+.about-card h5 {
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.about-card p {
+    color: #475569;
+    font-size: .95rem;
+}
+
+/* ================= STATS ================= */
+.stats {
+    background: #0f172a;
+    color: #fff;
+}
+
+.stat-box {
+    text-align: center;
+}
+
+.stat-box h2 {
+    font-weight: 800;
+    font-size: 2.5rem;
+}
+
+.stat-box p {
+    color: #cbd5e1;
+}
+
+/* ================= VALUES ================= */
+.value-item {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.value-icon {
+    font-size: 2rem;
+}
+
+/* ================= CTA ================= */
+.about-cta {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: #fff;
+    padding: 80px 0;
+    text-align: center;
+}
+
+.about-cta h2 {
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.about-cta p {
+    max-width: 650px;
+    margin: auto;
+    color: #e0e7ff;
+}
+
+</style>
+
+<!-- ================= HERO ================= -->
+<section class="about-hero">
+    <div class="container">
+        <h1>About COLOR BLACK 19</h1>
+        <p>
+            We build smart, secure, and reliable digital solutions that
+            simplify school management and empower education.
+        </p>
+    </div>
+</section>
+
+<!-- ================= WHO WE ARE ================= -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Who We Are</h2>
+        <p class="section-subtitle">
+            COLOR BLACK 19 is a modern school management platform designed to
+            solve real challenges faced by schools, teachers, and parents.
+        </p>
+
+        <div class="about-grid">
+            <div class="about-card">
+                <h5>🎓 Our Mission</h5>
+                <p>
+                    To simplify school operations by providing a unified,
+                    reliable, and user-friendly management system.
+                </p>
+            </div>
+
+            <div class="about-card">
+                <h5>🚀 Our Vision</h5>
+                <p>
+                    To become a trusted digital partner for schools across
+                    Africa and beyond.
+                </p>
+            </div>
+
+            <div class="about-card">
+                <h5>💡 What We Do</h5>
+                <p>
+                    We provide tools for fees management, attendance tracking,
+                    student records, and secure online payments.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= STATS ================= -->
+<section class="section stats">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 stat-box">
+                <h2>100%</h2>
+                <p>Secure Data</p>
+            </div>
+            <div class="col-md-3 stat-box">
+                <h2>24/7</h2>
+                <p>System Availability</p>
+            </div>
+            <div class="col-md-3 stat-box">
+                <h2>Fast</h2>
+                <p>M-Pesa Payments</p>
+            </div>
+            <div class="col-md-3 stat-box">
+                <h2>Smart</h2>
+                <p>Automated Reports</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= CORE VALUES ================= -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Our Core Values</h2>
+        <p class="section-subtitle">
+            These principles guide everything we build and deliver.
+        </p>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="value-item">
+                    <div class="value-icon">🔒</div>
+                    <div>
+                        <h6>Security First</h6>
+                        <p>We prioritize data protection and system integrity.</p>
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">⚡</div>
+                    <div>
+                        <h6>Efficiency</h6>
+                        <p>We eliminate manual work through automation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="value-item">
+                    <div class="value-icon">🤝</div>
+                    <div>
+                        <h6>Trust</h6>
+                        <p>Schools and parents rely on us every day.</p>
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">📈</div>
+                    <div>
+                        <h6>Growth</h6>
+                        <p>We continuously improve our platform.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="about-cta">
+    <div class="container">
+        <h2>Ready to Transform Your School?</h2>
+        <p>
+            Join schools that are already managing fees, attendance, and
+            student data with confidence.
+        </p>
+
+        <a href="{% url 'login' %}" class="btn btn-light btn-lg mt-3">
+            Get Started
+        </a>
+    </div>
+</section>
+
+{% endblock %}

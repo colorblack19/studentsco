@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+
+  .page-wrapper {
+    padding-top: 70px;
+   
+}
+
+</style>
+<div class="page-wrapper">
+<div class="container my-5" style="max-width:800px">
+
+    <div class="mb-4">
+        <h3 class="fw-bold">Add School Event</h3>
+        <small class="text-muted">
+            Create an event visible to parents & students
+        </small>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm border-0">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">Event Title</label>
+            {{ form.title }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            {{ form.description }}
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Start Date</label>
+                {{ form.start_date }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">End Date</label>
+                {{ form.end_date }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Event Image / Poster</label>
+            {{ form.image }}
+
+            <img id="preview"
+                 style="display:none;margin-top:10px;max-height:200px;border-radius:10px;"
+            >
+        </div>
+
+        <div class="form-check mb-4">
+            {{ form.is_active }}
+            <label class="form-check-label">
+                Active (visible to parents)
+            </label>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary">
+                Save Event
+            </button>
+
+            <a href="{% url 'admin_events' %}" class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        </div>
+    </form>
+
+</div>
+</div>
+<script>
+document.querySelector('input[type="file"]').addEventListener("change", e => {
+    const img = document.getElementById("preview");
+    img.src = URL.createObjectURL(e.target.files[0]);
+    img.style.display = "block";
+});
+</script>
+
+{% endblock %}

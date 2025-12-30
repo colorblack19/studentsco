@@ -18,6 +18,11 @@
                     <th>#</th>
                     <th>Class</th>
                     <th>Amount</th>
+                    <th>Opening</th>
+                    <th>Deadline</th>
+                    <th>Notes</th>
+
+
                     <th style="width: 180px;">Actions</th>
                 </tr>
             </thead>
@@ -28,6 +33,10 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ fee.class_name }}</td>
                     <td>KES {{ fee.amount }}</td>
+                <td>{{ fee.opening_amount|default:"-" }}</td>
+                <td>{{ fee.deadline|date:"M d, Y"|default:"-" }}</td>
+                <td>{{ fee.notes|truncatechars:30|default:"-" }}</td>
+
                     <td>
 
                      <a href="{% url 'feestructure_edit' fee.id %}" class="btn btn-sm btn-primary">

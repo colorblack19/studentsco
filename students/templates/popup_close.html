@@ -1,8 +1,23 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Closing...</title>
+</head>
+<body>
+
 <script>
-    window.opener.dismissAddRelatedObjectPopup(
-        window,
-        "{{ object.pk }}",
-        "{{ object }}"
-    );
+    // refresh page ya nyuma
+    if (window.opener) {
+        window.opener.location.reload();
+    }
+
+    // funga popup
     window.close();
 </script>
+
+<p>Saving...</p>
+
+</body>
+</html>
+

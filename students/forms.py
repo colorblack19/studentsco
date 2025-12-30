@@ -27,9 +27,20 @@ class StudentForm(forms.ModelForm):
         # ✅ SHOW ONLY TEACHERS
         self.fields['teacher'].queryset = User.objects.filter(groups__name="Teacher")
         self.fields['teacher'].label = "Assign Teacher"
-
+        
 
 class FeeStructureForm(forms.ModelForm):
     class Meta:
         model = FeeStructure
-        fields = ['class_name', 'amount']
+        fields = [
+            'class_name',
+            'amount',
+            'opening_amount',
+            'deadline',
+            'notes'
+        ]
+
+        widgets = {
+            'deadline': forms.DateInput(attrs={'type': 'date'}),
+            'notes': forms.Textarea(attrs={'rows': 3}),
+        }

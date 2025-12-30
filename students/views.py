@@ -20,10 +20,8 @@ from datetime import datetime
 from django.contrib.auth.decorators import user_passes_test
 
 from .forms import StudentForm
-from .models import FeeStructure
+from .models import FeeStructure 
 from .forms import FeeStructureForm
-
-
 from django.shortcuts import get_object_or_404, redirect
 import base64
 import datetime
@@ -51,14 +49,21 @@ from .models import AttendanceAlert
 from django.contrib.auth.decorators import permission_required
 
 from accounts.models import TeacherProfile
+from accounts.views import is_admin
+from .utils import require_admin_approval
+from .models import Payment, AdminActionLog
 
+from django.contrib.auth import authenticate
 
+from django.contrib.auth.decorators import user_passes_test
 
-
+def is_admin(user):
+    return user.is_authenticated and user.is_staff
 
 # ====================== DASHBOARD ======================
 
 def dashboard(request):
+    
     cleanup_pending_payments()
 
     recent_payments = Payment.objects.filter(
@@ -162,16 +167,29 @@ def dashboard(request):
 def student_profile(request, pk):
     student = get_object_or_404(Student, pk=pk)
 
+    # ✅ Admin bypass
+    if request.user.is_staff or request.user.is_superuser:
+        verified = True
+    else:
+        verified = request.session.get(f"verified_student_{student.id}", False)
+     
+
     payments = Payment.objects.filter(student=student)
 
-    total_paid = Payment.objects.filter(student=student,
-                                        status="PAID").aggregate(total=Sum("amount_paid"))["total"] or 0
+    total_paid = Payment.objects.filter(
+        student=student,
+        status="PAID"
+    ).aggregate(total=Sum("amount_paid"))["total"] or 0
 
+    fee = FeeStructure.objects.filter(
+        class_name=student.class_level
+    ).first()
 
-    fee = FeeStructure.objects.filter(class_name=student.class_level).first()
     total_fee = fee.amount if fee else 0
     balance = total_fee - total_paid
 
+    
+ 
 
     return render(request, "student_profile.html", {
         "student": student,
@@ -179,12 +197,31 @@ def student_profile(request, pk):
         "total_paid": total_paid,
         "total_fee": total_fee,
         "balance": balance,
+        "verified": verified,  # 👈 muhimu
+    })
+
+
+def verify_admission(request, pk):
+    student = get_object_or_404(Student, pk=pk)
+
+    admission = request.POST.get("admission_number", "").strip()
+
+    if admission == student.admission_number:
+        # Save verification in session
+        request.session[f"verified_student_{student.id}"] = True
+        return JsonResponse({"success": True})
+
+    return JsonResponse({
+        "success": False,
+        "message": "Invalid admission number. Please try again."
     })
 
 # ====================== STUDENTS LIST ======================
 def students_list(request):
     # --- BASE QUERY ---
     students = Student.objects.all()
+    total_students = Student.objects.count()
+
        # --- GET FILTER VALUES (safe defaults & strip whitespace) ---
     search = request.GET.get("search", "").strip()
     class_level = request.GET.get("class", "").strip()   # we will pass this back as "class" in context
@@ -259,6 +296,7 @@ def students_list(request):
         "start": start,
         "end": end,
         "classes": classes,
+        "total_students": total_students, 
     }
 
     return render(request, "students_list.html",context)
@@ -266,12 +304,21 @@ def students_list(request):
 # ====================== DELETE STUDENT LIST ======================
 @login_required
 def delete_student(request, student_id):
-    if not request.user.is_staff:
-        messages.error(request, "Only admins can delete students.")
-        return redirect("student_list")
-    
+
+    # Staff but NOT superuser → needs admin approval
+    if request.user.is_staff and not request.user.is_superuser:
+        if not request.session.get("admin_approved"):
+            request.session["next_url"] = request.path
+            messages.warning(request, "Admin approval required to delete.")
+            return redirect("admin_approval")
+
+    # Superuser OR approved staff
     student = get_object_or_404(Student, id=student_id)
     student.delete()
+
+    # clear approval after action
+    request.session.pop("admin_approved", None)
+
     messages.success(request, "Student deleted successfully.")
     return redirect("student_list")
 
@@ -401,19 +448,39 @@ def edit_payment(request, payment_id):
 
 
 # ====================== DELETE ======================
+
+
+
+
+
 @login_required
 def delete_payment(request, payment_id):
-    payment = get_object_or_404(Payment, id=payment_id)
-    # Only admins can delete payments
+
+    # 1️⃣ Only staff or superuser can even attempt
     if not request.user.is_staff:
         messages.error(request, "You are NOT allowed to delete payments.")
         return redirect("payments_list")
 
+    # 2️⃣ Staff (not superuser) must get admin approval
+    if not require_admin_approval(request):
+        return redirect("admin_approval")
+
+    # 3️⃣ Delete payment
     payment = get_object_or_404(Payment, id=payment_id)
     payment.delete()
 
+    # 4️⃣ Log the action (VERY IMPORTANT)
+    AdminActionLog.objects.create(
+        user=request.user,
+        action=f"Deleted payment ID {payment_id}"
+    )
+
+    # 5️⃣ Clear approval after action
+    request.session.pop("admin_approved", None)
+
     messages.success(request, "Payment deleted successfully.")
     return redirect("payments_list")
+
 
 
 # ====================== API ======================
@@ -483,7 +550,7 @@ def admin_required(view_func):
 
 
 @login_required
-@permission_required("students.add_student", raise_exception=True)
+
 def student_add(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
@@ -510,10 +577,17 @@ def add_feestructure_popup(request):
     return render(request, 'add_feestructure_popup.html', {'form': form})
 
 
+@login_required
+@user_passes_test(is_admin)
 def feestructure_list(request):
-    items = FeeStructure.objects.all().order_by('-id')
+    items = FeeStructure.objects.all().order_by('-created_at')
     return render(request, 'feestructure_list.html', {'items': items})
 
+
+
+def public_feestructure(request):
+    items = FeeStructure.objects.all().order_by('class_name')
+    return render(request, 'public_feestructure.html', {'items': items})
 
 
 def feestructure_edit(request, pk):
@@ -1018,3 +1092,147 @@ def monthly_attendance_summary(request):
         "monthly_attendance_summary.html",
         context
     )
+
+
+
+@login_required
+def admin_attendance_overview(request):
+    if not request.user.is_staff:
+        return render(request, "403.html")
+
+    records = (
+        Attendance.objects
+        .select_related("student", "teacher")
+        .order_by("-date")
+    )
+
+    return render(
+        request,
+        "attendance_overview.html",
+        {"records": records}
+    )
+
+
+@login_required
+def admin_locked_attendance(request):
+    if not request.user.is_staff:
+        return render(request, "403.html")
+
+    records = Attendance.objects.filter(is_locked=True)
+
+    return render(
+        request,
+        "locked_attendance.html",
+        {"records": records}
+    )
+
+@login_required
+def unlock_attendance(request, attendance_id):
+    if not request.user.is_staff:
+        return render(request, "403.html")
+
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+    attendance.is_locked = False
+    attendance.save()
+
+    messages.success(request, "Attendance unlocked successfully.")
+    return redirect("locked_attendance")
+
+
+
+@login_required
+def attendance_alerts(request):
+    if not request.user.is_staff:
+        return render(request, "403.html")
+
+    alerts = (
+        AttendanceAlert.objects
+        .select_related("student", "teacher")
+        .order_by("-created_at")
+    )
+
+    return render(
+        request,
+        "attendance_alerts.html",
+        {"alerts": alerts}
+    )
+
+
+
+def home_dashboard(request):
+    return render(request, "home.html")
+
+
+
+def search_student(request):
+    q = request.GET.get('q', '').strip()
+
+    if len(q) < 2:
+        return JsonResponse({'found': False})
+
+    parts = q.split()
+
+    if len(parts) == 1:
+        student = Student.objects.filter(
+            Q(first_name__icontains=parts[0]) |
+            Q(last_name__icontains=parts[0])
+        ).first()
+    else:
+        student = Student.objects.filter(
+            Q(first_name__icontains=parts[0]) &
+            Q(last_name__icontains=parts[-1])
+        ).first()
+
+    if student:
+        return JsonResponse({
+            'found': True,
+            'name': f"{student.first_name} {student.last_name}",
+            'message': 'Student is registered. Scroll down to view full details.'
+        })
+
+    return JsonResponse({'found': False})
+
+
+
+
+def admin_approval(request):
+
+    logs = AdminActionLog.objects.order_by("-timestamp")[:10]
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        admin = authenticate(request, username=username, password=password)
+
+        if admin and admin.is_superuser:
+            request.session["admin_approved"] = True
+
+            # log approval
+            AdminActionLog.objects.create(
+                user=admin,
+                action=f"Approved action for {request.user.username}"
+            )
+
+            messages.success(request, "Admin approval granted.")
+            return redirect(request.session.get("next_url", "dashboard"))
+
+        messages.error(request, "Invalid admin credentials.")
+
+    return render(request, "admin_approval.html", {
+        "logs": logs
+    })
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def delete_admin_log(request, log_id):
+
+    log = get_object_or_404(AdminActionLog, id=log_id)
+    log.delete()
+
+    # 🔥 VERY IMPORTANT
+    request.session.pop("admin_approved", None)
+
+    messages.success(request, "Log deleted successfully.")
+    return redirect("admin_approval")
+

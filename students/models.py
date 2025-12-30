@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from django.conf import settings
 
+from django.contrib.auth.models import User
 
 
 class Student(models.Model):
@@ -147,6 +148,18 @@ class FeeStructure(models.Model):
     class_name = models.CharField(max_length=100, unique=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
+        # 🔥 NEW FIELDS
+    opening_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+    deadline = models.DateField(null=True, blank=True)
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
     def __str__(self):
         return f"{self.class_name} - {self.amount}"
 
@@ -201,5 +214,13 @@ def save(self, *args, **kwargs):
 
 def __str__(self):
         return f"{self.student.first_name} - {self.amount_paid} - {self.status}"
+
+class AdminActionLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.action}"
 
 

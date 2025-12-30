@@ -7,13 +7,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from .models import TeacherProfile
 
-
+from django.db.models import Q
 
 from django.contrib.auth.models import Group, Permission
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 def login_user(request):
-
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -23,20 +23,35 @@ def login_user(request):
         if user is not None:
             login(request, user)
 
-            # 🔐 ROLE BASED REDIRECT (FINAL & CLEAN)
-            if hasattr(user, "teacherprofile"):
+            # 🔥 ADMIN (SUPERUSER / STAFF)
+            if user.is_superuser or user.is_staff:
+                return redirect("dashboard")
+
+            # 🔥 TEACHER
+            if user.groups.filter(name="Teacher").exists():
                 return redirect("teacher_dashboard")
 
-            elif user.is_staff:
-                return redirect("dashboard")
-
-            else:
-                return redirect("dashboard")
+            # 🔥 STUDENT / PARENT
+            return redirect("home_dashboard")
 
         else:
             messages.error(request, "Invalid username or password")
 
     return render(request, 'accounts/login_19.html')
+
+
+@login_required
+def after_login_redirect(request):
+    user = request.user
+
+    if user.is_superuser:
+        return redirect("home_dashboard")  # 👈 badilisha hapa
+
+    if user.is_staff or user.groups.filter(name="Teacher").exists():
+        return redirect("teacher_dashboard")
+
+    return redirect("home_dashboard")
+
 
 
 
@@ -149,16 +164,29 @@ def group_edit(request, id):
     })
 
 
+
+
+
 @login_required
 def user_list(request):
     if not request.user.is_staff:
         return render(request, "403.html")
 
-    users = User.objects.all().order_by("-date_joined")
+    users = (
+        User.objects
+        .filter(
+            Q(groups__name="Teacher") | Q(is_staff=True)
+        )                       # ✅ Teacher AU Staff
+        .exclude(is_superuser=True)  # ❌ Ondoa SYSTEM@SCHOOL
+        .exclude(id=request.user.id) # ❌ Ondoa wewe admin ulielogin
+        .order_by("-date_joined")
+        .distinct()
+    )
 
     return render(request, "accounts/list.html", {
         "users": users
     })
+
 
 
 
@@ -235,3 +263,22 @@ def user_delete(request, id):
     return render(request, "accounts/delete.html", {
         "user_obj": user
     })
+
+
+
+def home_dashboard(request):
+    return render(request, "home.html")
+
+
+
+
+
+def about_us(request):
+    return render(request, "accounts/about.html")
+
+
+
+
+def is_admin(user):
+    return user.groups.filter(name='Admin').exists()
+
