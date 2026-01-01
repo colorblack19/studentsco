@@ -1,38 +1,64 @@
+
 from django.contrib import admin
-from .models import Student, FeeStructure, Payment
 from django.utils.html import format_html
-from .models import Attendance  
+from .models import Student, Subject, Attendance, FeeStructure, Payment
 
 
 
-admin.site.register(Student)
 
+
+admin.site.register(Subject)
+
+# =========================
+# ✅ Student (custom admin)
+# =========================
+@admin.register(Student)
+class StudentAdmin(admin.ModelAdmin):
+    list_display = (
+        "first_name",
+        "last_name",
+        "class_level",
+        "parent_name",
+        
+    )
+    search_fields = (
+        "first_name",
+        "last_name",
+        "parent_name",
+    )
+
+
+# =========================
+# ✅ Fee Structure (unchanged – old behavior)
+# =========================
 admin.site.register(FeeStructure)
 
-@admin.register(Payment)
 
+# =========================
+# ✅ Payment (OLD FEATURE preserved)
+# =========================
+@admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
     list_display = (
-        'student',
-        'amount_paid',
-        'colored_status',
-        'method',
-        'date_paid',
+        "student",
+        "amount_paid",
+        "colored_status",
+        "method",
+        "date_paid",
     )
 
     list_filter = (
-        'status',
-        'method',
-        'date_paid',
+        "status",
+        "method",
+        "date_paid",
     )
 
     search_fields = (
-        'student__first_name',
-        'student__last_name',
+        "student__first_name",
+        "student__last_name",
     )
 
-    ordering = ('-date_paid',)
-
+    ordering = ("-date_paid",)
 
     def colored_status(self, obj):
         colors = {
@@ -43,13 +69,15 @@ class PaymentAdmin(admin.ModelAdmin):
         return format_html(
             '<b style="color:{}">{}</b>',
             colors.get(obj.status, "black"),
-            obj.status
+            obj.status,
         )
 
     colored_status.short_description = "Status"
 
 
-
+# =========================
+# ✅ Attendance (OLD FEATURE preserved)
+# =========================
 @admin.register(Attendance)
 class AttendanceAdmin(admin.ModelAdmin):
     list_display = (
@@ -62,9 +90,9 @@ class AttendanceAdmin(admin.ModelAdmin):
 
     list_filter = (
         "date",
-        "status",      # ⭐ MUHIMU
+        "status",
         "is_locked",
-        "teacher",     # ⭐ MUHIMU
+        "teacher",
     )
 
     search_fields = (

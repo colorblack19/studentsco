@@ -20,9 +20,6 @@ urlpatterns = [
 
 
     path("", home_dashboard, name="home_dashboard"),
-
-
-
     path("", lambda request: redirect("dashboard")),
 
     # MAIN
@@ -38,14 +35,11 @@ urlpatterns = [
 
     # 🔍 Admin Attendance
     path("admin/attendance/",admin_attendance_overview,name="attendance_overview"),
-
     path("admin/attendance/locked/",admin_locked_attendance,name="locked_attendance"),
 
 
     # 🔓 ACTION (no template)
     path("admin/attendance/unlock/<int:attendance_id>/",unlock_attendance,name="unlock_attendance"),
-
-
     path("attendance/alerts/",attendance_alerts,name="attendance_alerts"),
 
 
@@ -74,6 +68,7 @@ urlpatterns = [
     path('student/<int:student_id>/mpesa/',views.mpesa_payment,name='mpesa_payment'),
     path("mpesa/callback/", views.mpesa_callback, name="mpesa_callback"),
 
+
     path("alerts/<int:alert_id>/reviewed/",views.mark_alert_reviewed,name="mark_alert_reviewed"),
     path("brand/", views.brand_intro, name="brand_intro"),
     path('fee-structure/',views.public_feestructure,name='public_feestructure'),
@@ -81,13 +76,25 @@ urlpatterns = [
 
 
     path('search-student/', views.search_student, name='search_student'),
-
-
     path("verify-admission/<int:pk>/",views.verify_admission,name="verify_admission"),
-
     path("admin-approval/", views.admin_approval, name="admin_approval"),
-
     path("admin/log/delete/<int:log_id>/", delete_admin_log, name="delete_admin_log"),
+
+
+
+
+    path("reports/", views.student_reports, name="student_reports"),
+    path("admin/reports/", views.admin_reports, name="admin_reports"),
+    path("admin/reports/add/<int:student_id>/",views.add_report,name="add_report"),
+
+    path("admin/reports/<int:pk>/edit/", views.edit_report, name="edit_report"),
+    path("reports/<int:pk>/download/",views.download_report_pdf,name="download_report_pdf"),
+    path("admin/reports/<int:pk>/publish/",views.publish_report,name="publish_report"),
+    path("admin/reports/<int:pk>/delete/",views.delete_report,name="delete_report"),
+
+
+
+
     
 
 

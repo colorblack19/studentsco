@@ -32,17 +32,18 @@
                 {% for record in records %}
                     <tr>
                         <td>{{ record.student.full_name }}</td>
-                        <td>{{ record.student.student_class }}</td>
-                        <td>{{ record.teacher.user.get_full_name }}</td>
+                        <td>{{ record.student.class_name }}</td>
+                        <td>{{ record.teacher.username }}</td>
                         <td>{{ record.date }}</td>
 
-                        <td>
-                            {% if record.is_present %}
-                                <span class="badge bg-success">Present</span>
+                             <td>
+                          {% if record.status == "Present" %}
+                            <span class="badge bg-success">Present</span>
                             {% else %}
-                                <span class="badge bg-danger">Absent</span>
-                            {% endif %}
-                        </td>
+                           <span class="badge bg-danger">Absent</span>
+                           {% endif %}
+                            </td>
+
 
                         <td>
                             {% if record.is_locked %}

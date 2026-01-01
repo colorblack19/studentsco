@@ -69,11 +69,19 @@
 }
 
 .container .text-muted {
-    font-size: 0.95rem;
-    max-width: 600px;
+    font-size: 1.05rem;       
+    line-height: 1.7;   
+    max-width: 650px;        
     margin: auto;
-
+    color: #0f0558;           
+    font-weight: 600;        
 }
+@media (min-width: 992px) {
+    .container .text-muted {
+        font-size: 1.2rem;
+    }
+}
+
 .container h5 {
     font-size: 0.95rem;
     max-width: 600px;
@@ -82,11 +90,14 @@
 
  .border {
     
-    max-width: 500px;
+    font-size: 1.05rem; 
+    line-height: 1.7;         
+    max-width: 550px;         
     margin: auto;
-    
+    color: #0f0558;          
+    font-weight: 400;        
+}   
 
-}
 /* PAGE SUBTITLE (description under title) */
 
 .container p.text-muted {
@@ -182,6 +193,16 @@
     color: #0d6efd;
     text-transform: uppercase;
 }
+
+.flex-grow-1{
+      
+    font-size: 1.05rem; 
+    line-height: 1.7;               
+    margin: auto;
+    color: #0f0558;          
+    font-weight: 400;        
+}   
+
 /* ===== CARD BODY LAYOUT ===== */
 .card-body {
     padding: 1.6rem 1.5rem 1.8rem;

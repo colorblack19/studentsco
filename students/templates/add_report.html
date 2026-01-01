@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid px-3 px-md-4">
+
+    <!-- Page Title -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="fw-semibold mb-0">➕ Add Academic Report</h4>
+    </div>
+
+<form method="post" class="card shadow-sm border-0">
+    {% csrf_token %}
+
+    <div class="card-body">
+
+        <!-- Report Info -->
+        <h6 class="section-title">📄 Report Details</h6>
+        <div class="form-section mb-4">
+            {{ report_form.as_p }}
+        </div>
+
+        <!-- Subjects -->
+        <h6 class="section-title">📚 Subjects</h6>
+
+        {{ formset.management_form }}
+
+        <div class="row" id="subjects-container">
+            {% for form in formset %}
+            <div class="col-md-6 col-lg-4 subject-form">
+                <div class="subject-card mb-3">
+
+                    {{ form.as_p }}
+
+                    {% if form.instance.pk %}
+                    <div class="form-check mt-2 text-danger">
+                        {{ form.DELETE }}
+                        <label class="form-check-label">
+                            Delete subject
+                        </label>
+                    </div>
+                    {% else %}
+                    <button type="button"
+                            class="btn btn-sm btn-outline-danger remove-subject mt-2">
+                        ❌ Remove
+                    </button>
+                    {% endif %}
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="button"
+                class="btn btn-outline-primary mt-2"
+                id="add-subject">
+            ➕ Add Subject
+        </button>
+
+    </div>
+
+    <div class="card-footer bg-white text-end">
+        <button type="submit" class="btn btn-success px-4">
+            💾 Save Report
+        </button>
+    </div>
+
+</form>
+
+
+</div>
+
+
+<style>
+    .section-title {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid #0d6efd;
+    padding-left: 8px;
+}
+
+.form-section p,
+.subject-card p {
+    margin-bottom: 0.6rem;
+}
+
+.subject-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+}
+
+input, select, textarea {
+    border-radius: 6px !important;
+}
+
+textarea {
+    min-height: 80px;
+}
+.main-content {
+    padding-top: 70px; /* nafasi ya navbar */
+    padding-left: 60px; /* nafasi ya sidebar */
+}
+</style>
+<script>
+document.getElementById("add-subject").addEventListener("click", function () {
+
+    const container = document.getElementById("subjects-container");
+    const totalForms = document.getElementById("id_subjects-TOTAL_FORMS");
+
+    const currentFormCount = parseInt(totalForms.value);
+    const newForm = container.children[0].cloneNode(true);
+
+    newForm.innerHTML = newForm.innerHTML.replace(
+        /subjects-\d+/g,
+        `subjects-${currentFormCount}`
+    );
+
+    container.appendChild(newForm);
+    totalForms.value = currentFormCount + 1;
+});
+
+
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("remove-subject")) {
+        e.target.closest(".subject-form").remove();
+    }
+});
+</script>
+{% endblock %}

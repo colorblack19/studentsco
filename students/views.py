@@ -57,6 +57,14 @@ from django.contrib.auth import authenticate
 
 from django.contrib.auth.decorators import user_passes_test
 
+from .models import AcademicReport
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from .models import AcademicReport, ReportSubject
+from .forms import AcademicReportForm, ReportSubjectForm
+from django.forms import inlineformset_factory
+from django.contrib.admin.views.decorators import staff_member_required
+
 def is_admin(user):
     return user.is_authenticated and user.is_staff
 
@@ -1106,11 +1114,11 @@ def admin_attendance_overview(request):
 
 
         .select_related(
-    "student",
-    "student__feestructure",
-    "student__teacher",
-    "teacher"
-)
+                        "student",
+                        "student__feestructure",
+                        "student__teacher",
+                        "teacher"
+                                 )
 
 
         .order_by("-date")
@@ -1246,3 +1254,169 @@ def delete_admin_log(request, log_id):
     messages.success(request, "Log deleted successfully.")
     return redirect("admin_approval")
 
+
+
+
+
+
+
+
+
+
+@login_required
+def student_reports(request):
+    reports = AcademicReport.objects.filter(
+        status="PUBLISHED"
+    ).select_related("student")
+
+    return render(
+        request,
+        "student_reports.html",
+        {
+            "reports": reports
+        }
+    )
+
+
+
+
+
+
+
+@staff_member_required
+def admin_reports(request):
+    reports = AcademicReport.objects.all()
+    return render(request, "reports_list.html", {
+        "reports": reports
+    })
+
+
+
+# students/views.py
+@staff_member_required
+def publish_report(request, pk):
+    report = get_object_or_404(AcademicReport, pk=pk)
+    report.is_published = not report.is_published
+    report.save()
+    return redirect("admin_reports")
+
+
+
+
+
+
+
+@staff_member_required
+def add_report(request, student_id):
+    student = get_object_or_404(Student, pk=student_id)
+
+    ReportSubjectFormSet = inlineformset_factory(
+        AcademicReport,
+        ReportSubject,
+        form=ReportSubjectForm,
+        extra=5,
+        can_delete=False
+    )
+
+    if request.method == "POST":
+        report_form = AcademicReportForm(request.POST)
+        formset = ReportSubjectFormSet(
+            request.POST,
+            form_kwargs={"student": student}
+        )
+
+        if report_form.is_valid() and formset.is_valid():
+            report = report_form.save(commit=False)
+            report.student = student
+            report.save()
+
+            formset.instance = report
+            formset.save()
+
+            return redirect("admin_reports")
+    else:
+        report_form = AcademicReportForm()
+        formset = ReportSubjectFormSet(
+            form_kwargs={"student": student}
+        )
+
+    return render(request, "add_report.html", {
+        "report_form": report_form,
+        "formset": formset,
+        "student": student
+    })
+
+
+
+@staff_member_required
+def edit_report(request, pk):
+    report = get_object_or_404(AcademicReport, pk=pk)
+
+    ReportSubjectFormSet = inlineformset_factory(
+        AcademicReport,
+        ReportSubject,
+        form=ReportSubjectForm,
+        extra=0,
+        can_delete=False
+    )
+
+    if request.method == "POST":
+        report_form = AcademicReportForm(request.POST, instance=report)
+        formset = ReportSubjectFormSet(
+            request.POST,
+            instance=report,
+            form_kwargs={"student": report.student}
+        )
+
+        if report_form.is_valid() and formset.is_valid():
+            report_form.save()
+            formset.save()
+            return redirect("admin_reports")
+    else:
+        report_form = AcademicReportForm(instance=report)
+        formset = ReportSubjectFormSet(
+            instance=report,
+            form_kwargs={"student": report.student}
+        )
+
+    return render(request, "edit_report.html", {
+        "report_form": report_form,
+        "formset": formset,
+        "report": report
+    })
+
+
+
+@login_required
+def download_report_pdf(request, pk):
+    report = get_object_or_404(
+        AcademicReport,
+        pk=pk,
+        is_published=True   # 🔐 ONLY published reports
+    )
+
+    template = get_template("report_pdf.html")
+    html = template.render({"report": report})
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename="report_{report.student.id}.pdf"'
+    )
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse("PDF generation error")
+
+    return response
+
+
+
+@staff_member_required
+def delete_report(request, pk):
+    report = get_object_or_404(AcademicReport, pk=pk)
+
+    report.delete()
+    messages.success(request, "Academic report deleted successfully.")
+
+    return redirect("admin_reports")

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+<div class="main-content">
+    {% block content %}
+
+<div class="container my-4">
+    <div class="mb-4">
+        <h4 class="fw-semibold mb-1">✏ Edit Academic Report</h4>
+        <p class="text-muted small">
+            Update report details and subject performance below.
+        </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Report Main Info -->
+                <div class="mb-4">
+                    <h6 class="section-title">📄 Report Information</h6>
+                    <div class="form-section">
+                        {{ report_form.as_p }}
+                    </div>
+                </div>
+
+                <!-- Subjects -->
+                <div class="mb-4">
+                    <h6 class="section-title">📚 Subjects Performance</h6>
+
+                    {{ formset.management_form }}
+
+                    {% for form in formset %}
+                        <div class="subject-card mb-3">
+                            {{ form.as_p }}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4">
+                        💾 Update Report
+                    </button>
+                   <button type="button"
+                           onclick="window.history.back();"
+                              class="btn btn-outline-secondary">
+                                Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+</div>
+<style>
+/* ===== MAIN CONTENT FIX ===== */
+.main-content {
+    padding-top: 70px; /* nafasi ya navbar */
+    padding-left: 60px; /* nafasi ya sidebar */
+}
+
+/* Mobile fix */
+@media (max-width: 991px) {
+    .main-content {
+        padding-left: 0;
+        padding-top: 70px;
+    }
+}
+</style>
+{% endblock %}

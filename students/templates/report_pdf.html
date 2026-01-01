@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Helvetica;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .info {
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 6px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            text-align: left;
+        }
+
+        .section {
+            margin-top: 15px;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Academic Report</h2>
+
+<div class="info">
+    <span class="label">Student:</span> {{ report.student.full_name }}<br/>
+    <span class="label">Class:</span> {{ report.student.class_level }}<br/>
+    <span class="label">Term:</span> {{ report.get_term_display }}
+</div>
+
+<table>
+    <tr>
+        <th>Subject</th>
+        <th>Marks</th>
+        <th>Grade</th>
+        <th>Comment</th>
+    </tr>
+
+    {% for s in report.subjects.all %}
+    <tr>
+        <td>{{ s.subject.name }}</td>
+        <td>{{ s.marks }}</td>
+        <td>{{ s.grade }}</td>
+        <td>{{ s.teacher_comment }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div class="section">
+    <span class="label">Total Score:</span> {{ report.total_score }}<br/>
+    <span class="label">Overall Grade:</span> {{ report.grade }}
+</div>
+
+<div class="section">
+    <span class="label">Teacher Comment:</span><br/>
+    {{ report.teacher_comment }}
+</div>
+
+<div class="section">
+    <span class="label">Headteacher Remark:</span><br/>
+    {{ report.headteacher_remark }}
+</div>
+<div>
+Class Teacher: __________   Date: ________
+</div>
+<div>
+Headteacher: __________
+</div>
+
+
+</body>
+</html>
