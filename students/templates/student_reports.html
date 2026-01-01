@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<h4>🎓 Academic Reports</h4>
+
+{% for report in reports %}
+<div class="card mb-4">
+    <div class="card-body">
+
+        <h6 class="fw-bold">
+            {{ report.get_term_display }} Report
+        </h6>
+
+        <table class="table table-sm mt-3">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Marks</th>
+                    <th>Grade</th>
+                    <th>Teacher Comment</th>
+                    <th>Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in report.subjects.all %}
+                <tr>
+                    <td>{{ subject.subject.name }}</td>
+                    <td>{{ subject.marks }}</td>
+                    <td>{{ subject.grade }}</td>
+                    <td>{{ subject.teacher_comment }}</td>
+                    <td><a href="{% url 'download_report_pdf' report.id %}"
+                             class="btn btn-sm btn-outline-primary mt-2">
+                                   📥 Download PDF
+                            </a>
+                        </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <hr>
+        <p><strong>Total:</strong> {{ report.total_score }}</p>
+        <p><strong>Overall Grade:</strong> {{ report.grade }}</p>
+        <p><strong>Remarks:</strong> {{ report.headteacher_remark }}</p>
+
+    </div>
+</div>
+{% empty %}
+<p class="text-muted">No academic reports available.</p>
+{% endfor %}
+{% endblock %}

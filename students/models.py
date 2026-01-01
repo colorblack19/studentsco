@@ -42,7 +42,7 @@ class Student(models.Model):
     feestructure = models.ForeignKey("FeeStructure",on_delete=models.SET_NULL,null=True,blank=True)
     photo = models.ImageField(upload_to='student_photos/', blank=True, null=True)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    
+   
 
     teacher = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -224,3 +224,69 @@ class AdminActionLog(models.Model):
         return f"{self.user.username} - {self.action}"
 
 
+class AcademicReport(models.Model):
+    TERM_CHOICES = [
+        ("MID", "Mid Term"),
+        ("END", "End Term"),
+    ]
+
+    student = models.ForeignKey("Student", on_delete=models.CASCADE)
+    term = models.CharField(max_length=3, choices=TERM_CHOICES)
+    total_score = models.IntegerField()
+    grade = models.CharField(max_length=5)
+    teacher_comment = models.TextField()
+    headteacher_remark = models.TextField(blank=True)
+    is_published = models.BooleanField(default=False)
+    status = models.CharField(
+    max_length=20,
+    choices=[("DRAFT", "Draft"), ("PUBLISHED", "Published")],
+    default="DRAFT"
+         )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student} - {self.get_term_display()}"
+
+
+class ReportSubject(models.Model):
+    report = models.ForeignKey(
+        AcademicReport,
+        related_name="subjects",
+        on_delete=models.CASCADE
+    )
+
+    subject = models.ForeignKey(
+        "students.Subject",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    name = models.CharField(
+        max_length=100,
+        blank=True
+    )  # 🔒 legacy support
+
+    marks = models.IntegerField()
+    grade = models.CharField(max_length=5)
+    teacher_comment = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.subject.name if self.subject else self.name
+
+
+
+# students/models.py
+class Subject(models.Model):
+    name = models.CharField(max_length=100)
+    class_level = models.CharField(
+        max_length=50,
+        choices=Student.CLASS_LEVELS
+    )
+
+    class Meta:
+        unique_together = ("name", "class_level")
+
+    def __str__(self):
+        return f"{self.name} ({self.class_level})"

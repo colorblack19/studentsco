@@ -191,7 +191,7 @@
                     <th>Parent Name</th>
                     <th>Class</th>
                     <th>Balance</th>
-                    <th>Profile</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
 
@@ -213,12 +213,20 @@
 
                    {% endif %}
                  </td>
-
+                      
 
                     <td>
                         <a href="{% url 'student_profile' item.student.id %}" class="btn btn-primary btn-sm">
                             View
                         </a>
+
+                            {% if request.user.is_staff %}
+                        <a href="{% url 'add_report' item.student.id %}"
+                            class="btn btn-success btn-sm">
+                          ➕ Add Report
+                           </a>
+                          {% endif %}
+
                         <a href="{% url 'delete_student' item.student.id %}"
                            class="btn btn-danger btn-sm"
                            onclick="return confirm('Are you sure you want to delete this student?')">

@@ -127,5 +127,14 @@
     </a>
 </li>
 {% endif %}
+
+{% if request.user.is_staff %}
+<li>
+    <a href="{% url 'admin_reports' %}">
+        📑 <span>Academic Reports</span>
+    </a>
+</li>
+{% endif %}
+
     </ul>
 </aside>
