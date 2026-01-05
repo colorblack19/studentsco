@@ -21,6 +21,10 @@ env/
 # Zip files
 accounts.zip
 
+students/static/images/debug.log
+*.log
+
+
 
 # Python
 __pycache__/
