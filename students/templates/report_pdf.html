@@ -1,98 +1,128 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <style>
-        body {
-            font-family: Helvetica;
-            font-size: 12px;
-            line-height: 1.6;
-        }
+<meta charset="utf-8">
 
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
+<style>
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    color: #000;
+}
 
-        .info {
-            margin-bottom: 15px;
-        }
+/* ===== TITLE ===== */
+h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
+/* ===== STUDENT INFO ===== */
+.info {
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
 
-        th, td {
-            border: 1px solid #000;
-            padding: 6px;
-        }
+/* ===== TABLE ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
 
-        th {
-            background-color: #f0f0f0;
-            text-align: left;
-        }
+th, td {
+    border: 1px solid #000;
+    padding: 5px;
+    font-size: 10.5px;
+}
 
-        .section {
-            margin-top: 15px;
-        }
+th {
+    background: #f2f2f2;
+    text-align: center;
+    font-weight: bold;
+}
 
-        .label {
-            font-weight: bold;
-        }
-    </style>
+/* Column control */
+.col-subject { width: 30%; }
+.col-marks   { width: 15%; text-align: center; }
+.col-grade   { width: 15%; text-align: center; }
+.col-comment { width: 40%; }
+
+/* ===== SECTIONS ===== */
+.section {
+    margin-top: 10px;
+}
+
+.label {
+    font-weight: bold;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    margin-top: 25px;
+}
+
+.signature {
+    margin-top: 12px;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Academic Report</h2>
+<h2>ACADEMIC REPORT</h2>
 
 <div class="info">
-    <span class="label">Student:</span> {{ report.student.full_name }}<br/>
-    <span class="label">Class:</span> {{ report.student.class_level }}<br/>
-    <span class="label">Term:</span> {{ report.get_term_display }}
+    <strong>Student:</strong> {{ report.student.full_name }}<br>
+    <strong>Class:</strong> {{ report.student.class_level }}<br>
+    <strong>Term:</strong> {{ report.get_term_display }}
 </div>
 
 <table>
-    <tr>
-        <th>Subject</th>
-        <th>Marks</th>
-        <th>Grade</th>
-        <th>Comment</th>
-    </tr>
-
-    {% for s in report.subjects.all %}
-    <tr>
-        <td>{{ s.subject.name }}</td>
-        <td>{{ s.marks }}</td>
-        <td>{{ s.grade }}</td>
-        <td>{{ s.teacher_comment }}</td>
-    </tr>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th class="col-subject">Subject</th>
+            <th class="col-marks">Marks</th>
+            <th class="col-grade">Grade</th>
+            <th class="col-comment">Teacher Comment</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in report.subjects.all %}
+        <tr>
+            <td class="col-subject">{{ s.subject.name }}</td>
+            <td class="col-marks">{{ s.marks }}</td>
+            <td class="col-grade">{{ s.grade }}</td>
+            <td class="col-comment">{{ s.teacher_comment }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 
 <div class="section">
-    <span class="label">Total Score:</span> {{ report.total_score }}<br/>
-    <span class="label">Overall Grade:</span> {{ report.grade }}
+    <strong>Total Score:</strong> {{ report.total_score }}<br>
+    <strong>Overall Grade:</strong> {{ report.grade }}
 </div>
 
 <div class="section">
-    <span class="label">Teacher Comment:</span><br/>
+    <strong>Teacher Comment:</strong><br>
     {{ report.teacher_comment }}
 </div>
 
 <div class="section">
-    <span class="label">Headteacher Remark:</span><br/>
+    <strong>Headteacher Remark:</strong><br>
     {{ report.headteacher_remark }}
 </div>
-<div>
-Class Teacher: __________   Date: ________
-</div>
-<div>
-Headteacher: __________
-</div>
 
+<div class="footer">
+    <div class="signature">
+        Class Teacher: ____________________ &nbsp;&nbsp; Date: ______________
+    </div>
+    <div class="signature">
+        Headteacher: ____________________
+    </div>
+</div>
 
 </body>
 </html>

@@ -16,6 +16,7 @@
         <table class="table table-sm mt-3">
             <thead>
                 <tr>
+
                     <th>Subject</th>
                     <th>Marks</th>
                     <th>Grade</th>
@@ -41,6 +42,7 @@
         </table>
 
         <hr>
+       <p><strong>Full Name : </strong>{{ report.student }}</p>
         <p><strong>Total:</strong> {{ report.total_score }}</p>
         <p><strong>Overall Grade:</strong> {{ report.grade }}</p>
         <p><strong>Remarks:</strong> {{ report.headteacher_remark }}</p>
@@ -50,4 +52,89 @@
 {% empty %}
 <p class="text-muted">No academic reports available.</p>
 {% endfor %}
+
+<style>
+    /* ===== Academic Reports ===== */
+h4 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+/* Card compact */
+.card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.card-body {
+    padding: 1rem 1.1rem;
+}
+
+/* Title */
+.card-body h6 {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    color: #111827;
+}
+
+/* Table compact */
+.table {
+    margin-bottom: 0.6rem;
+    font-size: 0.85rem;
+}
+
+.table thead th {
+    background: #f8fafc;
+    font-weight: 600;
+    padding: 0.45rem;
+    border-bottom: 1px solid #dee2e6;
+    white-space: nowrap;
+}
+
+.table tbody td {
+    padding: 0.4rem;
+    vertical-align: middle;
+    line-height: 1.2;
+}
+
+/* Prevent table being too tall */
+.table tbody tr {
+    height: auto;
+}
+
+/* Teacher comment small */
+.table td:nth-child(4) {
+    font-size: 0.8rem;
+    color: #4b5563;
+}
+
+/* Download button small */
+.table .btn {
+    padding: 0.25rem 0.45rem;
+    font-size: 0.75rem;
+}
+
+/* Footer info compact */
+.card-body p {
+    margin-bottom: 0.2rem;
+    font-size: 0.85rem;
+}
+
+.card-body hr {
+    margin: 0.5rem 0;
+}
+
+/* Mobile friendly */
+@media (max-width: 768px) {
+    .table {
+        font-size: 0.8rem;
+    }
+
+    .card-body {
+        padding: 0.9rem;
+    }
+}
+
+</style>
 {% endblock %}
