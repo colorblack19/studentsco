@@ -65,11 +65,18 @@ from .forms import AcademicReportForm, ReportSubjectForm
 from django.forms import inlineformset_factory
 from django.contrib.admin.views.decorators import staff_member_required
 
-def is_admin(user):
-    return user.is_authenticated and user.is_staff
+
+
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+def is_staff_or_admin(user):
+    return user.is_staff or user.is_superuser
+
+
 
 # ====================== DASHBOARD ======================
-
+@login_required
+@user_passes_test(is_staff_or_admin)
 def dashboard(request):
     
     cleanup_pending_payments()
