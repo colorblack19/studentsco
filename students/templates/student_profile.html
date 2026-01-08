@@ -376,17 +376,22 @@ body.lock-scroll {
 
 <!-- ================= INFORMATION ================= -->
 <section class="page-section">
-       <div class="profile-card mb-4">
-            <div class="row">
-                 <div class="col-md-6">
-                    <p class="section-title">PROFILE INFO</p>
+    <div class="profile-card mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                  <p class="section-title">PROFILE INFO</p>
 
                 <div class="info-box"><strong>Name:</strong> {{ student.full_name }}</div>
                 <div class="info-box"><strong>Class:</strong> {{ student.class_name }}</div>
-                   {% if verified %}
-                    <div class="info-box"><strong>Admission Number:</strong> {{ student.admission_number }}</div>
-                  {% endif %}
+                <div class="info-box"><strong>Admission Number:</strong>
+                {% if verified %}
+                       {{ student.admission_number }}
+                 {% else %}
+                <span class="text-muted">••••••••</span>
+                {% endif %}
+                 </div>
 
+        </div>
 
             <div class="col-md-6">
                 <p class="section-title"> PARENT / GUARDIAN </p>
