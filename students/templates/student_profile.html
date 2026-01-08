@@ -383,8 +383,10 @@ body.lock-scroll {
 
                 <div class="info-box"><strong>Name:</strong> {{ student.full_name }}</div>
                 <div class="info-box"><strong>Class:</strong> {{ student.class_name }}</div>
-                <div class="info-box"><strong>Admission_Number:</strong> {% if verified %}{{ student.admission_number }}{% else %}
-               <span>••••••••</span>{% endif %}</div>
+                   {% if verified %}
+                    <div class="info-box"><strong>Admission Number:</strong> {{ student.admission_number }}</div>
+                  {% endif %}
+
 
             <div class="col-md-6">
                 <p class="section-title"> PARENT / GUARDIAN </p>
