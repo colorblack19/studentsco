@@ -36,9 +36,11 @@ urlpatterns = [
 
     # STUDENTS / SYSTEM
     path('students/', include('students.urls')),
-
+    
 
     path('admin/', admin.site.urls),
+    
+    path("timetable/", include("timetable.urls"))
     
 
 

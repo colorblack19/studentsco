@@ -1,0 +1,135 @@
+<div class="timetable-wrapper">
+    <table class="table timetable-table">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Class</th>
+                <th>Subject</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in timetables %}
+            <tr>
+                <td>
+                    <span class="badge day-badge">{{ t.get_day_display }}</span>
+                </td>
+                <td class="fw-semibold">{{ t.class_level.name }}</td>
+                <td>{{ t.subject.name }}</td>
+                <td class="time-cell">
+                    {{ t.start_time }} – {{ t.end_time }}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="empty-state">
+                    📭 No timetable assigned
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<style>
+    /* Wrapper */
+.timetable-wrapper {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    margin-top: 20px;
+}
+
+/* Table */
+.timetable-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    font-size: 15px;
+}
+
+/* Header */
+.timetable-table thead th {
+    background: linear-gradient(135deg, #0d6efd, #084298);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 13px;
+    padding: 14px;
+    border: none;
+}
+
+/* Body cells */
+.timetable-table tbody td {
+    padding: 14px;
+    vertical-align: middle;
+    border-top: 1px solid #eee;
+}
+
+/* Row hover */
+.timetable-table tbody tr {
+    transition: all 0.2s ease-in-out;
+}
+
+.timetable-table tbody tr:hover {
+    background: #f8f9fa;
+    transform: scale(1.005);
+}
+
+/* Day badge */
+.day-badge {
+    background: #e7f1ff;
+    color: #0d6efd;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Time cell */
+.time-cell {
+    font-weight: 600;
+    color: #198754;
+}
+
+/* Empty state */
+.empty-state {
+    padding: 30px;
+    font-size: 16px;
+    color: #6c757d;
+    font-style: italic;
+    background: #fafafa;
+    border-radius: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .timetable-table {
+        font-size: 14px;
+    }
+
+    .timetable-table thead {
+        display: none;
+    }
+
+    .timetable-table tbody tr {
+        display: block;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .timetable-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 15px;
+    }
+
+    .timetable-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #555;
+    }
+}
+
+</style>

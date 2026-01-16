@@ -92,13 +92,6 @@ urlpatterns = [
     path("admin/reports/<int:pk>/publish/",views.publish_report,name="publish_report"),
     path("admin/reports/<int:pk>/delete/",views.delete_report,name="delete_report"),
 
-
-
-
-    
-
-
-
 ]
 
 

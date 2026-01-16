@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container admin-timetable-wrap mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">➕ Add Timetable</h5>
+                </div>
+
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- DAY + SUBJECT -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Day</label>
+                                <select name="day" class="form-select" required>
+                                    <option value="">-- Select Day --</option>
+                                    <option value="MON">Monday</option>
+                                    <option value="TUE">Tuesday</option>
+                                    <option value="WED">Wednesday</option>
+                                    <option value="THU">Thursday</option>
+                                    <option value="FRI">Friday</option>
+                                </select>
+                            </div>
+  <div class="col-md-4">
+    <label class="form-label fw-semibold">Class</label>
+    <select name="class_level" class="form-select" required>
+        <option value="">-- Select Class --</option>
+        {% for c in class_levels %}
+            <option value="{{ c.id }}">{{ c }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Subject</label>
+                                <select name="subject" class="form-select" required>
+                                    <option value="">-- Select Subject --</option>
+                                    {% for s in subjects %}
+                                        <option value="{{ s.id }}">{{ s.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            
+                        </div>
+
+                        <!-- TIME -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Start Time</label>
+                                <input type="time" name="start_time" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">End Time</label>
+                                <input type="time" name="end_time" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <!-- TEACHER -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Teacher</label>
+                            <select name="teacher" class="form-select" required>
+                                <option value="">-- Select Teacher --</option>
+                                {% for t in teachers %}
+                                    <option value="{{ t.id }}">{{ t.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- BUTTONS -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'admin_timetable' %}" class="btn btn-outline-secondary">
+                                ← Back
+                            </a>
+
+                            <button type="submit" class="btn btn-success px-4">
+                                💾 Save Timetable
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

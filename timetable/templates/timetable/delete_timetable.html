@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container admin-timetable-wrap">
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">🗑 Delete Timetable</h5>
+        </div>
+
+        <div class="card-body text-center">
+            <p class="fs-5">
+                Are you sure you want to delete this timetable?
+            </p>
+
+            <p class="text-muted">
+                {{ timetable.get_day_display }} |
+                {{ timetable.subject }} |
+                {{ timetable.teacher.username }}
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+                <a href="{% url 'admin_timetable' %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn btn-danger">
+                    Yes, Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

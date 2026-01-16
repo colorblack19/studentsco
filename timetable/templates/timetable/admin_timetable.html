@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .admin-timetable-wrap {
+    margin-top: 90px; 
+    margin-left: 5px;
+}
+
+</style>
+
+<div class="container admin-timetable-wrap">
+
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>📅 Admin Timetable</h2>
+        <a href="{% url 'add_timetable' %}" class="btn btn-primary">
+            ➕ Add Timetable
+        </a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Day</th>
+                <th>Subject</th>
+                <th>Time</th>
+                <th>Teacher</th>
+                <th width="160">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for t in timetables %}
+            <tr>
+                <td>{{ t.get_day_display }}</td>
+                <td>{{ t.subject }}</td>
+                <td>{{ t.start_time }} - {{ t.end_time }}</td>
+                <td>{{ t.teacher.username }}</td>
+                <td>
+                    <a href="{% url 'edit_timetable' t.id %}"
+                       class="btn btn-sm btn-warning">
+                        ✏️ Edit
+                    </a>
+
+                    <a href="{% url 'delete_timetable' t.id %}"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('Delete this timetable?');">
+                        🗑 Delete
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted">
+                    No timetables found
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

@@ -1427,3 +1427,4 @@ def delete_report(request, pk):
     messages.success(request, "Academic report deleted successfully.")
 
     return redirect("admin_reports")
+

@@ -25,7 +25,13 @@
              <h3>👋 Welcome, {{ request.user.username }}<h3>
             
               
-              
+                      <!-- 🔥 TIMETABLE BUTTON -->
+        <div class="mt-4">
+            <a href="{% url 'teacher_timetable' %}"
+               class="btn hero-timetable-btn">
+                📅 My Timetable
+            </a>
+        </div>
           
        </div>
 </section>
@@ -169,7 +175,6 @@
             </div>
         </a>
     </div>
-
 </div>
 
 
@@ -332,6 +337,112 @@
 .disabled-card:hover {
     transform: none;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+.hero-timetable-btn{
+    display:inline-block;
+    padding:10px 26px;
+    border:1.5px solid #fff;
+    border-radius:14px;
+
+    background:transparent;
+    color:#fff;
+
+    font-size:0.9rem;
+    font-weight:600;
+    letter-spacing:1px;
+    text-transform:uppercase;
+
+    transition:all 0.3s ease;
+    box-shadow:0 8px 18px rgba(0,0,0,0.25);
+}
+
+.hero-timetable-btn:hover{
+    background:#0d6efd;
+    border-color:#0d6efd;
+    color:#fff;
+
+    transform:translateY(-3px);
+    box-shadow:0 14px 30px rgba(13,110,253,0.45);
+}
+
+.hero-timetable-btn:active{
+    transform:translateY(-1px);
+    box-shadow:0 6px 14px rgba(13,110,253,0.35);
+}
+/* ===============================
+   HERO RESPONSIVE OVERRIDE (SAFE)
+   ADD AT THE VERY BOTTOM
+================================ */
+
+@media (max-width: 992px) {
+    .cb-hero {
+        height: auto;
+        padding: 120px 20px 80px;
+    }
+
+    .cb-hero h1 {
+        font-size: 2.4rem;
+        letter-spacing: 1.5px;
+    }
+
+    .cb-hero p {
+        font-size: 0.95rem;
+        margin-top: 10px;
+        line-height: 1.4;
+    }
+
+    .cb-hero h3 {
+        font-size: 1.05rem;
+        margin-top: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .cb-hero {
+        padding: 110px 16px 70px;
+        text-align: center;
+    }
+
+    .cb-hero h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+    }
+
+    .cb-hero p {
+        font-size: 0.9rem;
+    }
+
+    .cb-hero h3 {
+        font-size: 1rem;
+        margin-top: 20px;
+    }
+
+    .hero-timetable-btn {
+        padding: 8px 22px;
+        font-size: 0.8rem;
+        border-radius: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cb-hero h1 {
+        font-size: 1.7rem;
+    }
+
+    .cb-hero p {
+        font-size: 0.85rem;
+    }
+
+    .cb-hero h3 {
+        font-size: 0.95rem;
+    }
+}
+
+/* Optional: disable floating animation on small screens */
+@media (max-width: 768px) {
+    .cb-hero h1 {
+        animation: none;
+    }
 }
 
 
