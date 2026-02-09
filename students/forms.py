@@ -88,9 +88,11 @@ class AcademicReportForm(forms.ModelForm):
         model = AcademicReport
         fields = [
             "term",
+            "exam_type",
             "teacher_comment",
             "headteacher_remark",
             "status",
+
         ]
         widgets = {
             "teacher_comment": forms.Textarea(attrs={"rows": 3}),
