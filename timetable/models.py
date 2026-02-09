@@ -8,7 +8,7 @@ class Timetable(models.Model):
         ("TUE", "Tuesday"),
         ("WED", "Wednesday"),
         ("THU", "Thursday"),
-        ("FRI", "Friday"),
+        ("FRI", "Friday"), 
     ]
 
     CLASS_LEVELS = Student.CLASS_LEVELS  # 🔥 reuse existing system
