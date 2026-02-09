@@ -39,8 +39,57 @@ textarea {
 
 
 
-<h4>📑 Academic Reports</h4>
+<h4 class="mb-3">
+    {% if request.GET.term %}
+        {{ request.GET.term }}
+    {% else %}
+        ALL TERMS
+    {% endif %}
+    –
+    {% if request.GET.exam %}
+        {% if request.GET.exam == "MID" %}MID TERM{% else %}END TERM{% endif %}
+    {% else %}
+        ALL EXAMS
+    {% endif %}
+    EXAMINATION REPORT
+</h4>
+
 <div class="container-fluid px-3 px-md-4">
+    
+        <div class="mb-3">
+                 <a href="{% url 'export_broadsheet' %}"class="btn btn-success btn-sm">
+               📊 Download Excel
+           </a>
+       </div>
+       
+    <form method="get" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <select name="term" class="form-select">
+            <option value="">-- Select Term --</option>
+            <option value="T1" {% if request.GET.term == "T1" %}selected{% endif %}>Term 1</option>
+            <option value="T2" {% if request.GET.term == "T2" %}selected{% endif %}>Term 2</option>
+            <option value="T3" {% if request.GET.term == "T3" %}selected{% endif %}>Term 3</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <select name="exam" class="form-select">
+            <option value="">-- Select Exam --</option>
+            <option value="MID" {% if request.GET.exam == "MID" %}selected{% endif %}>Mid Term</option>
+            <option value="END" {% if request.GET.exam == "END" %}selected{% endif %}>End Term</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary">
+            🔍 Filter
+        </button>
+
+    </div>
+    
+</form>
+
+
 <table class="table table-bordered">
 <tr>
     <th>Student</th>
@@ -54,9 +103,10 @@ textarea {
     <td>{{ report.student }}</td>
     <td>{{ report.get_term_display }}</td>
     <td>
-        <span class="badge {% if report.is_published %}bg-success{% else %}bg-secondary{% endif %}">
+        <span class="badge {% if report.status == "PUBLISHED" %}bg-success{% else %}bg-secondary{% endif %}">
             {{ report.status }}
         </span>
+        
     </td>
 <td>
     <a href="{% url 'edit_report' report.id %}"

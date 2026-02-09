@@ -16,7 +16,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'colorblack.pythonanywhere.com',
     'www.colorblack.pythonanywhere.com',
-      '127.0.0.1','localhost'  
+   
 ]
 
 INSTALLED_APPS = [
@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'students.apps.StudentsConfig',
     'events',
     'timetable',
+    'chat',
 ]
 
 
@@ -44,6 +45,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "chat.middleware.UserOnlineMiddleware",
 ]
 
 
@@ -68,6 +70,8 @@ TEMPLATES = [
 
                 # 👇 CUSTOM ROLE CONTEXT (MUHIMU)
                 'accounts.context_processors.user_role',
+                'chat.context_processors.chat_context',
+
             ],
         },
     },

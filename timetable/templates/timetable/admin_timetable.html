@@ -1,63 +1,127 @@
 {% extends "base.html" %}
 {% block content %}
+
 <style>
-    .admin-timetable-wrap {
-    margin-top: 90px; 
-    margin-left: 5px;
+.admin-timetable-wrap{
+    margin-top:90px;
+}
+
+/* Card */
+.teacher-card{
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 5px 18px rgba(0,0,0,0.08);
+    margin-bottom:30px;
+}
+
+/* Header */
+.teacher-header{
+    background:linear-gradient(135deg,#0d6efd,#084298);
+    color:white;
+    padding:12px 18px;
+    border-radius:12px 12px 0 0;
+    font-size:18px;
+    font-weight:600;
+}
+
+/* Table */
+.teacher-table{
+    width:100%;
+}
+
+.teacher-table th{
+    background:#f1f3f5;
+}
+
+.teacher-table td,
+.teacher-table th{
+    padding:10px;
 }
 
 </style>
 
 <div class="container admin-timetable-wrap">
 
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📅 Admin Timetable</h2>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>📅 Admin Timetable</h2>
-        <a href="{% url 'add_timetable' %}" class="btn btn-primary">
-            ➕ Add Timetable
-        </a>
+    <a href="{% url 'add_timetable' %}" class="btn btn-primary">
+        ➕ Add Timetable
+    </a>
+</div>
+
+{% regroup timetables by teacher as teacher_list %}
+
+{% for teacher in teacher_list %}
+
+<div class="teacher-card">
+
+    <!-- TEACHER NAME -->
+    <div class="teacher-header">
+        👨‍🏫 {{ teacher.grouper.username }}
     </div>
 
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Day</th>
-                <th>Subject</th>
-                <th>Time</th>
-                <th>Teacher</th>
-                <th width="160">Actions</th>
-            </tr>
-        </thead>
+    <!-- TABLE -->
+    <div class="table-responsive">
+        <table class="table table-bordered teacher-table mb-0">
 
-        <tbody>
-            {% for t in timetables %}
-            <tr>
-                <td>{{ t.get_day_display }}</td>
-                <td>{{ t.subject }}</td>
-                <td>{{ t.start_time }} - {{ t.end_time }}</td>
-                <td>{{ t.teacher.username }}</td>
-                <td>
-                    <a href="{% url 'edit_timetable' t.id %}"
-                       class="btn btn-sm btn-warning">
-                        ✏️ Edit
-                    </a>
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Subject</th>
+                    <th>Time</th>
+                    <th width="160">Actions</th>
+                </tr>
+            </thead>
 
-                    <a href="{% url 'delete_timetable' t.id %}"
-                       class="btn btn-sm btn-danger"
-                       onclick="return confirm('Delete this timetable?');">
-                        🗑 Delete
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" class="text-center text-muted">
-                    No timetables found
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+            <tbody>
+
+{% regroup teacher.list by day as day_list %}
+
+{% for day in day_list %}
+
+<!-- DAY ROW -->
+<tr class="table-primary">
+    <td colspan="4">
+        <strong>{{ day.grouper|capfirst }}</strong>
+    </td>
+</tr>
+
+<!-- SUBJECTS UNDER THAT DAY -->
+{% for t in day.list %}
+<tr>
+    <td></td>
+    <td>{{ t.subject.name }}</td>
+    <td>{{ t.start_time }} - {{ t.end_time }}</td>
+    <td>
+
+        <a href="{% url 'edit_timetable' t.id %}"
+           class="btn btn-sm btn-warning">
+           ✏️ Edit
+        </a>
+
+        <a href="{% url 'delete_timetable' t.id %}"
+           class="btn btn-sm btn-danger"
+           onclick="return confirm('Delete this timetable?');">
+           🗑 Delete
+        </a>
+
+    </td>
+</tr>
+{% endfor %}
+
+{% endfor %}
+
+</tbody>
+
+
+        </table>
+    </div>
+
+</div>
+
+{% endfor %}
 
 </div>
 

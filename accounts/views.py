@@ -283,3 +283,18 @@ def about_us(request):
 def is_admin(user):
     return user.groups.filter(name='Admin').exists()
 
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+
+@login_required
+def upload_teacher_photo(request):
+    if request.method == "POST":
+        profile = request.user.teacherprofile
+
+        if "photo" in request.FILES:
+            profile.photo = request.FILES["photo"]
+            profile.save()
+
+    return redirect(request.META.get("HTTP_REFERER", "/"))

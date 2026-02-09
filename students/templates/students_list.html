@@ -225,14 +225,20 @@
                             class="btn btn-success btn-sm">
                           ➕ Add Report
                            </a>
+                            <a href="{% url 'manage_student_teachers' item.student.id %}"
+                          class="btn btn-warning btn-sm">
+                          👩‍🏫 Teachers
+                            </a>
+
                           {% endif %}
+
 
                         <a href="{% url 'delete_student' item.student.id %}"
                            class="btn btn-danger btn-sm"
                            onclick="return confirm('Are you sure you want to delete this student?')">
                            Delete
                         </a>
-                        
+
                     </td>
                 </tr>
            

@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from .models import Timetable
 from students.models import Subject
-from .models import  ClassLevel
+from students.models import Student
 
 
 
@@ -19,24 +19,26 @@ def is_admin(user):
 def admin_timetable(request):
     timetables = (
         Timetable.objects
-        .select_related("teacher", "subject", "class_level")
-        .order_by("day", "start_time")
+        .select_related("teacher", "subject")
+        .order_by("teacher", "day", "start_time")
     )
 
     return render(request, "timetable/admin_timetable.html", {
         "timetables": timetables
     })
 
+
+
 @login_required
 @user_passes_test(is_admin)
 def add_timetable(request):
     subjects = Subject.objects.all()
     teachers = User.objects.filter(groups__name="Teacher")
-    class_levels = ClassLevel.objects.all()
+    class_levels = Student.CLASS_LEVELS
 
     if request.method == "POST":
         Timetable.objects.create(
-            class_level_id=request.POST.get("class_level"),
+            class_level=request.POST.get("class_level"),
             day=request.POST.get("day"),
             start_time=request.POST.get("start_time"),
             end_time=request.POST.get("end_time"),
@@ -91,8 +93,9 @@ def teacher_timetable(request):
     timetables = (
         Timetable.objects
         .filter(teacher=request.user)
-        .select_related("subject", "class_level")
+        .select_related("subject", "teacher")  # ⚠️ class_level IMETOLEWA
         .order_by("day", "start_time")
+        
     )
 
     return render(request, "timetable/teacher_timetable.html", {

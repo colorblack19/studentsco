@@ -21,8 +21,8 @@ class Student(models.Model):
         ('Grade6', 'Grade6'),
         ('Grade7', 'Grade7'),
         ('Grade8', 'Grade8'),
-        ('Form1', 'Form1'),
-        ('Form2', 'Form2'),
+        ('Grade9', 'Grade9'),
+        ('Grade10', 'Grade10'),
         ('Form3', 'Form3'),
         ('Form4', 'Form4'),
     )
@@ -45,12 +45,19 @@ class Student(models.Model):
    
 
     teacher = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="students"
-    )
+    settings.AUTH_USER_MODEL,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="students"
+)
+
+    extra_teachers = models.ManyToManyField(
+    settings.AUTH_USER_MODEL,
+    blank=True,
+    related_name="extra_students"
+)
+
     # UNIQUE ADMISSION NO FROM DATABASE
     admission_number = models.CharField(max_length=10, unique=True, blank=True, null=True)
     
@@ -225,28 +232,67 @@ class AdminActionLog(models.Model):
 
 
 class AcademicReport(models.Model):
+
     TERM_CHOICES = [
+        ("T1", "Term 1"),
+        ("T2", "Term 2"),
+        ("T3", "Term 3"),
+    ]
+
+    EXAM_TYPE_CHOICES = [
         ("MID", "Mid Term"),
         ("END", "End Term"),
     ]
 
     student = models.ForeignKey("Student", on_delete=models.CASCADE)
-    term = models.CharField(max_length=3, choices=TERM_CHOICES)
-    total_score = models.IntegerField()
-    grade = models.CharField(max_length=5)
+
+    term = models.CharField(
+        max_length=2,
+        choices=TERM_CHOICES
+    )
+
+
+    exam_type = models.CharField(
+    max_length=3,
+    choices=EXAM_TYPE_CHOICES,
+    default="MID"
+)
+
+
+    total_score = models.IntegerField(default=0)
+    grade = models.CharField(max_length=5, blank=True)
+
+    mean_marks = models.FloatField(default=0)
     teacher_comment = models.TextField()
     headteacher_remark = models.TextField(blank=True)
-    is_published = models.BooleanField(default=False)
+
     status = models.CharField(
-    max_length=20,
-    choices=[("DRAFT", "Draft"), ("PUBLISHED", "Published")],
-    default="DRAFT"
-         )
+        max_length=20,
+        choices=[("DRAFT", "Draft"), ("PUBLISHED", "Published")],
+        default="DRAFT"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
+    def calculate_report(self):
+        from .views import get_report_grade
 
-    def __str__(self):
-        return f"{self.student} - {self.get_term_display()}"
+        subjects = self.subjects.all()
+        total = sum(s.marks for s in subjects)
+        count = subjects.count()
+
+        avg = total / count if count else 0
+
+        self.total_score = total
+        self.mean_marks = avg
+        self.grade = get_report_grade(avg)
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if not is_new:
+            self.calculate_report()
+            super().save(update_fields=["total_score", "mean_marks", "grade"])
 
 
 class ReportSubject(models.Model):
@@ -263,32 +309,22 @@ class ReportSubject(models.Model):
         blank=True
     )
 
-    name = models.CharField(
-        max_length=100,
-        blank=True
-    )  # 🔒 legacy support
-
-    marks = models.IntegerField()
-    grade = models.CharField(max_length=5)
+    marks = models.IntegerField(default=0)
+    grade = models.CharField(max_length=5, blank=True)
     teacher_comment = models.TextField(blank=True)
+    mean_marks = models.FloatField(default=0)
+    position = models.IntegerField(null=True, blank=True)
+    def save(self, *args, **kwargs):
+        from .views import get_subject_grade
+        self.grade = get_subject_grade(self.marks)
+        super().save(*args, **kwargs)
 
-    def __str__(self):
-        return self.subject.name if self.subject else self.name
 
-
-
-# students/models.py
 class Subject(models.Model):
     name = models.CharField(max_length=100)
-    class_level = models.CharField(
-        max_length=50,
-        choices=Student.CLASS_LEVELS
-    )
 
     class Meta:
-        unique_together = ("name", "class_level")
-
+        unique_together = ("name",)
     def __str__(self):
-        return f"{self.name} ({self.class_level})"
-
+        return self.name
 

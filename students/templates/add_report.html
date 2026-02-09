@@ -127,5 +127,37 @@ document.addEventListener("click", function (e) {
         e.target.closest(".subject-form").remove();
     }
 });
+
+
+function getGrade(marks) {
+    if (marks >= 80) return "A";
+    if (marks >= 75) return "A-";
+    if (marks >= 70) return "B+";
+    if (marks >= 65) return "B";
+    if (marks >= 60) return "B-";
+    if (marks >= 55) return "C+";
+    if (marks >= 50) return "C";
+    if (marks >= 45) return "C-";
+    if (marks >= 40) return "D+";
+    if (marks >= 35) return "D";
+    if (marks >= 30) return "D-";
+    return "E";
+}
+
+
+document.addEventListener("input", function (e) {
+    if (e.target.name && e.target.name.includes("marks")) {
+        const marks = parseInt(e.target.value);
+        const gradeInput = e.target
+            .closest(".subject-card")
+            .querySelector("input[name$='grade']");
+
+        if (!isNaN(marks) && gradeInput) {
+            gradeInput.value = getGrade(marks);
+        }
+    }
+});
 </script>
+
+
 {% endblock %}

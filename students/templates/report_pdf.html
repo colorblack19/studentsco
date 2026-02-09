@@ -4,124 +4,323 @@
 <meta charset="utf-8">
 
 <style>
+/* ===== BASE ===== */
 body {
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 11px;
-    color: #000;
-}
-
-/* ===== TITLE ===== */
-h2 {
-    text-align: center;
-    margin-bottom: 15px;
-    font-size: 16px;
-    letter-spacing: 1px;
-}
-
-/* ===== STUDENT INFO ===== */
-.info {
-    margin-bottom: 12px;
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-size: 10px;
+    color: #1f2937; /* dark slate */
     line-height: 1.4;
 }
 
-/* ===== TABLE ===== */
-table {
+/* ===== GLOBAL BOX ===== */
+.box {
+    border: 1px solid #1f2937;
+    padding: 4px;   /* ❗ kutoka 8px */
+    margin-bottom: 10px;
+    background: #ffffff;
+}
+
+/* SECTION TITLES */
+.box strong {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #111827;
+}
+
+/* ===== HEADER ===== */
+.header {
+    text-align: center;
+    border: 2px solid #1e3a8a;
+    background: #eff6ff;
+}
+.header h2 {
+    margin: 0;
+    font-size: 17px;
+    letter-spacing: 1px;
+    color: #1e3a8a;
+}
+.header p {
+    margin: 3px 0 0;
+    font-size: 11px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+/* ===== STUDENT CARD ===== */
+.student-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
 }
-
-th, td {
-    border: 1px solid #000;
-    padding: 5px;
+.student-info p {
+    margin: 2px 0;
     font-size: 10.5px;
 }
+.student-info strong {
+    color: #1e3a8a;
+}
 
-th {
-    background: #f2f2f2;
+.photo {
+    width: 90px;
+    height: 110px;
+    border: 2px solid #1e3a8a;
     text-align: center;
+    font-size: 9px;
+    color: #6b7280;
+}
+
+/* ===== PERFORMANCE PROFILE ===== */
+.profile-table td {
+    vertical-align: top;
+    padding: 4px;
+}
+.profile-box {
+    border: 1px dashed #1e3a8a;
+    padding: 6px;
+    background: #f8fafc;
+}
+
+/* ===== SUMMARY ===== */
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 10.5px;
+}
+.summary-table td {
+    border: 1px solid #1f2937;
+    padding: 6px;
+    font-weight: bold;
+    background: #f9fafb;
+}
+.summary-table td:nth-child(odd) {
+    background: #eef2ff;
+}
+
+/* ===== PROGRESS ===== */
+.progress-up {
+    color: #166534;
+    font-weight: bold;
+}
+.progress-down {
+    color: #7f1d1d;
+    font-weight: bold;
+}
+.progress-flat {
+    color: #374151;
     font-weight: bold;
 }
 
-/* Column control */
-.col-subject { width: 30%; }
-.col-marks   { width: 15%; text-align: center; }
-.col-grade   { width: 15%; text-align: center; }
-.col-comment { width: 40%; }
-
-/* ===== SECTIONS ===== */
-.section {
-    margin-top: 10px;
+/* ===== SUBJECT TABLE ===== */
+.subject-table {
+    width: 95%;
+    border-collapse: collapse;
+    font-size: 9px;
 }
 
-.label {
-    font-weight: bold;
+.subject-table th,
+.subject-table td {
+    border: 1px solid #000;
+    padding: 3px;
+}
+
+.subject-table tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+/* ===== REMARKS ===== */
+.remarks p {
+    margin: 3px 0;
+    font-size: 10.5px;
+}
+.remarks strong {
+    color: #1e3a8a;
 }
 
 /* ===== FOOTER ===== */
-.footer {
-    margin-top: 25px;
+.footer-table {
+    width: 100%;
+    font-size: 10px;
+}
+.footer-table td {
+    padding-top: 10px;
 }
 
-.signature {
-    margin-top: 12px;
+/* ===== SMALL UTILS ===== */
+.center {
+    text-align: center;
+}
+.right {
+    text-align: right;
 }
 </style>
 </head>
 
 <body>
 
-<h2>ACADEMIC REPORT</h2>
-
-<div class="info">
-    <strong>Student:</strong> {{ report.student.full_name }}<br>
-    <strong>Class:</strong> {{ report.student.class_level }}<br>
-    <strong>Term:</strong> {{ report.get_term_display }}
+<!-- HEADER -->
+<div class="box header">
+    <h2>NAME SCHOOL</h2>
+    <p>ACADEMIC REPORT – {{ report.get_term_display }}</p>
 </div>
 
-<table>
-    <thead>
-        <tr>
-            <th class="col-subject">Subject</th>
-            <th class="col-marks">Marks</th>
-            <th class="col-grade">Grade</th>
-            <th class="col-comment">Teacher Comment</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for s in report.subjects.all %}
-        <tr>
-            <td class="col-subject">{{ s.subject.name }}</td>
-            <td class="col-marks">{{ s.marks }}</td>
-            <td class="col-grade">{{ s.grade }}</td>
-            <td class="col-comment">{{ s.teacher_comment }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+<!-- STUDENT CARD -->
+<table class="subject-table" width="95%" align="center">
+<tr>
+<td width="80%" class="student-info">
+    <p><strong>Name:</strong> {{ report.student.full_name }}</p>
+    <p><strong>Admission No:</strong> {{ report.student.admission_number }}</p>
+    <p><strong>Class:</strong> {{ report.student.class_level }}</p>
+    <p><strong>Gender:</strong> {{ report.student.get_gender_display }}</p>
+    <p><strong>Age:</strong> {{ report.student.age }}</p>
+</td>
+
+
+    <td width="20%" align="center">
+        {% if report.student.photo %}
+            <img src="file:///{{ report.student.photo.path }}" width="90" height="110">
+
+        {% else %}
+            <div class="photo">NO PHOTO</div>
+        {% endif %}
+    </td>
+</tr>
+</table>
+</div>
+<!-- SUBJECT PERFORMANCE PROFILE -->
+<div class="box">
+    <strong>Subject Performance Profile</strong><br><br>
+
+<table width="95%" class="profile-table">
+<tr>
+    <td width="50%">
+        <div class="profile-box">
+            <strong>Strongest Subject</strong><br>
+            {{ performance.best.subject.name }}<br>
+            Marks: {{ performance.best.marks }}<br>
+            Grade: {{ performance.best.grade }}
+        </div>
+    </td>
+
+    <td width="50%">
+        <div class="profile-box">
+            <strong>Needs Improvement</strong><br>
+            {{ performance.worst.subject.name }}<br>
+            Marks: {{ performance.worst.marks }}<br>
+            Grade: {{ performance.worst.grade }}
+        </div>
+    </td>
+</tr>
 </table>
 
-<div class="section">
-    <strong>Total Score:</strong> {{ report.total_score }}<br>
-    <strong>Overall Grade:</strong> {{ report.grade }}
 </div>
 
-<div class="section">
-    <strong>Teacher Comment:</strong><br>
-    {{ report.teacher_comment }}
+
+<!-- PERFORMANCE SUMMARY -->
+<div class="box">
+<table class="summary-table">
+<tr>
+    <td>Total Marks<br>{{ report.total_score }}</td>
+    <td>Overall Grade<br>{{ report.grade }}</td>
+    <td>Subjects<br>{{ report.subjects.count }}</td>
+    <td>Status<br>{{ report.status }}</td>
+</tr>
+</table>
+</div>
+<!-- PERFORMANCE OVER TIME -->
+<div class="box">
+    <strong>Academic Progress</strong><br><br>
+
+    {% if previous %}
+    <table width="100%" border="1" cellpadding="5">
+        <tr>
+            <th>Term</th>
+            <th>Total Marks</th>
+            <th>Grade</th>
+        </tr>
+        <tr>
+            <td>{{ previous.get_term_display }}</td>
+            <td align="center">{{ previous.total_score }}</td>
+            <td align="center">{{ previous.grade }}</td>
+        </tr>
+        <tr>
+            <td>{{ report.get_term_display }}</td>
+            <td align="center">{{ report.total_score }}</td>
+            <td align="center">{{ report.grade }}</td>
+        </tr>
+    </table>
+
+    <br>
+    <strong>Progress:</strong>
+    {% if report.total_score > previous.total_score %}
+        ▲ Improved Performance
+    {% elif report.total_score < previous.total_score %}
+        ▼ Declined Performance
+    {% else %}
+        ■ No Change
+    {% endif %}
+
+    {% else %}
+        <em>No previous academic record available.</em>
+    {% endif %}
 </div>
 
-<div class="section">
-    <strong>Headteacher Remark:</strong><br>
-    {{ report.headteacher_remark }}
+<!-- SUBJECT PERFORMANCE -->
+<div class="box">
+<table class="subject-table">
+<tr>
+    <th>#</th>
+    <th>Subject</th>
+    <th>Marks</th>
+    <th>Grade</th>
+    <th>Teacher Comment</th>
+</tr>
+
+{% for s in report.subjects.all %}
+<tr>
+    <td align="center">{{ forloop.counter }}</td>
+    <td>
+        {% if s.subject %}
+            {{ s.subject.name }}
+        {% else %}
+            {{ s.name }}
+        {% endif %}
+    </td>
+    <td align="center">{{ s.marks }}</td>
+    <td align="center">{{ s.grade }}</td>
+    <td>{{ s.teacher_comment }}</td>
+</tr>
+{% endfor %}
+</table>
 </div>
 
-<div class="footer">
-    <div class="signature">
-        Class Teacher: ____________________ &nbsp;&nbsp; Date: ______________
-    </div>
-    <div class="signature">
-        Headteacher: ____________________
-    </div>
+<!-- REMARKS -->
+<div class="box remarks">
+    <strong>Class Teacher's Remark:</strong>
+    <p>{{ report.teacher_comment }}</p>
+
+    <strong>Headteacher's Remark:</strong>
+    <p>{{ report.headteacher_remark }}</p>
+</div>
+
+<!-- FOOTER -->
+<div class="box">
+<table class="footer-table">
+<tr>
+    <td>
+        Class Teacher Signature:<br><br>
+        ______________________
+    </td>
+    <td>
+        Headteacher Signature:<br><br>
+        ______________________
+    </td>
+    <td>
+        Date:<br><br>
+        ______________________
+    </td>
+</tr>
+</table>
 </div>
 
 </body>

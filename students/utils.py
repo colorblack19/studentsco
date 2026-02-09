@@ -10,3 +10,17 @@ def require_admin_approval(request):
 
     request.session["next_url"] = request.path
     return False
+
+
+def subject_performance(report):
+    subjects = report.subjects.all()
+    if not subjects:
+        return None
+
+    best = max(subjects, key=lambda s: s.marks)
+    worst = min(subjects, key=lambda s: s.marks)
+
+    return {
+        "best": best,
+        "worst": worst,
+    }

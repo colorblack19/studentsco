@@ -28,13 +28,12 @@
                                 </select>
                             </div>
   <div class="col-md-4">
-    <label class="form-label fw-semibold">Class</label>
-    <select name="class_level" class="form-select" required>
-        <option value="">-- Select Class --</option>
-        {% for c in class_levels %}
-            <option value="{{ c.id }}">{{ c }}</option>
-        {% endfor %}
-    </select>
+<select name="class_level" class="form-select" required>
+    <option value="">-- Select Class --</option>
+    {% for value, label in class_levels %}
+        <option value="{{ value }}">{{ label }}</option>
+    {% endfor %}
+</select>
 </div>
 
 

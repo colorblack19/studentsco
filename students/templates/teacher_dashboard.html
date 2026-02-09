@@ -5,17 +5,52 @@
 <section class="cb-hero">  
     <!-- ADMIN HERO TOP -->
     <div class="hero-admin-top">
-        <div class="hero-left">
-            SCHOOL SYSTEM
-        </div>
 
-        <div class="hero-right">
-            <a href="{% url 'logout' %}" class="btn hero-logout-btn">
-                Logout
-            </a>
-        </div>
+    <div class="hero-left">
+        SCHOOL SYSTEM
+    </div>
 
-    </div> 
+    <div class="hero-right d-flex align-items-center gap-3"> 
+
+        <div class="teacher-profile">
+
+    <form method="POST" action="{% url 'upload_teacher_photo' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- CLICKABLE IMAGE -->
+        <label for="photo-input" style="cursor:pointer;">
+            <img src="{{ request.user.teacherprofile.photo.url }}"
+                 class="teacher-avatar"
+                 title="Click to change photo">
+        </label>
+
+        <!-- HIDDEN FILE INPUT -->
+        <input type="file"
+               id="photo-input"
+               name="photo"
+               accept="image/*"
+               hidden
+               onchange="this.form.submit();">
+    </form>
+
+    <div class="teacher-info">
+        <strong>{{ request.user.username }}</strong>
+        <span class="status {% if request.user.teacherprofile.online %}online{% else %}offline{% endif %}">
+            {% if request.user.teacherprofile.online %}Online{% else %}Offline{% endif %}
+        </span>
+    </div>
+
+</div>
+
+
+        <a href="{% url 'logout' %}" class="btn hero-logout-btn">
+            Logout
+        </a>
+
+    </div>
+
+</div>
+
 
         <div>
              <h1>COLOR BLACK 19</h1>
@@ -446,7 +481,99 @@
 }
 
 
+
+/* ===============================
+   TEACHER PROFILE (HERO TOP)
+   SAFE + PRO ADDITION
+================================ */
+
+.hero-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* Profile container */
+.teacher-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 6px 14px;
+    border-radius: 30px;
+
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(6px);
+
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: all 0.25s ease;
+}
+
+/* Hover (soft – no layout shift) */
+.teacher-profile:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+/* Avatar */
+.teacher-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+
+    border: 2px solid #0d6efd;
+    background: #111;
+}
+
+/* Text block */
+.teacher-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    color: #fff;
+}
+
+/* Username */
+.teacher-info strong {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+/* Status base */
+.status {
+    font-size: 0.65rem;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+/* Online / Offline */
+.status.online {
+    color: #22c55e;
+}
+
+.status.offline {
+    color: #94a3b8;
+}
+
+/* MOBILE SAFETY */
+@media (max-width: 768px) {
+    .teacher-info {
+        display: none;
+    }
+}
+
+
 </style>
+    <!-- 🔵 CHAT ICON (ADMIN + TEACHER ONLY) -->
+{% if can_see_chat %}
+<a href="{% url 'chat_home' %}" class="chat-icon">
+    💬
+    {% if unread_count > 0 %}
+        <span class="badge">{{ unread_count }}</span>
+    {% endif %}
+</a>
+{% endif %}
 
 
 

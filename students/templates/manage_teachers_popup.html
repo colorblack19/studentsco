@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+
+
+<div class="card p-4 shadow">
+
+
+<p><b>STUDENT:</b> {{ student.full_name }}</p>
+
+<form method="post">
+{% csrf_token %}<div class="teacher-box">
+
+    {{ form.extra_teachers }}
+
+</div>
+
+
+<button class="btn btn-primary mt-3">
+Save Changes
+</button>
+
+<a href="{% url 'students_list' %}"
+   class="btn btn-secondary mt-3">
+Cancel
+</a>
+
+</form>
+
+</div>
+</div>
+<style> 
+   /* ===== MANAGE TEACHERS PANEL ===== */
+
+.teacher-box {
+    max-height: 260px;
+    margin-top: 20px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 12px;
+    background: #f8f9fa;
+}
+
+/* each checkbox row */
+.teacher-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.teacher-box li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.teacher-box li:hover {
+    background: #e9ecef;
+}
+
+/* checkbox size */
+.teacher-box input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* teacher name */
+.teacher-box label {
+    margin: 0;
+    cursor: pointer;
+}
+.container{
+    margin-top: 60px;
+}
+
+</style>
+{% endblock %}

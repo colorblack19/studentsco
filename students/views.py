@@ -35,8 +35,6 @@ from datetime import timedelta
 from .models import Payment
 from django.core.paginator import Paginator
 
-
-
 from .models import Student, Attendance
 from datetime import date
 from django.contrib.auth.models import User, Group
@@ -52,9 +50,7 @@ from accounts.models import TeacherProfile
 from accounts.views import is_admin
 from .utils import require_admin_approval
 from .models import Payment, AdminActionLog
-
 from django.contrib.auth import authenticate
-
 from django.contrib.auth.decorators import user_passes_test
 
 from .models import AcademicReport
@@ -65,9 +61,21 @@ from .forms import AcademicReportForm, ReportSubjectForm
 from django.forms import inlineformset_factory
 from django.contrib.admin.views.decorators import staff_member_required
 
-
-
+from .utils import subject_performance
 from django.contrib.auth.decorators import login_required, user_passes_test
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
+from openpyxl.utils import get_column_letter
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+
+from .models import AcademicReport, Student
+from students.models import Subject
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.forms import inlineformset_factory
+from django.db.models import Prefetch
 
 def is_staff_or_admin(user):
     return user.is_staff or user.is_superuser
@@ -89,11 +97,6 @@ def dashboard(request):
     total_payments = Payment.objects.filter(status="PAID").count()
     amount_paid = Payment.objects.filter(status="PAID").aggregate(Sum("amount_paid"))["amount_paid__sum"] or 0
     total_amount_paid = amount_paid
-
-
-
-    
-    
 
     # ============================
     # EXPECTED FEES (BASED ON STUDENTS)
@@ -315,6 +318,29 @@ def students_list(request):
     }
 
     return render(request, "students_list.html",context)
+# ====================== DELETE STUDENT LIST ======================
+
+from django.shortcuts import get_object_or_404, redirect, render
+from .forms import StudentTeacherForm
+from .models import Student
+
+def manage_student_teachers(request, student_id):
+
+    student = get_object_or_404(Student, id=student_id)
+
+    if request.method == "POST":
+        form = StudentTeacherForm(request.POST, instance=student)
+        if form.is_valid():
+            form.save()
+            return redirect("students_list")
+
+    else:
+        form = StudentTeacherForm(instance=student)
+
+    return render(request,
+                  "manage_teachers_popup.html",
+                  {"student": student, "form": form})
+
 
 # ====================== DELETE STUDENT LIST ======================
 @login_required
@@ -460,13 +486,7 @@ def edit_payment(request, payment_id):
 
     return render(request, "edit_payment.html", {"payment": payment})
 
-
-
 # ====================== DELETE ======================
-
-
-
-
 
 @login_required
 def delete_payment(request, payment_id):
@@ -495,8 +515,6 @@ def delete_payment(request, payment_id):
 
     messages.success(request, "Payment deleted successfully.")
     return redirect("payments_list")
-
-
 
 # ====================== API ======================
 
@@ -562,22 +580,24 @@ def admin_required(view_func):
 
 
 
-
-
 @login_required
-
 def student_add(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
+
         if form.is_valid():
-            form.save()
+            student = form.save(commit=False)   # ⚠️ bado haijasave DB
+            student.save()                      # sasa main student anaingia
+
+            # ✅ SAVE MANY-TO-MANY TEACHERS
+            form.save_m2m()
+
             return redirect('student_list')
     else:
         form = StudentForm()
 
-
-
     return render(request, 'student_add.html', {'form': form})
+
 
 
 def add_feestructure_popup(request):
@@ -593,7 +613,6 @@ def add_feestructure_popup(request):
 
 
 @login_required
-@user_passes_test(is_admin)
 def feestructure_list(request):
     items = FeeStructure.objects.all().order_by('-created_at')
     return render(request, 'feestructure_list.html', {'items': items})
@@ -779,9 +798,11 @@ def teacher_dashboard(request):
     today = date.today()
 
     # 👨‍🎓 TOTAL STUDENTS
+  
     total_students = Student.objects.filter(
-        teacher=user
-    ).count()
+    Q(teacher=user) |
+    Q(extra_teachers=user)
+).distinct().count()
 
     # 📝 MARKED TODAY
     marked_today = Attendance.objects.filter(
@@ -913,7 +934,8 @@ def mark_alert_reviewed(request, alert_id):
     return redirect("at_risk_students")
 
 
-
+   
+from django.db.models import Q
 
 @login_required
 def teacher_students(request):
@@ -922,7 +944,13 @@ def teacher_students(request):
        return render(request, "403.html")
 
 
-    students = request.user.students.all()
+
+    students = Student.objects.filter(
+    Q(teacher=request.user) |
+    Q(extra_teachers=request.user)
+).distinct()
+
+
 
     context = {
         "students": students,
@@ -943,7 +971,11 @@ def mark_attendance(request):
 
 
     teacher = request.user
-    students = Student.objects.filter(teacher=teacher)
+    students = Student.objects.filter(
+    Q(teacher=teacher) |
+    Q(extra_teachers=teacher)
+).distinct()
+
     today = timezone.localdate()
 
     total_students = students.count()
@@ -1264,55 +1296,131 @@ def delete_admin_log(request, log_id):
 
 
 
-
-
-
-
-
-
 @login_required
 def student_reports(request):
-    reports = AcademicReport.objects.filter(
-        status="PUBLISHED"
-    ).select_related("student")
+    term = request.GET.get("term")        # T1, T2, T3
+    exam_type = request.GET.get("exam")   # MID, END
+
+    reports = AcademicReport.objects.filter(status="PUBLISHED")
+
+    if term:
+        reports = reports.filter(term=term)
+
+    if exam_type:
+        reports = reports.filter(exam_type=exam_type)
+
+    reports = (
+    reports
+    .select_related("student")
+    .prefetch_related("subjects")
+    .order_by(
+        "student__class_level",
+        "-total_score",
+        "-mean_marks"
+    )
+)
+
+
+
+    classes = {}
+
+    for report in reports:
+       class_name = report.student.class_level
+       classes.setdefault(class_name, []).append(report)
+
+             # calculate position per class
+    for class_name, class_reports in classes.items():
+       sorted_reports = sorted(
+        class_reports,
+        key=lambda r: (r.total_score, r.mean_marks),
+        reverse=True
+    )
+
+    for index, report in enumerate(sorted_reports, start=1):
+        report.position = index
+        
+
 
     return render(
         request,
         "student_reports.html",
         {
-            "reports": reports
+            "classes": classes,
+            "selected_term": term,
+            "selected_exam": exam_type,
         }
     )
 
 
 
-
-
-
-
 @staff_member_required
 def admin_reports(request):
+    term = request.GET.get("term")
+    exam_type = request.GET.get("exam")
+
     reports = AcademicReport.objects.all()
+    
+
+    if term:
+        reports = reports.filter(term=term)
+
+    if exam_type:
+        reports = reports.filter(exam_type=exam_type)
+
     return render(request, "reports_list.html", {
         "reports": reports
     })
 
 
 
-# students/views.py
+
 @staff_member_required
 def publish_report(request, pk):
     report = get_object_or_404(AcademicReport, pk=pk)
-    report.is_published = not report.is_published
+
+    if report.status == "PUBLISHED":
+        report.status = "DRAFT"
+    else:
+        report.status = "PUBLISHED"
+
     report.save()
     return redirect("admin_reports")
 
 
+# ================================
+# helpers (safe kabisa)
+# ================================
+# ================================
+def get_subject_grade(marks):
+    marks = float(marks or 0) 
+    if marks >= 80: return "A"
+    if marks >= 75: return "A-"
+    if marks >= 70: return "B+"
+    if marks >= 65: return "B"
+    if marks >= 60: return "B-"
+    if marks >= 55: return "C+"
+    if marks >= 50: return "C"
+    if marks >= 45: return "C-"
+    if marks >= 40: return "D+"
+    if marks >= 35: return "D"
+    if marks >= 30: return "D-"
+    return "E"
 
 
-
-
-
+def get_report_grade(avg):
+    avg = float(avg or 0)   # 🔒 SAFE FIX
+    if avg >= 80: return "A"
+    if avg >= 75: return "A-"
+    if avg >= 70: return "B+"
+    if avg >= 65: return "B"
+    if avg >= 60: return "B-"
+    if avg >= 55: return "C+"
+    if avg >= 50: return "C"
+    if avg >= 45: return "C-"
+    if avg >= 40: return "D+"
+    if avg >= 35: return "D"
+    if avg >= 30: return "D-"
+    return "E"
 @staff_member_required
 def add_report(request, student_id):
     student = get_object_or_404(Student, pk=student_id)
@@ -1333,14 +1441,35 @@ def add_report(request, student_id):
         )
 
         if report_form.is_valid() and formset.is_valid():
+            # 1️⃣ save report
             report = report_form.save(commit=False)
             report.student = student
+            report.total_score = 0   # 🔥 ADD THIS
+            report.grade = ""        # optional but safe
             report.save()
 
+            # 2️⃣ save subjects
             formset.instance = report
             formset.save()
 
+            # 3️⃣ calculations (EXCEL STYLE 🔥)
+            subjects = report.subjects.all()
+
+            total = 0
+            for s in subjects:
+                s.grade = get_subject_grade(s.marks)
+                total += s.marks
+                s.save()
+
+            avg = total / subjects.count() if subjects.exists() else 0
+
+            report.total_score = total
+            report.mean_marks = avg     
+            report.grade = get_report_grade(avg)
+            report.save()
+
             return redirect("admin_reports")
+
     else:
         report_form = AcademicReportForm()
         formset = ReportSubjectFormSet(
@@ -1352,7 +1481,6 @@ def add_report(request, student_id):
         "formset": formset,
         "student": student
     })
-
 
 
 @staff_member_required
@@ -1394,20 +1522,39 @@ def edit_report(request, pk):
 
 
 
+
 @login_required
 def download_report_pdf(request, pk):
     report = get_object_or_404(
         AcademicReport,
         pk=pk,
-        is_published=True   # 🔐 ONLY published reports
+        status="PUBLISHED"
+
     )
+    previous = (
+    AcademicReport.objects
+    .filter(
+        student=report.student,
+        status="PUBLISHED"
+    )
+    .exclude(pk=report.pk)
+    .order_by("-created_at")
+    .first()
+)
+
+
+    performance = subject_performance(report)
 
     template = get_template("report_pdf.html")
-    html = template.render({"report": report})
+    html = template.render({
+        "report": report,
+        "performance": performance,
+        "previous": previous,
+    })
 
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = (
-        f'attachment; filename="report_{report.student.id}.pdf"'
+        f'attachment; filename="report_{report.student.admission_number}.pdf"'
     )
 
     pisa_status = pisa.CreatePDF(html, dest=response)
@@ -1428,3 +1575,110 @@ def delete_report(request, pk):
 
     return redirect("admin_reports")
 
+
+@login_required
+def export_class_broadsheet(request):
+    wb = Workbook()
+    wb.remove(wb.active)
+
+    # ===== Styles =====
+    header_fill = PatternFill("solid", fgColor="1F4E78")
+    header_font = Font(bold=True, color="FFFFFF")
+    title_font = Font(bold=True, size=14)
+    center = Alignment(horizontal="center", vertical="center")
+
+    border = Border(
+        left=Side(style="thin"),
+        right=Side(style="thin"),
+        top=Side(style="thin"),
+        bottom=Side(style="thin"),
+    )
+
+    # ===== Subjects (fixed order – school standard) =====
+    all_subjects = [
+        "English", "Kiswahili", "Mathematics", "Biology", "Physics",
+        "Chemistry", "Geography", "C.R.E", "Agriculture",
+        "Computer Studies", "Business Studies", "History"
+    ]
+
+    # ===== Classes =====
+    classes = Student.objects.values_list("class_level", flat=True).distinct()
+
+    for class_name in classes:
+        ws = wb.create_sheet(title=str(class_name))
+
+        # ===== Title =====
+        total_columns = 2 + len(all_subjects) + 4  # ADM, NAME + subjects + TOTAL, AVG, GRADE, POS
+        ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=total_columns)
+        ws.cell(row=1, column=1).value = f"{class_name} – Academic Broadsheet"
+        ws.cell(row=1, column=1).font = title_font
+        ws.cell(row=1, column=1).alignment = center
+
+        # ===== Headers =====
+        headers = ["ADM", "NAME"] + all_subjects + ["TOTAL", "AVG", "GRADE", "POS"]
+        ws.append(headers)
+
+        for col in range(1, len(headers) + 1):
+            cell = ws.cell(row=2, column=col)
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = center
+            cell.border = border
+            ws.column_dimensions[get_column_letter(col)].width = 15
+
+        # ===== Reports (ORDER MATTERS) =====
+        reports = (
+            AcademicReport.objects
+            .select_related("student")
+            .prefetch_related("subjects")
+            .filter(
+                student__class_level=class_name,
+                status="PUBLISHED"
+            )
+            .order_by("-total_score", "-mean_marks")
+        )
+
+        # ===== Rows + Position =====
+        row = 3
+        position = 1
+
+        for report in reports:
+            student = report.student
+
+            subjects = {
+                (s.subject.name if s.subject else ""): s.marks
+                for s in report.subjects.all()
+            }
+
+            row_data = [
+                student.admission_number,
+                f"{student.first_name} {student.last_name}",
+            ]
+
+            for sub in all_subjects:
+                row_data.append(subjects.get(sub, ""))
+
+            row_data += [
+                report.total_score,
+                round(report.mean_marks, 2),
+                report.grade,
+                position,
+            ]
+
+            ws.append(row_data)
+
+            for col in range(1, len(row_data) + 1):
+                cell = ws.cell(row=row, column=col)
+                cell.border = border
+                cell.alignment = center
+
+            position += 1
+            row += 1
+
+    # ===== Response =====
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="Academic_Broadsheet.xlsx"'
+    wb.save(response)
+    return response

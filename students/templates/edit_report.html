@@ -1,78 +1,179 @@
 {% extends "base.html" %}
+{% block content %}
 
-<div class="main-content">
-    {% block content %}
+<div class="container-fluid px-3 px-md-4">
 
-<div class="container my-4">
-    <div class="mb-4">
-        <h4 class="fw-semibold mb-1">✏ Edit Academic Report</h4>
-        <p class="text-muted small">
-            Update report details and subject performance below.
-        </p>
+    <!-- Page Title -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="fw-semibold mb-0">✏ Edit Academic Report</h4>
     </div>
 
-    <!-- Form Card -->
-    <div class="card shadow-sm border-0">
+    <form method="post" class="card shadow-sm border-0">
+        {% csrf_token %}
+
         <div class="card-body">
 
-            <form method="post">
-                {% csrf_token %}
+            <!-- Report Info -->
+            <h6 class="section-title">📄 Report Details</h6>
+            <div class="form-section mb-4">
+                {{ report_form.as_p }}
+            </div>
 
-                <!-- Report Main Info -->
-                <div class="mb-4">
-                    <h6 class="section-title">📄 Report Information</h6>
-                    <div class="form-section">
-                        {{ report_form.as_p }}
+            <!-- Subjects -->
+            <h6 class="section-title">📚 Subjects</h6>
+
+            {{ formset.management_form }}
+
+            <div class="row" id="subjects-container">
+                {% for form in formset %}
+                <div class="col-md-6 col-lg-4 subject-form">
+                    <div class="subject-card mb-3">
+
+                        {{ form.as_p }}
+
+                        {% if form.instance.pk %}
+                        <!-- existing subject → delete checkbox -->
+                        <div class="form-check mt-2 text-danger">
+                            {{ form.DELETE }}
+                            <label class="form-check-label">
+                                Delete subject
+                            </label>
+                        </div>
+                        {% else %}
+                        <!-- new subject → JS remove -->
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger remove-subject mt-2">
+                            ❌ Remove
+                        </button>
+                        {% endif %}
+
                     </div>
                 </div>
+                {% endfor %}
+            </div>
 
-                <!-- Subjects -->
-                <div class="mb-4">
-                    <h6 class="section-title">📚 Subjects Performance</h6>
-
-                    {{ formset.management_form }}
-
-                    {% for form in formset %}
-                        <div class="subject-card mb-3">
-                            {{ form.as_p }}
-                        </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Actions -->
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary px-4">
-                        💾 Update Report
-                    </button>
-                   <button type="button"
-                           onclick="window.history.back();"
-                              class="btn btn-outline-secondary">
-                                Cancel
-                    </button>
-
-                </div>
-
-            </form>
+            <button type="button"
+                    class="btn btn-outline-primary mt-2"
+                    id="add-subject">
+                ➕ Add Subject
+            </button>
 
         </div>
-    </div>
+
+        <div class="card-footer bg-white text-end">
+            <button type="submit" class="btn btn-success px-4">
+                💾 Update Report
+            </button>
+            <button type="button"
+                    onclick="window.history.back();"
+                    class="btn btn-outline-secondary">
+                Cancel
+            </button>
+        </div>
+
+    </form>
 
 </div>
 
-</div>
 <style>
-/* ===== MAIN CONTENT FIX ===== */
-.main-content {
-    padding-top: 70px; /* nafasi ya navbar */
-    padding-left: 60px; /* nafasi ya sidebar */
+.section-title {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid #0d6efd;
+    padding-left: 8px;
 }
 
-/* Mobile fix */
+.form-section p,
+.subject-card p {
+    margin-bottom: 0.6rem;
+}
+
+.subject-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+}
+
+input, select, textarea {
+    border-radius: 6px !important;
+}
+
+textarea {
+    min-height: 80px;
+}
+
+.main-content {
+    padding-top: 70px;
+    padding-left: 60px;
+}
+
 @media (max-width: 991px) {
     .main-content {
         padding-left: 0;
-        padding-top: 70px;
     }
 }
 </style>
+
+<script>
+/* ===== ADD SUBJECT ===== */
+document.getElementById("add-subject").addEventListener("click", function () {
+
+    const container = document.getElementById("subjects-container");
+    const totalForms = document.getElementById("id_subjects-TOTAL_FORMS");
+
+    const currentFormCount = parseInt(totalForms.value);
+    const newForm = container.children[0].cloneNode(true);
+
+    newForm.innerHTML = newForm.innerHTML.replace(
+        /subjects-\d+/g,
+        `subjects-${currentFormCount}`
+    );
+
+    // clear values
+    newForm.querySelectorAll("input, select, textarea").forEach(el => {
+        if (el.type !== "hidden") el.value = "";
+    });
+
+    container.appendChild(newForm);
+    totalForms.value = currentFormCount + 1;
+});
+
+/* ===== REMOVE NEW SUBJECT ===== */
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("remove-subject")) {
+        e.target.closest(".subject-form").remove();
+    }
+});
+
+/* ===== AUTO GRADE ===== */
+function getGrade(marks) {
+    if (marks >= 80) return "A";
+    if (marks >= 75) return "A-";
+    if (marks >= 70) return "B+";
+    if (marks >= 65) return "B";
+    if (marks >= 60) return "B-";
+    if (marks >= 55) return "C+";
+    if (marks >= 50) return "C";
+    if (marks >= 45) return "C-";
+    if (marks >= 40) return "D+";
+    if (marks >= 35) return "D";
+    if (marks >= 30) return "D-";
+    return "E";
+}
+
+document.addEventListener("input", function (e) {
+    if (e.target.name && e.target.name.includes("marks")) {
+        const marks = parseInt(e.target.value);
+        const gradeInput = e.target
+            .closest(".subject-card")
+            .querySelector("input[name$='grade']");
+
+        if (!isNaN(marks) && gradeInput) {
+            gradeInput.value = getGrade(marks);
+        }
+    }
+});
+</script>
+
 {% endblock %}

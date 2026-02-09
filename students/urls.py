@@ -91,6 +91,13 @@ urlpatterns = [
     path("reports/<int:pk>/download/",views.download_report_pdf,name="download_report_pdf"),
     path("admin/reports/<int:pk>/publish/",views.publish_report,name="publish_report"),
     path("admin/reports/<int:pk>/delete/",views.delete_report,name="delete_report"),
+    path("reports/export/excel/", views.export_class_broadsheet, name="export_excel"),
+    path("admin/reports/export/excel/",views.export_class_broadsheet,name="export_broadsheet"),
+    # urls.py
+
+   path("student/<int:student_id>/teachers/",views.manage_student_teachers,name="manage_student_teachers"),
+
+
 
 ]
 

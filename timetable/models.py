@@ -1,22 +1,6 @@
-from django.db import models
+from students.models import Student
 from django.contrib.auth.models import User
-
-
-class SchoolLevel(models.TextChoices):
-    PRIMARY = "PRIMARY", "Primary"
-    HIGH = "HIGH", "High School"
-
-
-class ClassLevel(models.Model):
-    name = models.CharField(max_length=20)
-    school_level = models.CharField(
-        max_length=12,
-        choices=SchoolLevel.choices
-    )
-
-    def __str__(self):
-        return f"{self.name} ({self.school_level})"
-
+from django.db import models
 
 class Timetable(models.Model):
     DAYS = [
@@ -27,30 +11,26 @@ class Timetable(models.Model):
         ("FRI", "Friday"),
     ]
 
-    # ✅ CLASS (FOREIGN KEY – MUHIMU)
-    class_level = models.ForeignKey(
-        ClassLevel,
-        on_delete=models.CASCADE,
-        related_name="timetables"
+    CLASS_LEVELS = Student.CLASS_LEVELS  # 🔥 reuse existing system
+
+    class_level = models.CharField(
+        max_length=50,
+        choices=CLASS_LEVELS
     )
 
-    # ✅ SUBJECT (kutoka students app)
     subject = models.ForeignKey(
         "students.Subject",
         on_delete=models.CASCADE
     )
 
-    # ✅ TEACHER
     teacher = models.ForeignKey(
         User,
         on_delete=models.CASCADE
     )
 
-    # ✅ TIME INFO
     day = models.CharField(max_length=3, choices=DAYS)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.class_level} - {self.subject} ({self.day})"
-

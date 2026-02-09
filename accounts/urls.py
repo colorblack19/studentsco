@@ -58,5 +58,6 @@ urlpatterns = [
 
     path("redirect/", after_login_redirect, name="after_login_redirect"),
     path("about/", views.about_us, name="about"),
-    
+    path("upload-photo/", views.upload_teacher_photo, name="upload_teacher_photo"),
+
 ]

@@ -301,5 +301,14 @@ window.addEventListener("scroll", function () {
 
 
 </script>
+    <!-- 🔵 CHAT ICON (ADMIN + TEACHER ONLY) -->
+{% if can_see_chat %}
+<a href="{% url 'chat_home' %}" class="chat-icon">
+    💬
+    {% if unread_count > 0 %}
+        <span class="badge">{{ unread_count }}</span>
+    {% endif %}
+</a>
+{% endif %}
 
 {% endblock %}
