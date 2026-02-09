@@ -77,6 +77,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.forms import inlineformset_factory
 from django.db.models import Prefetch
 
+from django.shortcuts import get_object_or_404, redirect, render
+from .forms import StudentTeacherForm
+from .models import Student
+from django.db.models import Q
 def is_staff_or_admin(user):
     return user.is_staff or user.is_superuser
 
@@ -320,9 +324,6 @@ def students_list(request):
     return render(request, "students_list.html",context)
 # ====================== DELETE STUDENT LIST ======================
 
-from django.shortcuts import get_object_or_404, redirect, render
-from .forms import StudentTeacherForm
-from .models import Student
 
 def manage_student_teachers(request, student_id):
 
@@ -935,7 +936,7 @@ def mark_alert_reviewed(request, alert_id):
 
 
    
-from django.db.models import Q
+
 
 @login_required
 def teacher_students(request):
