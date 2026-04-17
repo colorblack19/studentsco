@@ -143,17 +143,44 @@ function getGrade(marks) {
     if (marks >= 30) return "D-";
     return "E";
 }
+function getComment(grade) {
+    const comments = {
+        "A": "Excellent performance",
+        "A-": "Very good work",
+        "B+": "Good effort",
+        "B": "Above average performance",
+        "B-": "Can improve further",
+        "C+": "Fair performance",
+        "C": "Average work",
+        "C-": "Needs improvement",
+        "D+": "Below expectation",
+        "D": "Work harder",
+        "D-": "Serious improvement needed",
+        "E": "Poor performance"
+    };
 
+    return comments[grade] || "";
+}
 
 document.addEventListener("input", function (e) {
+
     if (e.target.name && e.target.name.includes("marks")) {
+
         const marks = parseInt(e.target.value);
-        const gradeInput = e.target
-            .closest(".subject-card")
-            .querySelector("input[name$='grade']");
+        const card = e.target.closest(".subject-card");
+
+        const gradeInput = card.querySelector("input[name$='grade']");
+        const commentInput = card.querySelector("textarea[name$='comment'], input[name$='comment']");
 
         if (!isNaN(marks) && gradeInput) {
-            gradeInput.value = getGrade(marks);
+
+            const grade = getGrade(marks);
+            gradeInput.value = grade;
+
+            // 🔥 AUTO COMMENT
+            if (commentInput) {
+                commentInput.value = getComment(grade);
+            }
         }
     }
 });

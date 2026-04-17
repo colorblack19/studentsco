@@ -16,6 +16,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'colorblack.pythonanywhere.com',
     'www.colorblack.pythonanywhere.com',
+     
 ]
 
 INSTALLED_APPS = [

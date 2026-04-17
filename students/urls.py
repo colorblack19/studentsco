@@ -95,10 +95,38 @@ urlpatterns = [
     path("admin/reports/export/excel/",views.export_class_broadsheet,name="export_broadsheet"),
     # urls.py
 
-   path("student/<int:student_id>/teachers/",views.manage_student_teachers,name="manage_student_teachers"),
+    path("student/<int:student_id>/teachers/",views.manage_student_teachers,name="manage_student_teachers"),
 
-
-
+    path(
+    "class-analysis/<str:class_level>/<str:term>/<str:exam>/<int:year>/",
+    views.class_analysis,
+    name="class_analysis"),
+    path(
+    "set-minimum-subjects/",
+    views.set_minimum_subjects,
+    name="set_minimum_subjects"
+),
+path(
+    "analysis-dashboard/<str:class_level>/<str:term>/<str:exam>/<int:year>/",
+    views.class_analysis_dashboard,
+    name="class_analysis_dashboard",
+),
+path(
+    "report-forms/<str:class_level>/<str:term>/<str:exam>/<int:year>/",
+    views.report_forms,
+    name="report_forms",
+), 
+    path(
+        "merit-list/<str:class_level>/<str:term>/<str:exam>/<int:year>/",
+        views.merit_list,
+        name="merit_list",
+    ),
+    path(
+    "download-reports/<str:class_level>/<str:term>/<str:exam>/<int:year>/",
+    views.download_reports,
+    name="download_reports"
+),
+    path("assign-teachers/", views.assign_teachers, name="assign_teachers"),
 ]
 
 

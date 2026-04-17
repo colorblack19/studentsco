@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Student, Subject, Attendance, FeeStructure, Payment
+from .models import Student, Subject, Attendance, FeeStructure, Payment, ClassMinimumSubject
 
 
 
@@ -106,3 +106,9 @@ class AttendanceAdmin(admin.ModelAdmin):
         queryset.update(is_locked=False)
 
     unlock_attendance.short_description = "🔓 Unlock selected attendance"
+
+
+# =========================
+# ✅ Class Minimum Subjects
+# =========================
+admin.site.register(ClassMinimumSubject)

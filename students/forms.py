@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from django.forms import inlineformset_factory
 from .models import AcademicReport, ReportSubject, Subject
 
+from .models import ClassTeacher, SubjectTeacher
+from .models import SchoolSettings
 
 
 
@@ -26,8 +28,8 @@ class StudentForm(forms.ModelForm):
         model = Student
         fields = [
             'first_name', 'last_name', 'gender', 'age',
-            'parent_name', 'phone_number', 'parent_id_number',
-            'class_level',
+            'parent_name' ,'phone_number', 'parent_id_number',
+            'class_level','stream',
             'teacher',          # MAIN TEACHER (unchanged)
             'extra_teachers',   # ✅ MANY TEACHERS
             'status', 'feestructure', 'photo', 'balance'
@@ -36,6 +38,7 @@ class StudentForm(forms.ModelForm):
         widgets = {
             'gender': forms.Select(attrs={'class': 'form-select'}),
             'class_level': forms.Select(attrs={'class': 'form-select'}),
+            'stream': forms.Select(attrs={'class': 'form-select'}),
             'teacher': forms.Select(attrs={'class': 'form-select'}),
             'feestructure': forms.Select(attrs={'class': 'form-select'}),
             'status': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
@@ -82,22 +85,16 @@ class FeeStructureForm(forms.ModelForm):
         }
 
 
-
 class AcademicReportForm(forms.ModelForm):
+
     class Meta:
         model = AcademicReport
+
         fields = [
             "term",
             "exam_type",
-            "teacher_comment",
-            "headteacher_remark",
             "status",
-
         ]
-        widgets = {
-            "teacher_comment": forms.Textarea(attrs={"rows": 3}),
-            "headteacher_remark": forms.Textarea(attrs={"rows": 3}),
-        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -132,3 +129,25 @@ ReportSubjectFormSet = inlineformset_factory(
     extra=1,
     can_delete=True 
 )
+
+
+
+
+
+class ClassTeacherForm(forms.ModelForm):
+    class Meta:
+        model = ClassTeacher
+        fields = "__all__"
+
+
+class SubjectTeacherForm(forms.ModelForm):
+    class Meta:
+        model = SubjectTeacher
+        fields = "__all__"
+
+
+
+class SchoolSettingsForm(forms.ModelForm):
+    class Meta:
+        model = SchoolSettings
+        fields = "__all__"

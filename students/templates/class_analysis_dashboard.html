@@ -1,0 +1,375 @@
+
+
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+.analysis-page{
+    background:#f5f7fa;
+    padding:30px;
+    border-radius:20px;
+}
+
+/* HEADER */
+.analysis-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.analysis-header h2{
+    font-size:32px;
+    font-weight:700;
+    margin-bottom:5px;
+}
+
+.analysis-header p{
+    color:#64748b;
+}
+
+/* FILTERS */
+.analysis-filters{
+    display:flex;
+    gap:15px;
+}
+
+.analysis-filters select{
+    padding:12px 20px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    min-width:220px;
+}
+
+/* STUDENT BOX */
+.student-box{
+    background:white;
+    border:1px solid #cbd5e1;
+    border-radius:14px;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.student-box h4{
+    margin:0;
+    font-size:15px;
+    color:#475569;
+}
+
+.student-box h2{
+    margin:5px 0;
+}
+
+.download-btn{
+    background:#22c55e;
+    color:white;
+    padding:12px 20px;
+    border:none;
+    border-radius:10px;
+    font-weight:600;
+}
+
+/* TAB */
+.subject-tab{
+    margin-bottom:20px;
+    border-bottom:3px solid #22c55e;
+    width:max-content;
+    padding-bottom:10px;
+    font-weight:600;
+}
+
+/* MAIN GRID */
+.analysis-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
+}
+
+/* MEAN CARD */
+.mean-card{
+    background:#3bb143;
+    color:white;
+    padding:25px;
+    border-radius:15px;
+}
+
+.mean-card h3{
+    font-size:30px;
+}
+
+/* COMPARE */
+.compare-buttons{
+    display:flex;
+    gap:15px;
+    margin-top:25px;
+}
+
+.compare-buttons button{
+    padding:12px 18px;
+    border-radius:12px;
+    border:2px solid #22c55e;
+    background:white;
+    cursor:pointer;
+    font-weight:600;
+}
+
+/* CHART BOX */
+.chart-box{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    min-height:300px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.04);
+}
+
+.fake-chart{
+    height:250px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#94a3b8;
+    border:2px dashed #cbd5e1;
+    border-radius:10px;
+}
+
+.dropdown{
+    position:relative;
+}
+
+.dropdown-menu{
+    display:none;
+    position:absolute;
+    right:0;
+    top:50px;
+    background:white;
+    width:220px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+    border-radius:12px;
+    overflow:hidden;
+    z-index:999;
+}
+
+.dropdown:hover .dropdown-menu{
+    display:block;
+}
+
+.dropdown-menu a{
+    display:block;
+    padding:15px;
+    text-decoration:none;
+    color:#333;
+    border-bottom:1px solid #eee;
+}
+
+.dropdown-menu a:hover{
+    background:#f8fafc;
+}
+
+.pro-chart{
+    background:white;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.06);
+}
+
+.chart-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.chart-header h4{
+    margin:0;
+    font-size:24px;
+}
+
+.chart-header span{
+    color:#16a34a;
+    font-weight:600;
+}
+
+.modern-chart{
+    width:100%;
+    height:300px;
+}
+
+.grid{
+    stroke:#e2e8f0;
+    stroke-width:1;
+}
+
+.curve-line{
+    fill:none;
+    stroke:#22c55e;
+    stroke-width:5;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.area-fill{
+    fill:rgba(34,197,94,0.15);
+}
+
+.dot{
+    fill:#22c55e;
+    stroke:white;
+    stroke-width:3;
+}
+.main-content{
+    padding-top:60px;
+    padding-left: 20px;
+}
+</style>
+
+
+<div class="analysis-page">
+
+    <!-- HEADER -->
+    <div class="analysis-header">
+
+        <div>
+            <h2>{{ class_level }}</h2>
+            <p>Intake level exam analysis</p>
+        </div>
+
+        <div class="analysis-filters">
+
+            <select>
+                <option>{{ class_level }}</option>
+            </select>
+
+            <select>
+                <option>{{ exam }}</option>
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <!-- STUDENTS BOX -->
+    <div class="student-box">
+
+        <div>
+            <h4>Students who sat for the exam</h4>
+            <h2>{{ total_students }}</h2>
+            <small>Out of {{ total_students }} total students</small>
+        </div>
+
+    <div class="dropdown">
+
+        <button class="btn download-btn">
+            Downloads ▼
+        </button>
+
+        <div class="dropdown-menu">
+
+            <a href="{% url 'report_forms' class_level term exam year %}">
+                📄 Report Forms
+            </a>
+
+            <a href="{% url 'merit_list' class_level term exam year %}">
+                🏆 Merit List
+            </a>
+
+            <a href="#">
+                📈 Most Improved List
+            </a>
+
+            <a href="#">
+                👁 View Print Format
+            </a>
+
+        </div>
+
+    </div>
+
+    </div>
+
+
+    <!-- TAB -->
+    <div class="subject-tab">
+        Curriculum Subjects
+    </div>
+
+
+    <!-- GRID -->
+    <div class="analysis-grid">
+
+        <!-- LEFT -->
+        <div>
+
+            <div class="mean-card">
+                <small>Mean Grade</small>
+                <h3>{{ mean_grade }}</h3>
+                <p>{{ exam }} - ({{ year }} {{ term }})</p>
+            </div>
+
+
+            <div class="compare-buttons">
+
+                <button>◉ Previous exam results</button>
+
+                <button>Student targets</button>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT -->
+<div class="pro-chart">
+    <div class="chart-header">
+        <h4>Performance Chart</h4>
+        <span>📈 Stream Mean</span>
+    </div>
+
+    <svg viewBox="0 0 500 260" class="modern-chart">
+
+        <!-- GRID -->
+        <line x1="40" y1="40" x2="470" y2="40" class="grid"/>
+        <line x1="40" y1="90" x2="470" y2="90" class="grid"/>
+        <line x1="40" y1="140" x2="470" y2="140" class="grid"/>
+        <line x1="40" y1="190" x2="470" y2="190" class="grid"/>
+        <line x1="40" y1="240" x2="470" y2="240" class="grid"/>
+
+        <!-- AREA FILL -->
+        <path d="
+            M60 200
+            C120 170, 140 150, 180 160
+            C230 170, 260 90, 310 110
+            C350 120, 390 70, 450 50
+            L450 240
+            L60 240 Z"
+            class="area-fill"
+        />
+
+        <!-- CURVE LINE -->
+        <path d="
+            M60 200
+            C120 170, 140 150, 180 160
+            C230 170, 260 90, 310 110
+            C350 120, 390 70, 450 50"
+            class="curve-line"
+        />
+
+        <!-- DOTS -->
+        <circle cx="60" cy="200" r="6" class="dot"/>
+        <circle cx="180" cy="160" r="6" class="dot"/>
+        <circle cx="310" cy="110" r="6" class="dot"/>
+        <circle cx="450" cy="50" r="6" class="dot"/>
+
+    </svg>
+
+</div>
+
+    </div>
+
+</div>
+
+{% endblock %}

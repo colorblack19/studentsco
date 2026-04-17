@@ -81,6 +81,27 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .forms import StudentTeacherForm
 from .models import Student
 from django.db.models import Q
+from collections import defaultdict
+from .models import AcademicReport
+from django.db.models import Avg, Count
+from django.contrib.admin.views.decorators import staff_member_required
+from .models import AcademicReport, Subject
+from django.shortcuts import redirect
+from .models import ClassMinimumSubject
+from django.shortcuts import render
+from django.db.models import Avg
+from .models import AcademicReport
+from .models import (
+    Student,
+    AcademicReport,
+    ReportSubject,
+    SchoolSettings
+)
+from django.db.models import Prefetch
+from .models import Student, AcademicReport, Subject
+from weasyprint import HTML
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 def is_staff_or_admin(user):
     return user.is_staff or user.is_superuser
 
@@ -136,7 +157,7 @@ def dashboard(request):
     # STUDENTS WITH BALANCE
     # ============================
     students_with_balance = []
-
+    
     students = Student.objects.all()
     for student in students:
         fee = FeeStructure.objects.filter(class_name=student.class_level).first()
@@ -158,7 +179,12 @@ def dashboard(request):
                 "name": student.full_name,
                 "balance": float(balance)
             })
+# 👉 PAGINATION (NEW - SAFE)
+    paginator = Paginator(students_with_balance, 10)  # 10 per page
 
+    page_number = request.GET.get("balance_page")
+    students_with_balance = paginator.get_page(page_number)
+    
     # ============================
     # PIE CHART
     # ============================
@@ -278,7 +304,7 @@ def students_list(request):
             # ============================
     # ✅ PAGINATION HAPA 👇
     # ============================
-    paginator = Paginator(students, 50)   # 50 students per page
+    paginator = Paginator(students, 40)   # 40 students per page
     page_number = request.GET.get("page")
     students = paginator.get_page(page_number)
 
@@ -313,6 +339,7 @@ def students_list(request):
     # --- CONTEXT (note: key name "class" preserved to match your template) ---
     context = {
         "student_data": student_data,
+        "students": students,   # 🔥 ADD THIS
         "search": search,
         "class": class_level,
         "start": start,
@@ -794,7 +821,6 @@ def teacher_dashboard(request):
         return render(request, "403.html")
 
     user = request.user
-
 
     today = date.today()
 
@@ -1296,11 +1322,11 @@ def delete_admin_log(request, log_id):
 
 
 
-
-@login_required
 def student_reports(request):
-    term = request.GET.get("term")        # T1, T2, T3
-    exam_type = request.GET.get("exam")   # MID, END
+
+    term = request.GET.get("term")
+    exam_type = request.GET.get("exam")
+    year = request.GET.get("year")   # ✅ NEW
 
     reports = AcademicReport.objects.filter(status="PUBLISHED")
 
@@ -1310,71 +1336,129 @@ def student_reports(request):
     if exam_type:
         reports = reports.filter(exam_type=exam_type)
 
+    if year:
+        reports = reports.filter(year=year)
+
     reports = (
-    reports
-    .select_related("student")
-    .prefetch_related("subjects")
-    .order_by(
-        "student__class_level",
-        "-total_score",
-        "-mean_marks"
+        reports
+        .select_related("student")
+        .prefetch_related("subjects")
+        .order_by(
+            "student__class_level",
+            "-total_score",
+            "-mean_marks"
+        )
     )
-)
 
-
-
-    classes = {}
+    # ✅ GROUP BY CLASS (SAFE VERSION)
+    classes = defaultdict(list)
 
     for report in reports:
-       class_name = report.student.class_level
-       classes.setdefault(class_name, []).append(report)
+        classes[report.student.class_level].append(report)
 
-             # calculate position per class
+    # ✅ POSITION PER CLASS
     for class_name, class_reports in classes.items():
-       sorted_reports = sorted(
-        class_reports,
-        key=lambda r: (r.total_score, r.mean_marks),
-        reverse=True
-    )
 
-    for index, report in enumerate(sorted_reports, start=1):
-        report.position = index
-        
+        sorted_reports = sorted(
+            class_reports,
+            key=lambda r: (r.total_score, r.mean_marks),
+            reverse=True
+        )
 
+        for index, report in enumerate(sorted_reports, start=1):
+            report.position = index
 
     return render(
         request,
         "student_reports.html",
         {
-            "classes": classes,
+            "classes": dict(classes),
             "selected_term": term,
             "selected_exam": exam_type,
+            "selected_year": year,   # ✅ NEW
         }
     )
 
 
 
+
 @staff_member_required
 def admin_reports(request):
+
     term = request.GET.get("term")
-    exam_type = request.GET.get("exam")
+    exam = request.GET.get("exam")
+    year = request.GET.get("year")
 
     reports = AcademicReport.objects.all()
-    
 
+    # ✅ FILTER TERM
     if term:
         reports = reports.filter(term=term)
 
-    if exam_type:
-        reports = reports.filter(exam_type=exam_type)
+    # ✅ FILTER EXAM
+    if exam:
+        reports = reports.filter(exam_type=exam)
+
+    # ✅ FILTER YEAR
+    if year:
+        reports = reports.filter(year=year)
+
+    # ✅ OPTIMIZE + ORDER
+    reports = reports.select_related("student")
+
+    # ✅ GROUP REPORTS PER CLASS
+    grouped_reports = defaultdict(list)
+
+    for report in reports:
+        grouped_reports[report.student.class_level].append(report)
+
+    # ✅ CREATE CLASS SUMMARY
+    classes = {}
+
+    for class_name, report_list in grouped_reports.items():
+
+        # ⭐ SORT BY MEAN MARKS (HIGH → LOW)
+        sorted_reports = sorted(
+            report_list,
+            key=lambda r: r.mean_marks or 0,
+            reverse=True
+        )
+
+        # ⭐ ADD AUTO RANKING
+        for index, report in enumerate(sorted_reports, start=1):
+            report.rank = index
+
+        total_students = len(sorted_reports)
+
+        # ⭐ CLASS MEAN
+        mean_marks = (
+            sum(r.mean_marks or 0 for r in sorted_reports)
+            / total_students
+            if total_students else 0
+        )
+
+        # ⭐ TOP STUDENT
+        top_report = sorted_reports[0] if sorted_reports else None
+
+        top_grade = top_report.grade if top_report else "-"
+        minimum_obj = ClassMinimumSubject.objects.filter(class_level=class_name).first()
+
+        minimum_subjects = minimum_obj.minimum_subjects if minimum_obj else 7
+
+        # ✅ FINAL DATA SENT TO TEMPLATE
+        classes[class_name] = {
+            "total_students": total_students,
+            "mean_marks": round(mean_marks, 2),
+            "top_grade": top_grade,
+            "reports": sorted_reports,        # ALL students
+            "top_three": sorted_reports[:3],  # ⭐ ONLY TOP 3
+            "top_student": top_report,
+            "minimum_subjects": minimum_subjects,
+        }
 
     return render(request, "reports_list.html", {
-        "reports": reports
+        "classes": classes,
     })
-
-
-
-
 @staff_member_required
 def publish_report(request, pk):
     report = get_object_or_404(AcademicReport, pk=pk)
@@ -1385,7 +1469,14 @@ def publish_report(request, pk):
         report.status = "PUBLISHED"
 
     report.save()
-    return redirect("admin_reports")
+
+    return redirect(
+        "class_analysis",
+        report.student.class_level,
+        report.term,
+        report.exam_type,
+        report.year,
+    )
 
 
 # ================================
@@ -1422,7 +1513,27 @@ def get_report_grade(avg):
     if avg >= 35: return "D"
     if avg >= 30: return "D-"
     return "E"
+def get_grade_points(grade):
+
+    points = {
+        "A":12,
+        "A-":11,
+        "B+":10,
+        "B":9,
+        "B-":8,
+        "C+":7,
+        "C":6,
+        "C-":5,
+        "D+":4,
+        "D":3,
+        "D-":2,
+        "E":1,
+        "X":0
+    }
+
+    return points.get(grade, 0)
 @staff_member_required
+
 def add_report(request, student_id):
     student = get_object_or_404(Student, pk=student_id)
 
@@ -1430,49 +1541,48 @@ def add_report(request, student_id):
         AcademicReport,
         ReportSubject,
         form=ReportSubjectForm,
-        extra=5,
+        extra=7,
         can_delete=False
     )
 
     if request.method == "POST":
         report_form = AcademicReportForm(request.POST)
+
         formset = ReportSubjectFormSet(
             request.POST,
             form_kwargs={"student": student}
         )
 
         if report_form.is_valid() and formset.is_valid():
-            # 1️⃣ save report
+
             report = report_form.save(commit=False)
             report.student = student
-            report.total_score = 0   # 🔥 ADD THIS
-            report.grade = ""        # optional but safe
             report.save()
 
-            # 2️⃣ save subjects
             formset.instance = report
             formset.save()
 
-            # 3️⃣ calculations (EXCEL STYLE 🔥)
-            subjects = report.subjects.all()
+            # ===============================
+            # CALCULATE REPORT
+            # ===============================
+            report.calculate_report()
 
-            total = 0
-            for s in subjects:
-                s.grade = get_subject_grade(s.marks)
-                total += s.marks
-                s.save()
+            # generate remarks
+            report.teacher_comment = report.generate_teacher_comment()
+            report.headteacher_remark = report.generate_headteacher_remark()
 
-            avg = total / subjects.count() if subjects.exists() else 0
-
-            report.total_score = total
-            report.mean_marks = avg     
-            report.grade = get_report_grade(avg)
             report.save()
+
+            # rankings / dev
+            update_positions(report)
+            update_subject_positions(report)
+            update_dev(report)
 
             return redirect("admin_reports")
 
     else:
         report_form = AcademicReportForm()
+
         formset = ReportSubjectFormSet(
             form_kwargs={"student": student}
         )
@@ -1482,8 +1592,81 @@ def add_report(request, student_id):
         "formset": formset,
         "student": student
     })
+def update_positions(report):
+
+    all_reports = AcademicReport.objects.filter(
+        student__class_level=report.student.class_level,
+        year=report.year,
+        term=report.term,
+        exam_type=report.exam_type
+    ).order_by("-total_score")
 
 
+    for index, r in enumerate(all_reports, start=1):
+        AcademicReport.objects.filter(id=r.id).update(
+            overall_position=index
+        )
+
+
+    stream_reports = AcademicReport.objects.filter(
+        student__class_level=report.student.class_level,
+        student__stream=report.student.stream,
+        year=report.year,
+        term=report.term,
+        exam_type=report.exam_type
+    ).order_by("-total_score")
+
+
+    for index, r in enumerate(stream_reports, start=1):
+        AcademicReport.objects.filter(id=r.id).update(
+            stream_position=index
+        )
+
+def update_subject_positions(report):
+
+    subjects = report.subjects.all().order_by("-marks")
+
+    for index, subject in enumerate(subjects, start=1):
+        subject.position = index
+        subject.save()
+
+
+
+def update_dev(report):
+
+    previous_exam = None
+
+    if report.exam_type == "END":
+        previous_exam = "MID"
+
+    if not previous_exam:
+        return
+
+
+    try:
+        previous_report = AcademicReport.objects.get(
+            student=report.student,
+            year=report.year,
+            term=report.term,
+            exam_type=previous_exam,
+        )
+
+    except AcademicReport.DoesNotExist:
+        return
+
+
+    for subject in report.subjects.all():
+
+        previous_subject = previous_report.subjects.filter(
+            subject=subject.subject
+        ).first()
+
+        if previous_subject:
+            subject.dev = subject.marks - previous_subject.marks
+        else:
+            subject.dev = 0
+
+        subject.save()
 @staff_member_required
 def edit_report(request, pk):
     report = get_object_or_404(AcademicReport, pk=pk)
@@ -1504,10 +1687,23 @@ def edit_report(request, pk):
             form_kwargs={"student": report.student}
         )
 
-        if report_form.is_valid() and formset.is_valid():
-            report_form.save()
-            formset.save()
-            return redirect("admin_reports")
+    if report_form.is_valid() and formset.is_valid():
+
+        report = report_form.save()
+        formset.save()
+
+        report.calculate_report()
+
+        report.teacher_comment = report.generate_teacher_comment()
+        report.headteacher_remark = report.generate_headteacher_remark()
+
+        report.save()
+
+        update_positions(report)
+        update_subject_positions(report)
+        update_dev(report)
+
+        return redirect("admin_reports")
     else:
         report_form = AcademicReportForm(instance=report)
         formset = ReportSubjectFormSet(
@@ -1520,7 +1716,6 @@ def edit_report(request, pk):
         "formset": formset,
         "report": report
     })
-
 
 
 
@@ -1683,3 +1878,328 @@ def export_class_broadsheet(request):
     response["Content-Disposition"] = 'attachment; filename="Academic_Broadsheet.xlsx"'
     wb.save(response)
     return response
+
+
+
+
+def class_analysis(request, class_level, term, exam, year):
+
+    reports = AcademicReport.objects.filter(
+        student__class_level=class_level,
+        term=term,
+        exam_type=exam,
+        year=year
+    ).select_related("student").prefetch_related("subjects__subject")
+
+    subjects = Subject.objects.all()
+
+    analysis_data = []
+
+    for report in reports:
+        row = {
+            "student": report.student,
+            "marks": [],
+            "report_id": report.id,
+            "report": report, # ✅ IMPORTANT
+        }
+
+        for subject in subjects:
+            mark = report.subjects.filter(subject=subject).first()
+            row["marks"].append(mark.marks if mark else "-")
+
+        analysis_data.append(row)
+
+    context = {
+        "class_level": class_level,
+        "term": term,
+        "exam": exam,
+        "year": year,
+        "subjects": subjects,
+        "analysis_data": analysis_data,
+    }
+
+    return render(request, "class_analysis.html", context)
+
+
+def set_minimum_subjects(request):
+    if request.method == "POST":
+
+        class_level = request.POST.get("class_level")
+        minimum = request.POST.get("minimum_subjects")
+
+        obj, created = ClassMinimumSubject.objects.update_or_create(
+            class_level=class_level,
+            defaults={"minimum_subjects": minimum}
+        )
+
+    return redirect("admin_reports")
+
+
+
+def class_analysis_dashboard(request, class_level, term, exam, year):
+
+    results = AcademicReport.objects.filter(
+        student__class_level=class_level,
+        term=term,
+        exam_type=exam,
+        year=year
+    )
+
+    # total students
+    total_students = results.count()
+
+    # mean marks
+    mean_marks = results.aggregate(avg=Avg("mean_marks"))["avg"] or 0
+
+
+    # grading system
+    def grade_from_marks(marks):
+
+        if marks >= 75:
+            return "A", 12
+        elif marks >= 70:
+            return "A-", 11
+        elif marks >= 65:
+            return "B+", 10
+        elif marks >= 60:
+            return "B", 9
+        elif marks >= 55:
+            return "B-", 8
+        elif marks >= 50:
+            return "C+", 7
+        elif marks >= 45:
+            return "C", 6
+        elif marks >= 40:
+            return "C-", 5
+        elif marks >= 35:
+            return "D+", 4
+        elif marks >= 30:
+            return "D", 3
+        elif marks >= 25:
+            return "D-", 2
+        else:
+            return "E", 1
+
+
+    mean_grade, mean_points = grade_from_marks(mean_marks)
+
+    # top student
+    top_student = results.order_by("-total_score").first()
+
+    if top_student:
+        top_grade, top_points = grade_from_marks(top_student.mean_marks)
+    else:
+        top_grade, top_points = "-", "-"
+
+
+    context = {
+        "class_level": class_level,
+        "term": term,
+        "exam": exam,
+        "year": year,
+        "total_students": total_students,
+        "mean_grade": mean_grade,
+        "mean_points": mean_points,
+        "top_grade": top_grade,
+        "top_points": top_points,
+    }
+
+    return render(request, "class_analysis_dashboard.html", context)
+
+
+
+
+
+
+def report_forms(request, class_level, term, exam, year):
+
+    school_settings = SchoolSettings.objects.first()
+
+    students = Student.objects.filter(
+        class_level=class_level
+    ).prefetch_related(
+
+        Prefetch(
+            "academicreport_set",
+            queryset=AcademicReport.objects.filter(
+                term=term,
+                exam_type=exam,
+                year=year
+            ).prefetch_related(
+                "subjects__subject"
+            ),
+            to_attr="filtered_reports"
+        )
+    )
+
+    context = {
+        "students": students,
+        "class_level": class_level,
+        "term": term,
+        "exam": exam,
+        "year": year,
+        "school_settings": school_settings,
+    }
+
+    return render(
+        request,
+        "report_forms.html",
+        context
+    )
+
+
+
+
+
+
+def merit_list(request, class_level, term, exam, year):
+
+    students = Student.objects.filter(
+        class_level=class_level
+    ).prefetch_related(
+        Prefetch(
+            "academicreport_set",
+            queryset=AcademicReport.objects.filter(
+                term=term,
+                exam_type=exam,
+                year=year
+            ).prefetch_related("subjects__subject"),
+            to_attr="filtered_reports"
+        )
+    )
+
+
+    # GET ONLY SUBJECTS USED IN THIS EXAM
+    subjects = Subject.objects.filter(
+        reportsubject__report__term=term,
+        reportsubject__report__exam_type=exam,
+        reportsubject__report__year=year,
+        reportsubject__report__student__class_level=class_level
+    ).distinct().order_by("name")
+
+
+    # BUILD SUBJECT MAP
+    for student in students:
+        for report in student.filtered_reports:
+
+            report.subject_map = {}
+
+            for rs in report.subjects.all():
+                report.subject_map[rs.subject.id] = rs
+
+
+    context = {
+        "students": students,
+        "subjects": subjects,
+        "class_level": class_level,
+        "term": term,
+        "exam": exam,
+        "year": year,
+    }
+
+    return render(request, "merit_list.html", context)
+
+
+@login_required
+def download_reports(request, class_level, term, exam, year):
+
+    school_settings = SchoolSettings.objects.first()
+
+    students = Student.objects.filter(
+        class_level=class_level
+    ).prefetch_related(
+
+        Prefetch(
+            "academicreport_set",
+            queryset=AcademicReport.objects.filter(
+                term=term,
+                exam_type=exam,
+                year=year
+            ).prefetch_related(
+                "subjects__subject"
+            ),
+            to_attr="filtered_reports"
+        )
+    )
+
+    html_string = render_to_string(
+        "report_form_pdf.html",
+        {
+            "students": students,
+            "class_level": class_level,
+            "term": term,
+            "exam": exam,
+            "year": year,
+            "school_settings": school_settings,
+        }
+    )
+
+    pdf_file = HTML(
+        string=html_string,
+        base_url=request.build_absolute_uri('/')
+    ).write_pdf()
+
+    response = HttpResponse(
+        pdf_file,
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = (
+        f'attachment; filename="ReportForms_{class_level}.pdf"'
+    )
+
+    return response
+
+from .forms import (
+    ClassTeacherForm,
+    SubjectTeacherForm,
+    SchoolSettingsForm
+)
+
+from .models import SchoolSettings
+
+
+def assign_teachers(request):
+
+    class_form = ClassTeacherForm()
+    subject_form = SubjectTeacherForm()
+
+    settings_instance = SchoolSettings.objects.first()
+
+    school_form = SchoolSettingsForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=settings_instance
+    )
+
+    if request.method == "POST":
+
+        if "save_class_teacher" in request.POST:
+
+            class_form = ClassTeacherForm(request.POST)
+
+            if class_form.is_valid():
+                class_form.save()
+
+
+        elif "save_subject_teacher" in request.POST:
+
+            subject_form = SubjectTeacherForm(request.POST)
+
+            if subject_form.is_valid():
+                subject_form.save()
+
+
+        elif "save_school_settings" in request.POST:
+
+            if school_form.is_valid():
+                school_form.save()
+
+
+    context = {
+        "class_form": class_form,
+        "subject_form": subject_form,
+        "school_form": school_form,
+    }
+
+    return render(request, "assign_teachers.html", context)

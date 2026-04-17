@@ -3,7 +3,6 @@
 {% block content %}
 <style>
 
-
 .cb-hero {
     height: 80vh;
     background: linear-gradient(
@@ -24,8 +23,6 @@
     margin-top: 70px;
 }
 
-
-
 /* BRAND TEXT ANIMATION */
 .cb-hero h1 {
     font-size: 3.2rem;
@@ -34,7 +31,6 @@
     animation: floatLR 18s ease-in-out infinite;
     position: relative;
 }
-
 
 .cb-hero p,
 .cb-hero small {
@@ -62,7 +58,6 @@
     }
 }
 
-
 @keyframes slideInOnce {
     from {
         opacity: 0;
@@ -78,13 +73,16 @@
 .hero-content {
     position: relative;
     z-index: 2;
+    width: 100%;
+    max-width: 900px;
+    margin: auto;
 }
 
 /* DASHBOARD AREA */
 .dashboard-bg {
-  min-height: 100vh;
-  background: url("{% static 'images/abstract.jpg' %}")center/cover no-repeat;
-    
+    min-height: 100vh;
+    background: url("{% static 'images/abstract.jpg' %}") center/cover no-repeat;
+    padding: 20px;
 }
 
 .card {
@@ -95,12 +93,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 
 .chart-card canvas {
     height: 320px !important;
+    max-width: 100%;
 }
-
 
 .dashboard-card {
     border-radius: 10px;
@@ -108,12 +107,14 @@
     box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     transition: all 0.25s ease;
     padding: 12px 15px;
+    width: 100%;
 }
 
 .dashboard-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 28px rgba(0,0,0,0.12);
 }
+
 .dashboard-card h6 {
     font-size: 0.8rem;
     letter-spacing: 0.8px;
@@ -130,6 +131,11 @@
     color: #0f172a;
 }
 
+.table {
+    width: 100%;
+    overflow-x: auto;
+}
+
 .table thead th {
     font-size: 0.85rem;
     color: #334155;
@@ -137,6 +143,126 @@
 }
 
 
+/* ===========================
+   MOBILE RESPONSIVE
+=========================== */
+@media (max-width: 768px) {
+
+    .cb-hero {
+        min-height: auto;
+        padding: 50px 20px;
+    }
+
+    .cb-hero h1 {
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+
+    .cb-hero p {
+        font-size: 0.95rem;
+    }
+
+    .cb-hero small {
+        font-size: 0.75rem;
+    }
+
+    .hero-actions {
+        margin-top: 30px;
+    }
+
+    .dashboard-card h3 {
+        font-size: 1.4rem;
+    }
+
+    .dashboard-card h6 {
+        font-size: 0.7rem;
+    }
+
+    .chart-card canvas {
+        height: 250px !important;
+    }
+
+    .dashboard-bg {
+        padding: 15px;
+    }
+}
+
+
+/* EXTRA SMALL DEVICES */
+@media (max-width: 480px) {
+
+    .cb-hero h1 {
+        font-size: 1.7rem;
+    }
+
+    .cb-hero p {
+        font-size: 0.85rem;
+    }
+
+    .hero-actions {
+        margin-top: 20px;
+    }
+
+    .dashboard-card {
+        padding: 10px;
+    }
+
+    .chart-card canvas {
+        height: 220px !important;
+    }
+
+}
+/* =========================
+   BALANCE PAGINATION 🔥
+========================= */
+
+.balance-pagination{
+    display: flex;
+    justify-content: flex-end; /* 🔥 RIGHT SIDE */
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/* BUTTON STYLE */
+.balance-pagination a,
+.balance-pagination span{
+    padding: 6px 11px;
+    font-size: 13px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+/* NORMAL */
+.balance-pagination a{
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #374151;
+}
+
+/* HOVER */
+.balance-pagination a:hover{
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+/* ACTIVE PAGE */
+.balance-pagination span{
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(37,99,235,0.3);
+}
+
+/* =========================
+   MOBILE 📱
+========================= */
+@media (max-width: 768px){
+    .balance-pagination{
+        justify-content: center; /* mobile iwe center */
+    }
+}
 </style>
 
 
@@ -150,11 +276,6 @@
 
 
 </section>
-
-
-
-
-
  <section class="dashboard-bg">
 
      <div class="container py-4">
@@ -211,10 +332,11 @@
 </div>
 
 <!-- BALANCES -->
-<div class="card shadow mt-4 p-3">
+<div id="balance-section" class="card shadow mt-4 p-3">
     <h5 class="fw-bold">⚠️ Students With Balance</h5>
 
     {% if students_with_balance %}
+        <!-- ✅ LIST YA STUDENTS -->
         <ul class="list-group">
             {% for s in students_with_balance %}
                 <li class="list-group-item d-flex justify-content-between">
@@ -223,9 +345,34 @@
                 </li>
             {% endfor %}
         </ul>
+<div class="balance-pagination mt-3">
+
+    <!-- PREVIOUS -->
+    {% if students_with_balance.has_previous %}
+        <a href="?balance_page={{ students_with_balance.previous_page_number }}#balance-section" 
+           class="btn btn-sm btn-outline-secondary mx-1">←</a>
+    {% endif %}
+
+    <!-- PAGE NUMBERS -->
+    {% for num in students_with_balance.paginator.page_range %}
+        {% if students_with_balance.number == num %}
+            <span class="btn btn-sm btn-primary mx-1">{{ num }}</span>
+        {% elif num > students_with_balance.number|add:'-3' and num < students_with_balance.number|add:'3' %}
+            <a href="?balance_page={{ num }}#balance-section" 
+               class="btn btn-sm btn-outline-primary mx-1">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    <!-- NEXT -->
+    {% if students_with_balance.has_next %}
+        <a href="?balance_page={{ students_with_balance.next_page_number }}#balance-section" 
+           class="btn btn-sm btn-outline-secondary mx-1">→</a>
+    {% endif %}
+
+</div>
+
     {% else %}
         <p class="text-success fw-semibold">🎉 All students have cleared fees</p>
-
     {% endif %}
 </div>
 

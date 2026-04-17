@@ -1,44 +1,212 @@
+
+
+
 {% extends "base.html" %}
 
 {% block content %}
 
 <style>
-    .section-title {
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-    border-left: 4px solid #0d6efd;
-    padding-left: 8px;
+
+/* ================= PAGE ================= */
+.main-content{
+    padding-top:80px;
+    padding-left:60px;
 }
 
-.form-section p,
-.subject-card p {
-    margin-bottom: 0.6rem;
+/* ================= CLASS CARD ================= */
+.class-card{
+    background:#ffffff;
+    border-radius:16px;
+    padding:22px;
+    margin-top:22px;
+    box-shadow:0 8px 22px rgba(0,0,0,0.08);
+    transition:.25s;
 }
 
-.subject-card {
+.class-card:hover{
+    transform:translateY(-3px);
+}
+
+/* ================= TITLE ================= */
+.exam-title{
+    color:#6b7280;
+    font-size:14px;
+    margin-bottom:18px;
+}
+
+/* ================= STATS ================= */
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+}
+
+.stat-box{
+    background:#f3f4f6;
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
+}
+
+.stat-box span{
+    font-size:13px;
+    color:#6b7280;
+}
+
+.stat-box h3{
+    margin-top:6px;
+    font-weight:700;
+    color:#16a34a;
+}
+
+/* ================= TOP STUDENTS ================= */
+.top-students{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:12px;
+    margin-top:10px;
+}
+
+.student-rank{
+    background:#f9fafb;
+    border-radius:12px;
+    padding:14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    transition:.25s;
+    border-left:4px solid #0d6efd;
+}
+
+.student-rank:hover{
+    background:white;
+    transform:translateY(-2px);
+}
+
+.rank-info{
+    font-weight:600;
+    font-size:15px;
+}
+
+.student-name{
+    margin-left:6px;
+    color:#111827;
+}
+
+.rank-number{
+    font-weight:bold;
+    color:#0d6efd;
+    font-size:18px;
+}
+
+.term{
+    font-size:12px;
+    color:#6b7280;
+    margin-top:4px;
+}
+
+/* ================= ACTION BUTTONS ================= */
+.class-actions{
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px dashed #ddd;
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.class-actions .btn{
+    border-radius:20px;
+    padding:6px 16px;
+    font-size:13px;
+    transition:.2s;
+}
+
+.class-actions .btn:hover{
+    transform:translateY(-1px);
+}
+
+/* ================= FILTER ================= */
+.filter-box{
+    background:#fff;
+    padding:15px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,.06);
+    margin-bottom:20px;
+}
+
+
+
+/* ===== Minimum Subjects Box ===== */
+
+.minimum-subjects-box {
     background: #f8f9fa;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 15px;
-    border: 1px solid #e0e0e0;
+    margin-top: 15px;
+    border: 1px solid #e3e6ea;
+    transition: 0.3s ease;
 }
 
-input, select, textarea {
-    border-radius: 6px !important;
+.minimum-subjects-box:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-textarea {
-    min-height: 80px;
+/* title */
+.minimum-subjects-box h6 {
+    font-weight: 600;
+    color: #344767;
 }
-.main-content {
-    padding-top: 70px; /* nafasi ya navbar */
-    padding-left: 60px; /* nafasi ya sidebar */
+
+/* input */
+.minimum-subjects-box input[type="number"] {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+
+}
+
+/* button */
+.minimum-subjects-box button {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 5px 14px;
+}
+
+/* help text */
+.minimum-subjects-box small {
+    display: block;
+    margin-top: 6px;
+}
+
+
+
+
+/* ===== Long Minimum Subjects Input ===== */
+
+.minimum-subjects-box form {
+    width: 100%;
+}
+
+.minimum-input {
+    width: 100%;
+    height: 42px;
+    border-radius: 8px;
+    font-size: 15px;
+    padding-left: 12px;
+}
+
+/* button stays right */
+.minimum-subjects-box form {
+    display: flex;
+    gap: 10px;
+}
+
+.minimum-subjects-box button {
+    white-space: nowrap;
 }
 </style>
-
-
-
-
-
 <h4 class="mb-3">
     {% if request.GET.term %}
         {{ request.GET.term }}
@@ -62,7 +230,8 @@ textarea {
            </a>
        </div>
        
-    <form method="get" class="row g-2 mb-3">
+    <div class="filter-box">
+    <form method="get" class="row g-2">
     <div class="col-md-3">
         <select name="term" class="form-select">
             <option value="">-- Select Term --</option>
@@ -79,7 +248,17 @@ textarea {
             <option value="END" {% if request.GET.exam == "END" %}selected{% endif %}>End Term</option>
         </select>
     </div>
-
+    <div class="col-md-3">
+    <select name="year" class="form-select">
+        <option value="">All Years</option>
+        <option value="2026" {% if request.GET.year == "2026" %}selected{% endif %}>2026</option>
+        <option value="2027" {% if request.GET.year == "2027" %}selected{% endif %}>2027</option>
+        <option value="2028" {% if request.GET.year == "2028" %}selected{% endif %}>2028</option>
+        <option value="2029" {% if request.GET.year == "2029" %}selected{% endif %}>2029</option>
+        <option value="2030" {% if request.GET.year == "2030" %}selected{% endif %}>2030</option>
+        
+    </select>
+     </div>
     <div class="col-md-3">
         <button type="submit" class="btn btn-primary">
             🔍 Filter
@@ -88,46 +267,120 @@ textarea {
     </div>
     
 </form>
-
-
-<table class="table table-bordered">
-<tr>
-    <th>Student</th>
-    <th>Term</th>
-    <th>Status</th>
-    <th>Actions</th>
-</tr>
-
-{% for report in reports %}
-<tr>
-    <td>{{ report.student }}</td>
-    <td>{{ report.get_term_display }}</td>
-    <td>
-        <span class="badge {% if report.status == "PUBLISHED" %}bg-success{% else %}bg-secondary{% endif %}">
-            {{ report.status }}
-        </span>
-        
-    </td>
-<td>
-    <a href="{% url 'edit_report' report.id %}"
-       class="btn btn-sm btn-warning">
-        ✏ Edit
-    </a>
-
-    <a href="{% url 'publish_report' report.id %}"
-       class="btn btn-sm btn-info">
-        {% if report.is_published %}Unpublish{% else %}Publish{% endif %}
-    </a>
-
-    <a href="{% url 'delete_report' report.id %}"
-       class="btn btn-sm btn-danger"
-       onclick="return confirm('Are you sure you want to delete this report?');">
-        🗑 Delete
-    </a>
-</td>
-
-</tr>
-{% endfor %}
-</table>
 </div>
+
+<!-- ================= CLASSES LOOP ================= -->
+{% for class_name, class_reports in classes.items %}
+
+<div class="class-card" style="font-size: 17px;">
+
+<h6>{{ class_name }}</h6>
+
+<h6 class="exam-title">
+{{ request.GET.exam|default:"ALL EXAMS" }}
+({{ request.GET.year|default:"ALL YEARS" }})
+</h6>
+
+
+<!-- ===== STATS ===== -->
+<div class="stats-grid">
+<div class="stat-box">
+<span>Mean Marks</span>
+<h3>{{ class_reports.mean_marks }}%</h3>
+</div>
+
+<div class="stat-box">
+<span>Students</span>
+<h3>{{ class_reports.total_students }}</h3>
+</div>
+
+<div class="stat-box">
+<span>Top Grade</span>
+<h3>{{ class_reports.top_grade }}</h3>
+</div>
+</div>
+
+
+<!-- ===== TOP 3 ===== -->
+<div class="top-students">
+
+{% for report in class_reports.top_three %}
+
+<div class="student-rank">
+
+<div>
+<div class="rank-info">
+{% if report.rank == 1 %}🥇
+{% elif report.rank == 2 %}🥈
+{% elif report.rank == 3 %}🥉
+{% endif %}
+<span class="student-name">{{ report.student }}</span>
+</div>
+
+<div class="term">{{ report.get_term_display }}</div>
+</div>
+
+<div class="rank-number">#{{ report.rank }}</div>
+
+</div>
+
+{% endfor %}
+</div>
+
+
+<!-- ===== ACTION BUTTONS ===== -->
+{% with report=class_reports.top_three.0 %}
+{% if report %}
+
+<div class="class-actions">
+
+<a href="{% url 'class_analysis' report.student.class_level report.term report.exam_type report.year %}"
+   class="btn btn-success btn-sm">
+   📊 View Analysis
+</a>
+</div>
+
+{% endif %}
+{% endwith %}
+<!-- ✅ MINIMUM SUBJECTS -->
+<div class="minimum-subjects-box">
+
+<h6>
+⚙ Minimum Subjects for {{ class_name }}
+</h6>
+
+<form method="post"
+      action="{% url 'set_minimum_subjects' %}"
+      class="d-flex gap-2 align-items-center">
+
+{% csrf_token %}
+
+<input type="hidden"
+       name="class_level"
+       value="{{ class_name }}">
+<input type="number"
+
+       name="minimum_subjects"
+       placeholder="Minimum-subject that can be taken "
+       value="{{ class_reports.minimum_subjects }}"
+       class="form-control minimum-input"
+       min="1"
+       >
+<button class="btn btn-primary btn-sm">
+💾Create
+</button>
+
+</form>
+
+<small>
+Average will be calculated using only minimum subjects.
+</small>
+
+</div>
+
+</div>
+
+{% empty %}
+<p>No reports available.</p>
+{% endfor %}
 {% endblock %}

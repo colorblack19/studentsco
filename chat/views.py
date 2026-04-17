@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Message
 from .models import UserStatus
 from django.db.models import Count, Q
+from django.db.models import Count, Q, Max
 
 @login_required
 @login_required
@@ -22,15 +23,24 @@ def chat_home(request, user_id=None):
     else:
         users = User.objects.none()
 
+
     users = users.annotate(
-        unread_count=Count(
-            "sent_messages",
-            filter=Q(
-                sent_messages__receiver=user,
-                sent_messages__is_read=False
-            )
+    unread_count=Count(
+        "sent_messages",
+        filter=Q(
+            sent_messages__receiver=user,
+            sent_messages__is_read=False
         )
+    ),
+    last_msg_time=Max(
+        "sent_messages__timestamp",
+        filter=Q(sent_messages__receiver=user)
+    ),
+    last_msg_time2=Max(
+        "received_messages__timestamp",
+        filter=Q(received_messages__sender=user)
     )
+     ).order_by("-last_msg_time", "-last_msg_time2")
 
     other_user = None
     messages = []

@@ -5,13 +5,10 @@
 <div class="chat-layout {% if request.user.is_staff %}admin{% else %}teacher{% endif %}">
 
 
-    <!-- LEFT : INBOX -->
-<!-- LEFT : INBOX -->
 <div class="inbox-panel">
 
-    <!-- LOGO -->
-    <div class="chat-logo">
-        <span>Messages</span>
+    <div class="chat-logo" style="color: #111827;">
+        <span>MSM</span>
     </div>
 
     {% for u in users %}
@@ -20,27 +17,23 @@
     <div class="avatar"
          onclick="event.preventDefault(); event.stopPropagation(); openProfile(
             '{{ u.username }}',
-            '{% if u.teacherprofile and u.teacherprofile.photo %}{{ u.teacherprofile.photo.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}',
+            '{% if u.teacherprofile and u.teacherprofile.photo %}{{ u.teacherprofile.photo.url }}{% else %}{% static 'chat_images/default-avatar.png' %}{% endif %}',
             'Teacher',
             '{% if u.teacherprofile.is_online %}Online{% else %}Offline{% endif %}'
          )">
 
         {% if u.teacherprofile and u.teacherprofile.photo %}
             <img src="{{ u.teacherprofile.photo.url }}">
-        {% else %}
-            {{ u.username|slice:":1"|upper }}
-        {% endif %}
+    {% else %}
+        <img src="{% static 'chat_images/default-avatar.png' %}">
+    {% endif %}
 
-        {% if u.unread_count > 0 %}
-            <span class="msg-badge">{{ u.unread_count }}</span>
-        {% endif %}
+    {% if u.unread_count > 0 %}
+        <span class="msg-badge">{{ u.unread_count }}</span>
+    {% endif %}
     </div>
 
     <strong>{{ u.username }}</strong>
-</a>
-
-
-
 
         <div class="user-info">
             {% if u.unread_count > 0 %}
@@ -242,9 +235,20 @@ document.addEventListener("DOMContentLoaded", function () {
 /* LEFT */
 .inbox-panel {
     width: 400px;
-    background: #fff;
-    border-right: 1px solid #e5e7eb;
+    background:#e5ddd5;
+    border-right: 1px solid #0b47bf;
     padding: 15px;
+
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+}
+.inbox-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.inbox-panel::-webkit-scrollbar-thumb {
+    background: #4c705b;
+    border-radius: 10px;
 }
 
 .inbox-user {
@@ -253,13 +257,14 @@ document.addEventListener("DOMContentLoaded", function () {
     padding: 12px;
     border-radius: 10px;
     text-decoration: none;
-    color: #111;
+    color: #202c33;
     margin-bottom: 6px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .inbox-user:hover,
 .inbox-user.active {
-    background: #e0e7ff;
+    background:#e4e7e5;
 }
 
 .avatar {
@@ -298,12 +303,13 @@ document.addEventListener("DOMContentLoaded", function () {
     flex: 1;
     display: flex;
     flex-direction: column;
+
 }
 
 .chat-header {
-    padding: 15px 20px;
-    background: #0f172a;
-    color: white;
+    padding: 20px 20px;
+    background:#e5ddd5;
+    color: #111827;
     display: flex;
     justify-content: space-between;
 }
@@ -329,6 +335,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overflow-wrap: break-word;
     word-break: break-word;
     white-space: normal;
+    
 }
 .chat-image {
     max-width: 220px;      /* WhatsApp-like size */

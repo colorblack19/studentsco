@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+/* =============================
+   PAGE TITLE
+============================= */
+h4{
+    font-weight:700;
+    color:#111827;
+    letter-spacing:.3px;
+}
+
+/* =============================
+   CARD CONTAINER
+============================= */
+.analysis-card{
+    background:#ffffff;
+    padding:28px;
+    border-radius:16px;
+    box-shadow:0 10px 28px rgba(0,0,0,.07);
+    border:1px solid #f1f5f9;
+}
+
+/* =============================
+   TABLE STYLE
+============================= */
+.table{
+    border-radius:12px;
+    overflow:hidden;
+}
+
+/* header */
+.table thead{
+    background:linear-gradient(135deg,#111827,#1f2937);
+    color:white;
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+/* cells */
+.table td,
+.table th{
+    text-align:center;
+    vertical-align:middle;
+    padding:14px 10px;
+}
+
+/* zebra rows */
+.table tbody tr:nth-child(even){
+    background:#f9fafb;
+}
+
+/* hover effect */
+.table-hover tbody tr:hover{
+    background:#eef2ff;
+    transition:.2s;
+}
+
+/* =============================
+   STUDENT COLUMN
+============================= */
+.student-info{
+    text-align:left;
+    font-weight:600;
+    color:#111827;
+}
+
+.student-info::before{
+    margin-right:6px;
+}
+
+/* =============================
+   ACTION AREA
+============================= */
+td:last-child{
+    min-width:190px;
+}
+
+/* buttons general */
+.btn{
+    border-radius:8px !important;
+    font-weight:600;
+    transition:.25s ease;
+    box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+
+/* edit */
+.btn-warning{
+    background:#f59e0b;
+    border:none;
+}
+.btn-warning:hover{
+    background:#d97706;
+    transform:translateY(-2px);
+}
+
+/* delete */
+.btn-danger{
+    background:#ef4444;
+    border:none;
+}
+.btn-danger:hover{
+    background:#dc2626;
+    transform:translateY(-2px);
+}
+
+/* publish */
+.btn-info{
+    background:#06b6d4;
+    border:none;
+}
+.btn-info:hover{
+    background:#0891b2;
+    transform:translateY(-2px);
+}
+
+/* =============================
+   STATUS BADGE
+============================= */
+.badge{
+    font-size:11px;
+    padding:6px 10px;
+    border-radius:20px;
+    letter-spacing:.4px;
+}
+
+/* =============================
+   ANALYZE BUTTON
+============================= */
+.analyze-btn{
+    background:linear-gradient(135deg,#3b82f6,#2563eb);
+    color:white;
+    padding:12px 22px;
+    border-radius:10px;
+    font-weight:900;
+    text-decoration:none;
+    transition:.3s;
+    box-shadow:0 6px 14px rgba(37,99,235,.35);
+}
+
+.analyze-btn:hover{
+    transform:translateY(-3px);
+    color:white;
+    box-shadow:0 10px 20px rgba(37,99,235,.45);
+}
+
+/* =============================
+   RESPONSIVE TABLE
+============================= */
+.table-responsive{
+    overflow-x:auto;
+}
+/* =============================
+   TOP TOOLBAR (PRO VERSION)
+============================= */
+.analysis-toolbar{
+    display:flex;
+    justify-content:center;   /* center buttons */
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:22px;
+    padding:18px;
+    background:#f9fafb;
+    border-radius:14px;
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
+    border:1px solid #e5e7eb;
+}
+
+/* container ya buttons */
+.toolbar-actions{
+    display:flex;
+    flex-direction:row;   /* ⭐ muhimu — buttons ziwe line moja */
+    gap:14px;
+    flex-wrap:wrap;
+}
+
+/* =============================
+   TOOLBAR BUTTON STYLE
+============================= */
+.analysis-toolbar .btn{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 8px ;
+    font-weight:700;
+    border-radius:12px !important;
+    border:none;
+    color:white;
+    transition:.25s ease;
+    box-shadow:0 6px 14px rgba(0,0,0,.15);
+}
+
+/* hover animation */
+.analysis-toolbar .btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 20px rgba(0,0,0,.2);
+}
+
+/* analyze */
+.analyze-btn{
+    background:linear-gradient(135deg,#3b82f6,#2563eb);
+}
+
+/* ranking */
+.btn-success{
+    background:linear-gradient(135deg,#22c55e,#15803d);
+}
+
+/* export */
+.btn-secondary{
+    background:linear-gradient(135deg,#6b7280,#374151);
+}
+
+/* statistics */
+.btn-dark{
+    background:linear-gradient(135deg,#111827,#000000);
+}
+.main-content {
+    margin-top: 65px;
+    margin-left: 200px;
+}
+
+</style>
+<!-- ===== ACTION TOOLBAR ===== -->
+<div class="analysis-toolbar">
+
+    <div class="toolbar-actions">
+
+        <a href="{% url 'class_analysis_dashboard' class_level term exam year %}"
+           class="btn analyze-btn">
+           📊Analyze Results
+        </a>
+
+        <!-- LINKS ZA BAADAYE -->
+        <a href="#" class="btn btn-success btn-sm">🏆 Ranking</a>
+
+        <a href="#" class="btn btn-secondary btn-sm">📄 Export</a>
+
+        <a href="#" class="btn btn-dark btn-sm">📈 Statistics</a>
+
+    </div>
+
+</div>
+
+<div class="container mt-4">
+
+<h4><b><i>
+{{ class_level }} —
+{{ term }} —
+{{ exam }} —
+{{ year }}</b></i>
+</h4>
+
+<div class="analysis-card mt-3">
+
+<table class="table table-bordered table-hover">
+
+<thead>
+<tr>
+
+<th>Student</th>
+
+{% for subject in subjects %}
+<th>{{ subject.name }}</th>
+{% endfor %}
+
+<th>Action</th>
+
+</tr>
+</thead>
+
+<tbody>
+
+{% for row in analysis_data %}
+<tr>
+
+<!-- STUDENT + ADMISSION -->
+<td class="student-info">
+    👨‍🎓 {{ row.student }}
+</td>
+
+<!-- MARKS -->
+{% for mark in row.marks %}
+<td>{{ mark }}</td>
+{% endfor %}
+
+<!-- ACTIONS -->
+<td>
+
+{% if row.report_id %}
+
+    <a href="{% url 'edit_report' row.report_id %}"
+       class="btn btn-warning btn-sm">
+       ✏ Edit
+    </a>
+
+    <a href="{% url 'delete_report' row.report_id %}"
+       class="btn btn-danger btn-sm"
+       onclick="return confirm('Are you sure?');">
+       🗑 Delete
+    </a>
+
+    <!-- ✅ PUBLISH -->
+    <a href="{% url 'publish_report' row.report_id %}"
+   class="btn btn-info btn-sm">
+
+    {% if row.report.status == "PUBLISHED" %}
+        🔒 Unpublish
+    {% else %}
+        🚀 Publish
+    {% endif %}
+
+</a>
+<span class="badge
+    {% if row.report.status == "PUBLISHED" %}
+        bg-success
+    {% else %}
+        bg-secondary
+    {% endif %}
+">
+    {{ row.report.status }}
+</span>
+
+{% else %}
+    <span class="text-muted">No Report</span>
+{% endif %}
+
+
+</td>
+
+
+</tr>
+{% endfor %}
+
+
+</tbody>
+
+</table>
+
+<!-- ===== ANALYSIS BUTTON ===== -->
+
+</div>
+</div>
+
+
+{% endblock %}

@@ -110,6 +110,244 @@
     .pagination a:hover {
         text-decoration: underline;
     }
+    /* =========================
+   MOBILE & UI IMPROVEMENTS
+========================= */
+
+/* Container spacing mobile */
+@media (max-width: 768px){
+
+    .container{
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .table-container{
+        padding: 18px;
+        border-radius: 12px;
+    }
+
+    h2{
+        font-size: 18px;
+        text-align: center;
+    }
+
+    /* SUMMARY BOX STACK */
+    .summary-box{
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .summary-box h3,
+    .summary-box h4{
+        font-size: 16px;
+    }
+
+    /* FILTER BOX */
+    .filter-box{
+        padding: 15px;
+    }
+
+    .filter-title{
+        font-size: 16px;
+        text-align: center;
+    }
+
+    /* Inputs zikae vizuri */
+    .form-control,
+    .form-select{
+        font-size: 14px;
+    }
+
+    /* TABLE FIX */
+    .table{
+        font-size: 13px;
+    }
+
+    /* Make table scrollable */
+    .table-container{
+        overflow-x: auto;
+    }
+
+    table{
+        min-width: 600px;
+    }
+
+    /* Buttons zikae vizuri */
+    .btn-sm{
+        font-size: 12px;
+        padding: 5px 8px;
+        margin-bottom: 3px;
+    }
+
+    /* Pagination */
+    .pagination{
+        font-size: 13px;
+    }
+
+}
+
+
+/* EXTRA SMALL DEVICES */
+@media (max-width: 480px){
+
+    h2{
+        font-size: 16px;
+    }
+
+    .summary-box{
+        font-size: 13px;
+    }
+
+    .filter-title{
+        font-size: 15px;
+    }
+
+    .btn-sm{
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+}
+/* =========================
+   PRO TABLE DESIGN 🔥
+========================= */
+
+.table-container{
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+/* TABLE */
+.table{
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.table thead th{
+    background: #1f2937;
+    color: #fff;
+    border: none;
+    font-weight: 600;
+}
+
+.table tbody tr{
+    background: #f9fafb;
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover{
+    background: #eef2ff;
+    transform: scale(1.002);
+}
+
+.table tbody td{
+    border-top: none;
+    border-bottom: none;
+    padding: 12px;
+}
+
+/* BALANCE STYLE */
+.balance{
+    font-weight: 800;
+    color: #dc2626;
+
+}
+
+/* BUTTONS IMPROVED */
+.btn-sm{
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* =========================
+   PAGINATION (PRO STYLE)
+========================= */
+
+.pagination-container{
+    display: flex;
+    justify-content: flex-end; /* 🔥 HAPA NDIO RIGHT */
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.pagination-container a,
+.pagination-container span{
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+/* NORMAL BUTTON */
+.pagination-container a{
+    border: 1px solid #d1d5db;
+    color: #374151;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+
+.pagination-container a:hover{
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+/* ACTIVE PAGE */
+.pagination-container span{
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+}
+
+/* =========================
+   MOBILE OPTIMIZATION 📱
+========================= */
+
+@media (max-width: 768px){
+
+    .table-container{
+        padding: 15px;
+    }
+
+    /* Scroll table */
+    .table-container{
+        overflow-x: auto;
+    }
+
+    table{
+        min-width: 650px;
+    }
+
+    /* Buttons stack vizuri */
+    .btn-sm{
+        font-size: 11px;
+        padding: 4px 6px;
+    }
+
+    /* Pagination */
+    .pagination-container{
+        justify-content: center; /* mobile iwe center */
+    }
+}
+
+/* EXTRA SMALL */
+@media (max-width: 480px){
+
+    .btn-sm{
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .pagination-container{
+        gap: 4px;
+    }
+}
 </style>
 
 <div class="container py-5">
@@ -230,7 +468,7 @@
                           👩‍🏫 Teachers
                             </a>
 
-                          {% endif %}
+                          
 
 
                         <a href="{% url 'delete_student' item.student.id %}"
@@ -238,7 +476,7 @@
                            onclick="return confirm('Are you sure you want to delete this student?')">
                            Delete
                         </a>
-
+                    {% endif %}
                     </td>
                 </tr>
            
@@ -256,18 +494,31 @@
 
         </table>
 
-<div class="pagination">
+<div class="pagination-container mt-4">
+
+    <!-- PREVIOUS -->
     {% if students.has_previous %}
-        <a href="?page={{ students.previous_page_number }}">Prev</a>
+        <a href="?page={{ students.previous_page_number }}" 
+           class="btn btn-sm btn-outline-secondary mx-1">←</a>
     {% endif %}
 
-    Page {{ students.number }} of {{ students.paginator.num_pages }}
+    <!-- PAGE NUMBERS -->
+    {% for num in students.paginator.page_range %}
+        {% if students.number == num %}
+            <span class="btn btn-sm btn-primary mx-1">{{ num }}</span>
+        {% elif num > students.number|add:'-3' and num < students.number|add:'3' %}
+            <a href="?page={{ num }}" 
+               class="btn btn-sm btn-outline-primary mx-1">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
 
+    <!-- NEXT -->
     {% if students.has_next %}
-        <a href="?page={{ students.next_page_number }}">Next</a>
+        <a href="?page={{ students.next_page_number }}" 
+           class="btn btn-sm btn-outline-secondary mx-1">→</a>
     {% endif %}
-</div>
 
+</div>
 {% if request.user.is_superuser %}
     <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">
         Back to Dashboard

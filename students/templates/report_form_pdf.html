@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+@page{
+    size:A4 portrait;
+    margin:10mm;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f3f4f6;
+    font-size:12px;
+}
+
+/* MAIN CARD */
+.report-card{
+    position:relative;
+    background:#fff;
+    width:100%;
+    min-height:95%;
+    padding:25px;
+    border-radius:15px;
+    border:1px solid #ddd;
+    margin-bottom:20px;
+    page-break-after:always;
+}
+
+/* SIDE BARS */
+.left-bar{
+    position:absolute;
+    top:0;
+    left:0;
+    width:12px;
+    height:100%;
+    background:#2b9acb;
+}
+
+.right-bar{
+    position:absolute;
+    top:0;
+    right:0;
+    width:12px;
+    height:100%;
+    background:#2b9acb;
+}
+
+/* CORNERS */
+.corner-left{
+    position:absolute;
+    top:0;
+    left:0;
+    width:45px;
+    height:45px;
+    background:#22c55e;
+    border-radius:0 0 30px 0;
+}
+
+.corner-right{
+    position:absolute;
+    top:0;
+    right:0;
+    width:45px;
+    height:45px;
+    background:#22c55e;
+    border-radius:0 0 0 30px;
+}
+
+/* HEADER */
+.school-header{
+    text-align:center;
+    margin-bottom:15px;
+}
+
+.school-header img{
+    width:70px;
+    height:70px;
+    object-fit:cover;
+}
+
+.school-header h2{
+    color:#2b9acb;
+    margin:5px 0;
+}
+
+/* TITLE */
+.report-title{
+    background:#2b9acb;
+    color:white;
+    padding:12px;
+    text-align:center;
+    font-weight:bold;
+    border-radius:0 0 20px 20px;
+    margin-bottom:20px;
+}
+
+/* STUDENT BOX */
+.student-box{
+    margin-bottom:20px;
+}
+
+.student-box img{
+    width:100px;
+    height:100px;
+    object-fit:cover;
+    border-radius:8px;
+}
+
+.student-details{
+    margin-top:10px;
+}
+
+/* SUMMARY TABLE */
+.summary-table{
+    width:100%;
+    margin:15px 0;
+    border-collapse:collapse;
+}
+
+.summary-table td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+    font-weight:bold;
+}
+
+/* SUBJECT TABLE */
+.subject-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+.subject-table th{
+    background:#f3f4f6;
+    padding:10px;
+    border:1px solid #ddd;
+}
+
+.subject-table td{
+    padding:8px;
+    border:1px solid #ddd;
+}
+
+/* REMARKS */
+.remarks{
+    margin-top:20px;
+}
+
+.remarks-box{
+    border:1px solid #ddd;
+    padding:10px;
+    margin-bottom:10px;
+    background:#fafafa;
+}
+
+</style>
+</head>
+<body>
+
+{% for student in students %}
+{% for report in student.filtered_reports %}
+
+<div class="report-card">
+
+<div class="left-bar"></div>
+<div class="right-bar"></div>
+<div class="corner-left"></div>
+<div class="corner-right"></div>
+
+
+<div class="school-header">
+
+<img src="http://127.0.0.1:8000/static/images/dashimage.jpg">
+
+<h2>NAME SCHOOL (COLORBLACK19)</h2>
+
+<p>P.O BOX 0000 – 0000</p>
+
+<p>Tel: 0742193820</p>
+
+</div>
+
+
+<div class="report-title">
+ACADEMIC REPORT FORM – {{ class_level }} – {{ exam }} – {{ year }}
+</div>
+
+
+<div class="student-box">
+
+{% if student.photo %}
+<img src="http://127.0.0.1:8000{{ student.photo.url }}">
+{% endif %}
+
+<div class="student-details">
+<h3>{{ student.full_name }}</h3>
+<p>ADM NO: {{ student.admission_number }}</p>
+<p>FORM: {{ student.class_level }}</p>
+</div>
+
+</div>
+
+
+<table class="summary-table">
+
+<tr>
+<td>Grade<br>{{ report.grade }}</td>
+<td>Total<br>{{ report.total_score }}</td>
+<td>Points<br>{{ report.total_points }}</td>
+<td>Position<br>{{ report.overall_position }}</td>
+</tr>
+
+</table>
+
+
+<table class="subject-table">
+
+<tr>
+<th>Subject</th>
+<th>Marks</th>
+<th>Grade</th>
+<th>Rank</th>
+</tr>
+
+{% for s in report.subjects.all %}
+<tr>
+<td>{{ s.subject.name }}</td>
+<td>{{ s.marks }}</td>
+<td>{{ s.grade }}</td>
+<td>{{ s.position }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+
+<div class="remarks">
+
+<div class="remarks-box">
+<strong>Teacher Remark:</strong><br>
+{{ report.teacher_comment }}
+</div>
+
+<div class="remarks-box">
+<strong>Principal Remark:</strong><br>
+{{ report.headteacher_remark }}
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+{% endfor %}
+
+</body>
+</html>

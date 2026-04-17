@@ -14,14 +14,23 @@
 
         <div class="teacher-profile">
 
-    <form method="POST" action="{% url 'upload_teacher_photo' %}" enctype="multipart/form-data">
+    <form method="POST"
+      action="{% url 'upload_teacher_photo' %}"
+      enctype="multipart/form-data">
         {% csrf_token %}
 
         <!-- CLICKABLE IMAGE -->
         <label for="photo-input" style="cursor:pointer;">
-            <img src="{{ request.user.teacherprofile.photo.url }}"
-                 class="teacher-avatar"
-                 title="Click to change photo">
+          {% if request.user.teacherprofile.photo %}
+          <img src="{{ request.user.teacherprofile.photo.url }}"
+           class="teacher-avatar"
+           title="Click to change photo">
+          {% else %}
+          <img src="{% static 'images/default-avatar.png' %}"
+            class="teacher-avatar"
+            title="Click to change photo">
+         {% endif %}
+       
         </label>
 
         <!-- HIDDEN FILE INPUT -->

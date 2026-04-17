@@ -6,27 +6,36 @@
     <title>School System</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     {% load static %}
 </head>
 
 <style>
+
+*{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 17px;
+    box-sizing: border-box;
+}
+
 /* ===== NAVBAR BASE ===== */
 .navbar {
-    height: 56px;
-    background: #020617 !important; /* dark clean */
+    min-height: 56px;
+    background: #447b80 !important; /* dark clean */
     border-bottom: 1px solid #e5e7eb;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1050;
+    padding: 0.5rem 1rem;
 }
 
 /* BRAND */
 .navbar-brand {
     font-size: 1.05rem;
     letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 /* NAV LINKS */
@@ -45,7 +54,7 @@
     color: #fff !important;
 }
 
-/* ACTIVE (OPTIONAL) */
+/* ACTIVE */
 .navbar-nav .nav-link.active {
     background: rgba(13,110,253,0.25);
     color: #fff !important;
@@ -53,7 +62,7 @@
 
 /* LOGOUT */
 .navbar-nav .nav-link.text-danger {
-    color: #f87171 !important;
+    color: #f14343 !important;
 }
 
 .navbar-nav .nav-link.text-danger:hover {
@@ -69,21 +78,23 @@
 .navbar-toggler:focus {
     box-shadow: none;
 }
+
+/* MOBILE NAV */
 @media (max-width: 991px) {
 
-    #navbarNav {
-        position: fixed;
-        top: 56px;              /* chini ya navbar */
-        right: 12px;
-        left: 12px;
-        background: #ffffff;
-        border-radius: 14px;
-        padding: 0.8rem;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.18);
-        z-index: 2000;
-        max-height: calc(100vh - 80px);
-        overflow-y: auto;
+#navbarNav {
+    position: absolute;
+    top: 56px;
+    right: 10px;
+    left: auto;
+    width: 160px;
     }
+    #navbarNav {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 0.6rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
 
     #navbarNav .navbar-nav {
         gap: 0.2rem;
@@ -107,9 +118,10 @@
     }
 }
 
+/* FLASH */
 .flash-messages {
     position: fixed;
-    top: 70px;                 /* chini ya navbar */
+    top: 70px;
     right: 20px;
     z-index: 1100;
     width: auto;
@@ -121,6 +133,8 @@
     border-radius: 10px;
     font-size: 0.95rem;
 }
+
+/* TITLES */
 .section-title {
     font-weight: 600;
     margin-bottom: 0.75rem;
@@ -128,13 +142,13 @@
     padding-left: 8px;
 }
 
-/* General form spacing */
+/* FORMS */
 .form-section p,
 .subject-card p {
     margin-bottom: 0.6rem;
 }
 
-/* Subject card */
+/* SUBJECT CARD */
 .subject-card {
     background: #f8f9fa;
     border-radius: 8px;
@@ -142,59 +156,109 @@
     border: 1px solid #e0e0e0;
 }
 
-/* Inputs */
-input, select, textarea {
+/* INPUTS */
+input,
+select,
+textarea {
     border-radius: 6px !important;
+    width: 100%;
+    max-width: 100%;
 }
 
-/* Improve textarea look */
+/* TEXTAREA */
 textarea {
     min-height: 80px;
 }
 
-/* Buttons */
+/* BUTTON */
 .btn-primary {
     box-shadow: 0 4px 10px rgba(13,110,253,0.25);
 }
 
-/* Mobile friendly */
+/* CHAT ICON */
+.chat-icon {
+    position: fixed;
+    right: 22px;
+    bottom: 30px;
+    font-size: 26px;
+    background: #0dcaf0;
+    color: white;
+    padding: 12px 14px;
+    border-radius: 50%;
+    z-index: 9999;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    text-decoration: none;
+}
+
+.chat-icon:hover {
+    background: #0bbcd6;
+    color: white;
+}
+
+.chat-icon .badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: red;
+    font-size: 11px;
+    padding: 3px 6px;
+    border-radius: 50%;
+}
+
+/* =====================
+   RESPONSIVE IMPROVEMENT
+===================== */
 @media (max-width: 768px) {
+
+    *{
+        font-size: 15px;
+    }
+
+    .navbar-brand {
+        font-size: 0.95rem;
+    }
+
+    .flash-messages {
+        right: 10px;
+        left: 10px;
+        max-width: 100%;
+    }
+
     .subject-card {
         padding: 12px;
     }
+
+    .chat-icon {
+        right: 15px;
+        bottom: 20px;
+        font-size: 22px;
+        padding: 10px 12px;
+    }
+
 }
 
+/* EXTRA SMALL PHONE */
+@media (max-width: 480px){
 
+    *{
+        font-size: 14px;
+    }
 
+    .navbar {
+        padding: 0.4rem 0.8rem;
+    }
 
-        .chat-icon {
-            position: fixed;
-            right: 22px;
-            bottom: 30px;
-            font-size: 26px;
-            background: #0dcaf0;
-            color: white;
-            padding: 12px 14px;
-            border-radius: 50%;
-            z-index: 9999;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-            text-decoration: none;
-        }
+    .navbar-brand {
+        font-size: 0.85rem;
+    }
 
-        .chat-icon:hover {
-            background: #0bbcd6;
-            color: white;
-        }
+    .chat-icon {
+        font-size: 20px;
+        padding: 9px 11px;
+    }
 
-        .chat-icon .badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: red;
-            font-size: 11px;
-            padding: 3px 6px;
-            border-radius: 50%;
-        }
+}
+
 </style>
 
 
@@ -218,43 +282,44 @@ textarea {
     <ul class="navbar-nav ms-auto me-3">
 
 
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard' %}">
-                    Dashboard
-                </a>
-            </li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard' %}">
+        <i class="fas fa-home me-2"></i> Dashboard
+    </a>
+</li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'student_list' %}">
-                    Students
-                </a>
-            </li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'student_list' %}">
+        <i class="fas fa-user-graduate me-2"></i> Students
+    </a>
+</li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'payments_list' %}">
-                    Payments
-                </a>
-            </li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'payments_list' %}">
+        <i class="fas fa-money-bill-wave me-2"></i> Payments
+    </a>
+</li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'student_add' %}">
-                    Add Student
-                </a>
-            </li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'student_add' %}">
+        <i class="fas fa-user-plus me-2"></i> Add Student
+    </a>
+</li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'feestructure_list' %}">
-                    Update Fees
-                </a>
-            </li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'feestructure_list' %}">
+        <i class="fas fa-edit me-2"></i> Update Fees
+    </a>
+</li>
+
         {% endif %}
        
 <ul class="navbar-nav">
-    <li class="nav-item">
-        <a class="nav-link text-danger" href="{% url 'logout' %}">
-            Logout
-        </a>
-    </li>
+<li class="nav-item">
+    <a class="nav-link text-danger" href="{% url 'logout' %}">
+        <i class="fas fa-sign-out-alt me-2"></i> Logout
+    </a>
+</li>
 </ul>
 
 

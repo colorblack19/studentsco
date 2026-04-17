@@ -13,7 +13,7 @@
     position: fixed;
     top: 56px;
     left: 0;
-    background: #ffffff;
+    background: #447b80 !important; 
     border-right: 1px solid #e5e7eb;
     padding: 1.2rem 0;
     overflow-y: auto;
@@ -32,7 +32,7 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.7rem 1.4rem;
-    color: #111827;
+    color: #fefefe;
     text-decoration: none;
     font-size: 0.95rem;
     font-weight: 500;
@@ -65,8 +65,44 @@
     background: #e5e7eb;
     margin: 0.7rem 1.2rem;
 }
+.sidebar-menu li a i{
+    font-size: 18px;
+    min-width: 22px;
+    text-align: center;
+}
+/* =====================
+   MOBILE SIDEBAR
+===================== */
+@media (max-width: 768px){
 
+    /* Sidebar iwe ndogo */
+    .sidebar{
+        width: 70px;
+        padding: 1rem 0;
+    }
 
+    /* Main content isogee */
+    .main-content{
+        margin-left: 70px;
+    }
+
+    /* Menu iwe centered */
+    .sidebar-menu li a{
+        justify-content: center;
+        padding: 0.8rem;
+    }
+
+    /* Ficha text */
+    .sidebar-menu li a span{
+        display: none;
+    }
+
+    /* Icon iwe kubwa kidogo */
+    .sidebar-menu li a i{
+        font-size: 20px;
+    }
+
+}
 </style>
 
 <aside class="sidebar">
@@ -75,25 +111,29 @@
 
         <li>
             <a href="{% url 'admin_events' %}">
-                📅 <span>School Events</span>
+                <i class="fas fa-calendar-alt"></i>
+                <span>School Events</span>
             </a>
         </li>
 
         <li>
             <a href="{% url 'attendance_overview' %}">
-                🗂️<span>All Attendance</span>
+                <i class="fas fa-folder-open"></i>
+                <span>All Attendance</span>
             </a>
         </li>
 
         <li>
-    <a href="{% url 'locked_attendance' %}">
-        🔐 <span>Locked Records</span>
-    </a>
+            <a href="{% url 'locked_attendance' %}">
+                <i class="fas fa-lock"></i>
+                <span>Locked Records</span>
+            </a>
         </li>
 
         <li>
             <a href="{% url 'attendance_alerts' %}">
-                🚨 <span>Attendance Alerts</span>
+                <i class="fas fa-bell"></i>
+                <span>Attendance Alerts</span>
             </a>
         </li>
 
@@ -101,7 +141,8 @@
 
         <li>
             <a href="{% url 'add_teacher' %}">
-                👨‍🏫 <span>Teachers</span>
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Teachers</span>
             </a>
         </li>
 
@@ -109,39 +150,49 @@
 
         <li>
             <a href="{% url 'group_list' %}">
-                ⚙ <span>Manage Groups</span>
+                <i class="fas fa-cogs"></i>
+                <span>Manage Groups</span>
             </a>
         </li>
 
         <li>
             <a href="{% url 'user_list' %}">
-                👥<span>Manage Users</span>
+                <i class="fas fa-users"></i>
+                <span>Manage Users</span>
             </a>
         </li>
 
-       
-{% if request.user.is_superuser %}
-<li>
-    <a href="{% url 'admin_approval' %}">
-        🛡️ <span>Admin Room</span>
-    </a>
-</li>
-{% endif %}
+        {% if request.user.is_superuser %}
+        <li>
+            <a href="{% url 'admin_approval' %}">
+                <i class="fas fa-shield-alt"></i>
+                <span>Admin Room</span>
+            </a>
+        </li>
+        {% endif %}
 
-{% if request.user.is_staff %}
-<li>
-    <a href="{% url 'admin_reports' %}">
-        📑 <span>Academic Reports</span>
-    </a>
-</li>
-{% endif %}
+        {% if request.user.is_staff %}
+        <li>
+            <a href="{% url 'admin_reports' %}">
+                <i class="fas fa-file-alt"></i>
+                <span>Academic Reports</span>
+            </a>
+        </li>
 
-<li>
-    <a href="{% url 'admin_timetable' %}">
-        📅 <span>Timetables</span>
-    </a>
-</li>
+        <li>
+            <a href="{% url 'assign_teachers' %}">
+                <i class="fas fa-user-plus"></i>
+                <span>Assign Teachers</span>
+            </a>
+        </li>
+        {% endif %}
 
+        <li>
+            <a href="{% url 'admin_timetable' %}">
+                <i class="fas fa-calendar"></i>
+                <span>Timetables</span>
+            </a>
+        </li>
 
     </ul>
 </aside>

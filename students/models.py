@@ -37,12 +37,25 @@ class Student(models.Model):
     parent_id_number = models.CharField(max_length=50, blank=True, null=True)
 
     class_level = models.CharField(max_length=50, choices=CLASS_LEVELS)
+
+    STREAM_CHOICES = (
+    ('A', 'A'),
+    ('B', 'B'),
+    ('C', 'C'),
+    ('D', 'D'),
+      )
+
+    stream = models.CharField(
+    max_length=10,
+    choices=STREAM_CHOICES,
+    blank=True,
+    null=True
+     )
     date_registered = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=True)
     feestructure = models.ForeignKey("FeeStructure",on_delete=models.SET_NULL,null=True,blank=True)
     photo = models.ImageField(upload_to='student_photos/', blank=True, null=True)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-   
 
     teacher = models.ForeignKey(
     settings.AUTH_USER_MODEL,
@@ -86,7 +99,11 @@ class Student(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     
-
+    @property
+    def class_teacher(self):
+       return ClassTeacher.objects.filter(
+        class_level=self.class_level
+    ).first()
     # ✅ ATTENDANCE MODEL (IKO NJE YA STUDENT)
 class Attendance(models.Model):
     STATUS_CHOICES = (
@@ -245,26 +262,22 @@ class AcademicReport(models.Model):
     ]
 
     student = models.ForeignKey("Student", on_delete=models.CASCADE)
-
-    term = models.CharField(
-        max_length=2,
-        choices=TERM_CHOICES
-    )
-
-
-    exam_type = models.CharField(
-    max_length=3,
-    choices=EXAM_TYPE_CHOICES,
-    default="MID"
-)
-
+    year = models.PositiveIntegerField(default=timezone.now().year)
+    term = models.CharField(max_length=2, choices=TERM_CHOICES)
+    exam_type = models.CharField(max_length=3, choices=EXAM_TYPE_CHOICES, default="MID")
 
     total_score = models.IntegerField(default=0)
-    grade = models.CharField(max_length=5, blank=True)
+    total_points = models.IntegerField(default=0)
 
+    stream_position = models.IntegerField(null=True, blank=True)
+    overall_position = models.IntegerField(null=True, blank=True)
+
+    grade = models.CharField(max_length=5, blank=True)
     mean_marks = models.FloatField(default=0)
-    teacher_comment = models.TextField()
-    headteacher_remark = models.TextField(blank=True)
+
+    teacher_comment = models.TextField(blank=True)
+
+    headteacher_remark = models.TextField(blank=True)    
 
     status = models.CharField(
         max_length=20,
@@ -273,28 +286,63 @@ class AcademicReport(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("student", "year", "term", "exam_type")
+
+
     def calculate_report(self):
-        from .views import get_report_grade
+        from .views import get_report_grade, get_grade_points
 
         subjects = self.subjects.all()
+
         total = sum(s.marks for s in subjects)
+
         count = subjects.count()
 
         avg = total / count if count else 0
 
+        total_points = 0
+
+        for s in subjects:
+            total_points += get_grade_points(s.grade)
+
         self.total_score = total
         self.mean_marks = avg
         self.grade = get_report_grade(avg)
+        self.total_points = total_points
 
-    def save(self, *args, **kwargs):
-        is_new = self.pk is None
-        super().save(*args, **kwargs)
+    def generate_teacher_comment(self):
 
-        if not is_new:
-            self.calculate_report()
-            super().save(update_fields=["total_score", "mean_marks", "grade"])
+        if self.mean_marks >= 80:
+            return "Excellent performance. Keep up the outstanding work."
+
+        elif self.mean_marks >= 70:
+            return "Very good performance. Maintain the effort."
+
+        elif self.mean_marks >= 60:
+            return "Good work. Aim even higher next term."
+
+        elif self.mean_marks >= 50:
+            return "Fair performance. More effort needed."
+
+        else:
+            return "Needs improvement. Work harder."
 
 
+    def generate_headteacher_remark(self):
+
+        if self.mean_marks >= 80:
+            return "Excellent academic achievement."
+
+        elif self.mean_marks >= 70:
+            return "Very commendable performance."
+
+        elif self.mean_marks >= 60:
+            return "Good work. Continue improving."
+
+        else:
+            return "More dedication is required."
 class ReportSubject(models.Model):
     report = models.ForeignKey(
         AcademicReport,
@@ -310,21 +358,102 @@ class ReportSubject(models.Model):
     )
 
     marks = models.IntegerField(default=0)
+
     grade = models.CharField(max_length=5, blank=True)
+
     teacher_comment = models.TextField(blank=True)
+
     mean_marks = models.FloatField(default=0)
+
     position = models.IntegerField(null=True, blank=True)
+
+    dev = models.IntegerField(default=0)
+
+    @property
+    def subject_teacher(self):
+        return SubjectTeacher.objects.filter(
+            subject=self.subject
+        ).first()
+
     def save(self, *args, **kwargs):
         from .views import get_subject_grade
+
         self.grade = get_subject_grade(self.marks)
+
         super().save(*args, **kwargs)
-
-
 class Subject(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
         unique_together = ("name",)
+
     def __str__(self):
         return self.name
 
+
+# ===============================
+# CLASS SETTINGS (NEW MODEL)
+# ===============================
+
+class ClassMinimumSubject(models.Model):
+    class_level = models.CharField(max_length=20, unique=True)
+    minimum_subjects = models.IntegerField(default=7)
+
+    def __str__(self):
+        return f"{self.class_level} - {self.minimum_subjects}"
+    
+
+class ClassTeacher(models.Model):
+
+    CLASS_LEVELS = (
+        ('Grade1', 'Grade1'),
+        ('Grade2', 'Grade2'),
+        ('Grade3', 'Grade3'),
+        ('Grade4', 'Grade4'),
+        ('Grade5', 'Grade5'),
+        ('Grade6', 'Grade6'),
+        ('Grade7', 'Grade7'),
+        ('Grade8', 'Grade8'),
+        ('Grade9', 'Grade9'),
+        ('Grade10', 'Grade10'),
+        ('Form3', 'Form3'),
+        ('Form4', 'Form4'),
+    )
+
+    class_level = models.CharField(max_length=50, choices=CLASS_LEVELS)
+
+    teacher = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"{self.class_level} - {self.teacher}"
+
+
+class SubjectTeacher(models.Model):
+
+    subject = models.ForeignKey(
+        "Subject",
+        on_delete=models.CASCADE
+    )
+
+    teacher = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"{self.subject.name} - {self.teacher}"
+    
+class SchoolSettings(models.Model):
+    principal_name = models.CharField(max_length=200)
+
+    principal_signature = models.ImageField(
+        upload_to="principal_signatures/",
+        blank=True,
+        null=True
+    )
+
+    def __str__(self):
+        return self.principal_name

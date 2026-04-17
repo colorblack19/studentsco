@@ -41,7 +41,7 @@ urlpatterns = [
 
     # 🔹 STUDENTS
     path("students/", include("students.urls")),
-
+  
     # 🔹 TIMETABLE
     path("timetable/", include("timetable.urls")),
 
