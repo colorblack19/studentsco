@@ -99,7 +99,13 @@ from .models import (
 )
 from django.db.models import Prefetch
 from .models import Student, AcademicReport, Subject
-from weasyprint import HTML
+from .forms import (
+    ClassTeacherForm,
+    SubjectTeacherForm,
+    SchoolSettingsForm
+)
+
+from .models import SchoolSettings
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 def is_staff_or_admin(user):
@@ -2100,6 +2106,7 @@ def merit_list(request, class_level, term, exam, year):
     return render(request, "merit_list.html", context)
 
 
+
 @login_required
 def download_reports(request, class_level, term, exam, year):
 
@@ -2108,55 +2115,38 @@ def download_reports(request, class_level, term, exam, year):
     students = Student.objects.filter(
         class_level=class_level
     ).prefetch_related(
-
         Prefetch(
             "academicreport_set",
             queryset=AcademicReport.objects.filter(
                 term=term,
                 exam_type=exam,
                 year=year
-            ).prefetch_related(
-                "subjects__subject"
-            ),
+            ).prefetch_related("subjects__subject"),
             to_attr="filtered_reports"
         )
     )
 
-    html_string = render_to_string(
-        "report_form_pdf.html",
-        {
-            "students": students,
-            "class_level": class_level,
-            "term": term,
-            "exam": exam,
-            "year": year,
-            "school_settings": school_settings,
-        }
-    )
+    template = get_template("report_form_pdf.html")
+    html = template.render({
+        "students": students,
+        "class_level": class_level,
+        "term": term,
+        "exam": exam,
+        "year": year,
+        "school_settings": school_settings,
+    })
 
-    pdf_file = HTML(
-        string=html_string,
-        base_url=request.build_absolute_uri('/')
-    ).write_pdf()
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="ReportForms_{class_level}.pdf"'
 
-    response = HttpResponse(
-        pdf_file,
-        content_type="application/pdf"
-    )
+    pisa_status = pisa.CreatePDF(html, dest=response)
 
-    response["Content-Disposition"] = (
-        f'attachment; filename="ReportForms_{class_level}.pdf"'
-    )
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF")
 
     return response
 
-from .forms import (
-    ClassTeacherForm,
-    SubjectTeacherForm,
-    SchoolSettingsForm
-)
 
-from .models import SchoolSettings
 
 
 def assign_teachers(request):
